@@ -1,0 +1,1 @@
+build_arm/acrylic_os.img filter=lfs diff=lfs merge=lfs -text
