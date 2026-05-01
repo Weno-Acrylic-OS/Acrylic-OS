@@ -6,7 +6,8 @@
 
 typedef enum {
     UI_STATE_CLOCK,
-    UI_STATE_HEART_RATE
+    UI_STATE_HEART_RATE,
+    UI_STATE_DATALOCK
 } UIState;
 
 void ui_init();

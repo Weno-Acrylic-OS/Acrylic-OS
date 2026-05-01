@@ -1,0 +1,193 @@
+#!/usr/bin/env node
+
+const { Command } = require('commander');
+const fs = require('fs');
+const path = require('path');
+const tar = require('tar');
+const crypto = require('crypto'); // Import the crypto module
+const open = require('open'); // Import the open module
+
+const program = new Command();
+
+program
+  .version('0.1.0')
+  .description('Weno Fit OS CLI');
+
+program
+  .command('init <projectName>')
+  .description('Initialize a new Weno Fit OS project')
+  .action((projectName) => {
+    const projectPath = path.join(process.cwd(), projectName);
+    const templatePath = path.join(__dirname, '..', 'templates', 'basic_app');
+
+    console.log(`Creating a new Weno Fit OS project in ${projectPath}...`);
+
+    try {
+      fs.mkdirSync(projectPath);
+      fs.cpSync(templatePath, projectPath, { recursive: true });
+      console.log('Project initialized successfully!');
+      console.log(`\nTo get started, run:\n  cd ${projectName}`);
+    } catch (error) {
+      console.error('Error initializing project:', error.message);
+    }
+  });
+
+program
+  .command('build')
+  .description('Build the Weno Fit OS application')
+  .action(() => {
+    const projectPath = process.cwd();
+    const distPath = path.join(projectPath, 'dist');
+
+    console.log('Building the application...');
+
+    try {
+      if (!fs.existsSync(distPath)) {
+        fs.mkdirSync(distPath);
+      }
+
+      const appManifestPath = path.join(projectPath, 'app.json');
+      if (!fs.existsSync(appManifestPath)) {
+        throw new Error('app.json not found in the current directory.');
+      }
+
+      const appManifest = JSON.parse(fs.readFileSync(appManifestPath, 'utf8'));
+      const appName = appManifest.name || 'app';
+      const outputFilename = `${appName}.wfo`;
+      const outputPath = path.join(distPath, outputFilename);
+
+      const files = fs.readdirSync(projectPath).filter(file => {
+        return file !== 'dist' && file !== 'node_modules';
+      });
+
+      tar.c(
+        {
+          gzip: true,
+          file: outputPath,
+          cwd: projectPath,
+        },
+        files
+      ).then(() => {
+        console.log(`Application built successfully: ${outputPath}`);
+      });
+
+    } catch (error) {
+      console.error('Error building application:', error.message);
+    }
+  });
+
+program
+  .command('sign')
+  .description('Sign a Weno Fit OS application package')
+  .option('-p, --package <file>', 'Path to the .wfo application package')
+  .option('-k, --key <file>', 'Path to the private key (.pem) for signing')
+  .action(async (options) => {
+    const { package: packagePath, key: keyPath } = options;
+
+    if (!packagePath || !keyPath) {
+      console.error('Error: Both --package and --key options are required.');
+      program.help();
+      return;
+    }
+
+    console.log(`Signing package: ${packagePath} with key: ${keyPath}...`);
+
+    try {
+      const packageBuffer = fs.readFileSync(packagePath);
+      const privateKey = fs.readFileSync(keyPath, 'utf8');
+
+      const signer = crypto.createSign('SHA256');
+      signer.update(packageBuffer);
+      const signature = signer.sign(privateKey, 'base64');
+
+      const signedPackagePath = packagePath.replace(/\.wfo$/, '.signed.wfo');
+      fs.writeFileSync(signedPackagePath, packageBuffer);
+      fs.appendFileSync(signedPackagePath, `\n---WFO_SIGNATURE_START---\n`);
+      fs.appendFileSync(signedPackagePath, signature);
+      fs.appendFileSync(signedPackagePath, `\n---WFO_SIGNATURE_END---\n`);
+
+      console.log(`Application package signed successfully: ${signedPackagePath}`);
+    } catch (error) {
+      console.error('Error signing application package:', error.message);
+    }
+  });
+
+program
+  .command('deploy')
+  .description('Deploy a Weno Fit OS application package')
+  .option('-p, --package <file>', 'Path to the .wfo application package')
+  .option('-s, --simulator', 'Deploy to the web simulator')
+  .option('-d, --device <path>', 'Deploy to a physical device via serial port')
+  .action(async (options) => {
+    const { package: packagePath, simulator, device } = options;
+
+    if (!packagePath) {
+      console.error('Error: --package option is required.');
+      program.help();
+      return;
+    }
+
+    if (!fs.existsSync(packagePath)) {
+      console.error(`Error: Package file not found at ${packagePath}`);
+      return;
+    }
+
+    if (simulator && device) {
+      console.error('Error: Cannot deploy to both simulator and device simultaneously. Please choose one.');
+      program.help();
+      return;
+    }
+
+    if (simulator) {
+      console.log(`Deploying package ${packagePath} to web simulator...`);
+      const simulatorPath = path.join(__dirname, '..', '..', 'build_web', 'weno_fit_os.html');
+      if (fs.existsSync(simulatorPath)) {
+        await open(simulatorPath);
+        console.log('Web simulator opened in your browser.');
+      } else {
+        console.error(`Error: Web simulator HTML file not found at ${simulatorPath}`);
+      }
+    } else if (device) {
+      console.log(`Deploying package ${packagePath} to physical device: ${device}...`);
+      console.log(' (Deployment to physical device is not fully implemented yet.)');
+    } else {
+      console.error('Error: Please specify either --simulator or --device.');
+      program.help();
+      return;
+    }
+  });
+
+program
+  .command('debug')
+  .description('Start a debugging session for the Weno Fit OS application')
+  .action(() => {
+    console.log('Starting debugging session...');
+    console.log(' (Simulating log stream. Press Ctrl+C to exit.)');
+
+    const logs = [
+      'INFO: App "HelloWorld" started.',
+      'DEBUG: Sensor "HeartRate" reading: 72 bpm.',
+      'INFO: UI updated: main screen.',
+      'DEBUG: Network connection status: connected.',
+      'WARNING: Battery level low: 15%.',
+      'INFO: App "HelloWorld" running smoothly.'
+    ];
+
+    let logIndex = 0;
+    const interval = setInterval(() => {
+      if (logIndex < logs.length) {
+        console.log(logs[logIndex]);
+        logIndex++;
+      } else {
+        logIndex = 0; // Loop logs for continuous simulation
+        console.log('--- Restarting simulated log stream ---');
+      }
+    }, 1500); // Print a log every 1.5 seconds
+
+    // Keep the process alive so the interval can run
+    // In a real debugger, this would be connected to a remote session
+  });
+
+program.parse(process.argv);
+
+

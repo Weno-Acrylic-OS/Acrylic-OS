@@ -56,6 +56,15 @@ void ui_draw_clock_screen() {
     display_update();
 }
 
+void ui_draw_datalock_screen(const char* pin_display) {
+    display_clear(BLACK);
+    ui_draw_string(80, 120, "ENTER PIN", WHITE);
+    if (pin_display != NULL) {
+        ui_draw_string(96, 150, pin_display, WHITE);
+    }
+    display_update();
+}
+
 void ui_draw_heart_rate_screen(const char* bpm_str) {
     display_clear(BLACK);
     ui_draw_string(70, 140, "HEART RATE:", WHITE);
@@ -63,13 +72,16 @@ void ui_draw_heart_rate_screen(const char* bpm_str) {
     display_update();
 }
 
-void ui_draw_screen(const char* bpm_str) {
+void ui_draw_screen(const char* draw_param) {
     switch (current_state) {
         case UI_STATE_CLOCK:
             ui_draw_clock_screen();
             break;
         case UI_STATE_HEART_RATE:
-            ui_draw_heart_rate_screen(bpm_str);
+            ui_draw_heart_rate_screen(draw_param);
+            break;
+        case UI_STATE_DATALOCK:
+            ui_draw_datalock_screen(draw_param);
             break;
     }
 }

@@ -4,6 +4,7 @@
 #include "app/fitness.h"
 #include "app/phone.h"
 #include "app/settings.h"
+#include "app/watchface_studio.h"
 
 static void app_list_event_handler(lv_event_t * e)
 {
@@ -19,6 +20,8 @@ static void app_list_event_handler(lv_event_t * e)
         create_clock_app(parent);
     } else if (strcmp(app_name, "Phone") == 0) {
         create_phone_app(parent);
+    } else if (strcmp(app_name, "Watch Face Studio") == 0) {
+        create_watchface_studio(parent);
     }
 }
 
@@ -41,4 +44,7 @@ void create_app_list(lv_obj_t * parent)
 
     lv_obj_t * phone_btn = lv_list_add_btn(list, LV_SYMBOL_CALL, "Phone");
     lv_obj_add_event_cb(phone_btn, app_list_event_handler, LV_EVENT_CLICKED, "Phone");
+
+    lv_obj_t * wf_studio_btn = lv_list_add_btn(list, LV_SYMBOL_EDIT, "Watch Face Studio");
+    lv_obj_add_event_cb(wf_studio_btn, app_list_event_handler, LV_EVENT_CLICKED, "Watch Face Studio");
 }
