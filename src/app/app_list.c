@@ -5,6 +5,10 @@
 #include "app/phone.h"
 #include "app/settings.h"
 #include "app/watchface_studio.h"
+#include "app/weather.h"
+#include "app/sleep.h"
+#include "app/music.h"
+#include "app/sdk_service.h"
 
 static void app_list_event_handler(lv_event_t * e)
 {
@@ -22,12 +26,29 @@ static void app_list_event_handler(lv_event_t * e)
         create_phone_app(parent);
     } else if (strcmp(app_name, "Watch Face Studio") == 0) {
         create_watchface_studio(parent);
+    } else if (strcmp(app_name, "Weather") == 0) {
+        create_weather_app(parent);
+    } else if (strcmp(app_name, "Sleep") == 0) {
+        create_sleep_app(parent);
+    } else if (strcmp(app_name, "Music") == 0) {
+        create_music_app(parent);
+    } else {
+        sdk_service_run_app(app_name);
+    }
+}
+
+static lv_obj_t * list;
+
+void add_to_app_list(const char * app_name) {
+    if (list) {
+        lv_obj_t * btn = lv_list_add_btn(list, NULL, app_name);
+        lv_obj_add_event_cb(btn, app_list_event_handler, LV_EVENT_CLICKED, (void*)app_name);
     }
 }
 
 void create_app_list(lv_obj_t * parent)
 {
-    lv_obj_t * list = lv_list_create(parent);
+    list = lv_list_create(parent);
     lv_obj_set_size(list, lv_pct(100), lv_pct(100));
     lv_obj_center(list);
 
@@ -47,4 +68,13 @@ void create_app_list(lv_obj_t * parent)
 
     lv_obj_t * wf_studio_btn = lv_list_add_btn(list, LV_SYMBOL_EDIT, "Watch Face Studio");
     lv_obj_add_event_cb(wf_studio_btn, app_list_event_handler, LV_EVENT_CLICKED, "Watch Face Studio");
+
+    lv_obj_t * weather_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "Weather");
+    lv_obj_add_event_cb(weather_btn, app_list_event_handler, LV_EVENT_CLICKED, "Weather");
+
+    lv_obj_t * sleep_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "Sleep");
+    lv_obj_add_event_cb(sleep_btn, app_list_event_handler, LV_EVENT_CLICKED, "Sleep");
+
+    lv_obj_t * music_btn = lv_list_add_btn(list, LV_SYMBOL_AUDIO, "Music");
+    lv_obj_add_event_cb(music_btn, app_list_event_handler, LV_EVENT_CLICKED, "Music");
 }
