@@ -13,6 +13,12 @@
 #include "app/quick_settings.h"
 #include "app/notifications.h"
 #include "app/voice_assistant.h"
+#include "app/fitness.h"
+#include "app/time_service.h"
+#include "app/persistence.h"
+#include "app/oobe.h"
+#include "app/sdk_service.h"
+#include "js_engine.h"
 
 #include "src/extra/themes/default/lv_theme_default.h"
 
@@ -38,6 +44,7 @@ void create_today_view(lv_obj_t * parent);
 void create_shortcuts_menu(lv_obj_t * parent);
 void create_voice_assistant(lv_obj_t * parent);
 static void datalock_keypad_event_handler(lv_event_t * e);
+static void context_updater_cb(lv_timer_t * timer);
 
 
 // --- Main Loop ---
@@ -46,17 +53,13 @@ void main_loop() {
 }
 
 // --- Event Handlers & Timers ---
-static void time_updater_task(lv_timer_t * timer) {
-    static int seconds = 0;
-    static int minutes = 0;
-    seconds++;
-    if (seconds == 60) {
-        seconds = 0;
-        minutes++;
-        if (minutes == 60) minutes = 0;
-    }
+static void context_updater_cb(lv_timer_t * timer) {
+    status_bar_show_workout_indicator(fitness_app_is_active());
+}
+
+static void status_bar_time_updater_task(lv_timer_t * timer) {
     char time_buffer[6];
-    snprintf(time_buffer, sizeof(time_buffer), "%02d:%02d", minutes, seconds);
+    snprintf(time_buffer, sizeof(time_buffer), "%02d:%02d", time_service_get_hours(), time_service_get_minutes());
     update_time_label(time_buffer);
 }
 
@@ -134,7 +137,8 @@ void create_datalock_screen(lv_obj_t * parent) {
 }
 
 void create_main_ui(lv_obj_t * parent) {
-    lv_timer_create(time_updater_task, 1000, NULL);
+    lv_timer_create(status_bar_time_updater_task, 1000, NULL);
+    lv_timer_create(context_updater_cb, 1000, NULL); // Create the new context timer
 
     lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
 
@@ -233,6 +237,10 @@ static void datalock_keypad_event_handler(lv_event_t * e) {
 int main() {
     lv_init();
     lvgl_display_init();
+    time_service_init();
+    persistence_init();
+    sdk_service_init();
+    js_engine_init();
     datalock_init();
 
     lv_disp_t * disp = lv_disp_get_default();
@@ -241,10 +249,12 @@ int main() {
 
     lv_obj_t* screen = lv_scr_act();
 
-    if (datalock_is_locked()) {
+    if (persistence_get_oobe_completed() && !datalock_is_locked()) {
+        create_main_ui(screen);
+    } else if (datalock_is_locked()) {
         create_datalock_screen(screen);
     } else {
-        create_main_ui(screen);
+        create_oobe_screen(screen);
     }
 
     emscripten_set_main_loop(main_loop, 0, 1);

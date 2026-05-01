@@ -16,8 +16,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "commander": "^9.4.1",
     "tar": "^7.5.13",
-    "open": "^8.4.0"
+    "open": "^8.4.0",
+    "yargs": "^17.7.2",
+    "fs-extra": "^11.2.0"
   }
 }

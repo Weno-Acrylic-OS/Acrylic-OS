@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "app/watchface.h"
+#include "app/status_bar.h"
 
 #define PI 3.14159265
 
@@ -76,6 +77,7 @@ void create_watchface(lv_obj_t * parent)
 {
     watchface_parent = parent;
     lv_obj_clean(parent);
+    create_status_bar(parent);
 
     if (digital_timer) {
         lv_timer_del(digital_timer);

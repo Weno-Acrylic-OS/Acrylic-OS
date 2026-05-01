@@ -12,7 +12,7 @@ LVGL_SRC = $(shell find $(LVGL_DIR)/src -name '*.c')
 
 # Compiler flags
 CFLAGS = -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE
-CFLAGS += -Iinclude -Iinclude/app -Iinclude/drivers -I$(LVGL_DIR)
+CFLAGS += -I. -Iinclude -Iinclude/app -Iinclude/drivers -I$(LVGL_DIR) -Ivendor/elk -Iweno-fit-os-sdk/include
 
 # Linker flags
 LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_main_loop']" --shell-file src/web/shell.html
@@ -20,7 +20,9 @@ LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_ma
 # Source files
 C_SOURCES = $(wildcard src/drivers/*.c)
 C_SOURCES += $(wildcard src/app/*.c)
+C_SOURCES += src/js_engine.c
 C_SOURCES += $(LVGL_SRC)
+C_SOURCES += vendor/elk/elk.c
 
 # Object files
 OBJS = $(patsubst %.c,$(OUT_DIR)/%.o,$(C_SOURCES))
