@@ -15,7 +15,7 @@ CFLAGS = -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE
 CFLAGS += -Iinclude -Iinclude/app -Iinclude/drivers -I$(LVGL_DIR)
 
 # Linker flags
-LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=327680 -s EXPORTED_FUNCTIONS="['_main', '_main_loop']" --shell-file src/web/shell.html
+LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_main_loop']" --shell-file src/web/shell.html
 
 # Source files
 C_SOURCES = $(wildcard src/drivers/*.c)

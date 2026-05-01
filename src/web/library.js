@@ -1,6 +1,21 @@
 mergeInto(LibraryManager.library, {
   display_init: function() {
     console.log("display_init called");
+
+    document.getElementById('btn_toggle_qs').addEventListener('click', function() {
+        console.log("Toggle Quick Settings button clicked");
+        Module.ccall('toggle_quick_settings');
+    });
+
+    document.getElementById('btn_toggle_notifications').addEventListener('click', function() {
+        console.log("Toggle Notifications button clicked");
+        Module.ccall('toggle_notifications');
+    });
+
+    document.getElementById('btn_toggle_shortcuts').addEventListener('click', function() {
+        console.log("Toggle Shortcuts button clicked");
+        Module.ccall('toggle_shortcuts');
+    });
   },
   display_clear: function(color) {
     var ctx = Module.canvas.getContext('2d');
@@ -31,3 +46,5 @@ mergeInto(LibraryManager.library, {
     return 0;
   }
 });
+
+
