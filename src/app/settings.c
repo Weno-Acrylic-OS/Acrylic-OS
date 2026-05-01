@@ -2,6 +2,8 @@
 #include "lvgl.h"
 #include "app_list.h"
 #include "app/datalock.h" // Needed for datalock functions
+#include "app/watchface_aod.h"
+#include "app/watchface.h"
 #include <string.h>
 
 // --- Forward Declarations ---
@@ -9,6 +11,9 @@ void create_settings_app(lv_obj_t * parent);
 static void create_datalock_settings_screen(lv_obj_t * parent);
 static void datalock_settings_keypad_handler(lv_event_t * e);
 static void navigate_to_settings_timer_cb(lv_timer_t * timer);
+static void back_to_app_list(lv_event_t * e);
+static void back_to_settings_app(lv_event_t * e);
+
 
 // --- State for PIN setup ---
 typedef enum {
@@ -37,6 +42,18 @@ static void navigate_to_settings_timer_cb(lv_timer_t * timer) {
     lv_obj_t * parent = timer->user_data;
     if (parent) {
         create_settings_app(parent);
+    }
+}
+
+static bool aod_enabled = false;
+
+static void toggle_aod(lv_event_t * e) {
+    aod_enabled = !aod_enabled;
+    lv_obj_t * parent = lv_obj_get_parent(lv_obj_get_parent(lv_event_get_current_target(e)));
+    if (aod_enabled) {
+        create_watchface_aod(parent);
+    } else {
+        create_watchface(parent);
     }
 }
 
@@ -86,6 +103,9 @@ void create_settings_app(lv_obj_t * parent) {
 
     lv_list_add_btn(list, LV_SYMBOL_WIFI, "Bluetooth");
     lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Display");
+
+    lv_obj_t* aod_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "Always On Display");
+    lv_obj_add_event_cb(aod_btn, toggle_aod, LV_EVENT_CLICKED, NULL);
 
     lv_list_add_text(list, "Theme");
     lv_obj_t * theme_dropdown = lv_dropdown_create(parent);

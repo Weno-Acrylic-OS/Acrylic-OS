@@ -1,10 +1,5 @@
 {
-  "name": "HelloWorld",
+  "name": "My App",
   "version": "1.0.0",
-  "author": "WenoFitOS Team",
-  "description": "A simple 'Hello, World!' application for Weno Fit OS.",
-  "permissions": [],
-  "entry_point": "index.js",
-  "icon": "icon.png",
-  "min_os_version": "0.1.0"
+  "entry_point": "index.js"
 }
