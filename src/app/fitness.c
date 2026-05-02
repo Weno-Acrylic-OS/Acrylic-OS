@@ -1,12 +1,37 @@
 // src/app/fitness.c
 #include "app/fitness.h"
 #include "app_list.h"
+#include "app/status_bar.h" // Needed to update status bar workout indicator
 
 static bool workout_is_active = false;
+static lv_obj_t * status_label; // Made static to be accessible by start/stop functions
 
 // Public accessor for the workout state
 bool fitness_app_is_active() {
     return workout_is_active;
+}
+
+// Public functions to start/stop workout
+void fitness_app_start_workout() {
+    if (!workout_is_active) {
+        workout_is_active = true;
+        status_bar_show_workout_indicator(true);
+        if (status_label) {
+            lv_label_set_text(status_label, "Workout Active");
+        }
+        // TODO: Integrate with gamification service if needed (e.g., start timer for workout XP)
+    }
+}
+
+void fitness_app_stop_workout() {
+    if (workout_is_active) {
+        workout_is_active = false;
+        status_bar_show_workout_indicator(false);
+        if (status_label) {
+            lv_label_set_text(status_label, "Workout Stopped");
+        }
+        // TODO: Integrate with gamification service if needed (e.g., grant workout XP)
+    }
 }
 
 static void back_to_app_list(lv_event_t * e) {
@@ -17,15 +42,13 @@ static void back_to_app_list(lv_event_t * e) {
 
 static void fitness_button_handler(lv_event_t * e) {
     const char* action = lv_event_get_user_data(e);
-    lv_obj_t * container = lv_obj_get_parent(lv_event_get_target(e));
-    lv_obj_t* status_label = lv_obj_get_child(container, 2); // Fragile, but works for this demo
+    // lv_obj_t * container = lv_obj_get_parent(lv_event_get_target(e)); // No longer needed
+    // status_label is static now
 
     if (strcmp(action, "start") == 0) {
-        workout_is_active = true;
-        lv_label_set_text(status_label, "Workout Active");
+        fitness_app_start_workout();
     } else if (strcmp(action, "stop") == 0) {
-        workout_is_active = false;
-        lv_label_set_text(status_label, "Workout Stopped");
+        fitness_app_stop_workout();
     }
 }
 
@@ -50,7 +73,7 @@ void create_fitness_app(lv_obj_t * parent) {
     lv_obj_t * title = lv_label_create(container);
     lv_label_set_text(title, "Fitness Tracker");
 
-    lv_obj_t * status_label = lv_label_create(container);
+    status_label = lv_label_create(container); // Assign to static variable
     lv_label_set_text(status_label, workout_is_active ? "Workout Active" : "Workout Stopped");
     lv_obj_set_style_pad_bottom(status_label, 20, 0);
 
