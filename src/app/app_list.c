@@ -8,6 +8,7 @@
 #include "app/weather.h"
 #include "app/sleep.h"
 #include "app/music.h"
+#include "app/gps.h"
 #include "app/sdk_service.h"
 
 static void app_list_event_handler(lv_event_t * e)
@@ -32,6 +33,8 @@ static void app_list_event_handler(lv_event_t * e)
         create_sleep_app(parent);
     } else if (strcmp(app_name, "Music") == 0) {
         create_music_app(parent);
+    } else if (strcmp(app_name, "Maps") == 0) {
+        create_gps_app(parent);
     } else {
         sdk_service_run_app(app_name);
     }
@@ -77,4 +80,7 @@ void create_app_list(lv_obj_t * parent)
 
     lv_obj_t * music_btn = lv_list_add_btn(list, LV_SYMBOL_AUDIO, "Music");
     lv_obj_add_event_cb(music_btn, app_list_event_handler, LV_EVENT_CLICKED, "Music");
+
+    lv_obj_t * gps_btn = lv_list_add_btn(list, LV_SYMBOL_GPS, "Maps");
+    lv_obj_add_event_cb(gps_btn, app_list_event_handler, LV_EVENT_CLICKED, "Maps");
 }
