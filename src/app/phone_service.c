@@ -1,4 +1,5 @@
 #include "app/phone_service.h"
+#include <emscripten.h>
 
 static bool is_playing = false;
 static music_track_t tracks[] = {
@@ -40,4 +41,8 @@ bool phone_service_is_playing() {
 
 music_track_t phone_service_get_current_track() {
     return tracks[current_track_index];
+}
+
+void phone_service_find_my_phone() {
+    emscripten_run_script("alert('Ringing your phone!');");
 }

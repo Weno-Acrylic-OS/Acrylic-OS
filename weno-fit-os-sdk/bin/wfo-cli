@@ -63,8 +63,7 @@ yargs(hideBin(process.argv))
       console.error(`Error: Package not found at ${packagePath}`);
       return;
     }
-    fs.appendFileSync(packagePath, '
----SIGNATURE---');
+    fs.appendFileSync(packagePath, '\\n---SIGNATURE---');
     console.log(`Package ${packagePath} signed successfully.`);
   })
   .command('deploy <package>', 'Deploy the application package to the simulator', (yargs) => {
