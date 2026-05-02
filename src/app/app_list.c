@@ -11,37 +11,40 @@
 #include "app/gps.h"
 #include "app/weno_store.h"
 #include "app/calendar.h"
+#include "app/profile.h"
 #include "app/sdk_service.h"
+#include "app/navigation_service.h"
 
 static void app_list_event_handler(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_current_target(e);
     const char * app_name = lv_event_get_user_data(e);
-    lv_obj_t * parent = lv_obj_get_parent(lv_obj_get_parent(obj));
 
     if (strcmp(app_name, "Settings") == 0) {
-        create_settings_app(parent);
+        navigation_service_navigate_to(create_settings_app);
     } else if (strcmp(app_name, "Fitness") == 0) {
-        create_fitness_app(parent);
+        navigation_service_navigate_to(create_fitness_app);
     } else if (strcmp(app_name, "Clock") == 0) {
-        create_clock_app(parent);
+        navigation_service_navigate_to(create_clock_app);
     } else if (strcmp(app_name, "Phone") == 0) {
-        create_phone_app(parent);
+        navigation_service_navigate_to(create_phone_app);
     } else if (strcmp(app_name, "Watch Face Studio") == 0) {
-        create_watchface_studio(parent);
+        navigation_service_navigate_to(create_watchface_studio);
     } else if (strcmp(app_name, "Weather") == 0) {
-        create_weather_app(parent);
+        navigation_service_navigate_to(create_weather_app);
     } else if (strcmp(app_name, "Sleep") == 0) {
-        create_sleep_app(parent);
+        navigation_service_navigate_to(create_sleep_app);
     } else if (strcmp(app_name, "Music") == 0) {
-        create_music_app(parent);
+        navigation_service_navigate_to(create_music_app);
     } else if (strcmp(app_name, "GPS") == 0) {
-            create_gps_app(parent);
-        } else if (strcmp(app_name, "Weno Store") == 0) {
-                create_weno_store_app(parent);
-            } else if (strcmp(app_name, "Calendar") == 0) {
-                create_calendar_app(parent);
-            } else {        sdk_service_run_app(app_name);
+        navigation_service_navigate_to(create_gps_app);
+    } else if (strcmp(app_name, "Weno Store") == 0) {
+        navigation_service_navigate_to(create_weno_store_app);
+    } else if (strcmp(app_name, "Calendar") == 0) {
+        navigation_service_navigate_to(create_calendar_app);
+    } else if (strcmp(app_name, "Profile") == 0) {
+        navigation_service_navigate_to(create_profile_app);
+    } else {
+        sdk_service_run_app(app_name);
     }
 }
 
@@ -87,10 +90,14 @@ void create_app_list(lv_obj_t * parent)
     lv_obj_add_event_cb(music_btn, app_list_event_handler, LV_EVENT_CLICKED, "Music");
 
     lv_obj_t * gps_btn = lv_list_add_btn(list, LV_SYMBOL_GPS, "GPS");
-        lv_obj_add_event_cb(gps_btn, app_list_event_handler, LV_EVENT_CLICKED, "GPS");
+    lv_obj_add_event_cb(gps_btn, app_list_event_handler, LV_EVENT_CLICKED, "GPS");
 
-        lv_obj_t * store_btn = lv_list_add_btn(list, LV_SYMBOL_DOWNLOAD, "Weno Store");
-            lv_obj_add_event_cb(store_btn, app_list_event_handler, LV_EVENT_CLICKED, "Weno Store");
+    lv_obj_t * store_btn = lv_list_add_btn(list, LV_SYMBOL_DOWNLOAD, "Weno Store");
+    lv_obj_add_event_cb(store_btn, app_list_event_handler, LV_EVENT_CLICKED, "Weno Store");
 
-            lv_obj_t * calendar_btn = lv_list_add_btn(list, LV_SYMBOL_EDIT, "Calendar");
-            lv_obj_add_event_cb(calendar_btn, app_list_event_handler, LV_EVENT_CLICKED, "Calendar");}
+    lv_obj_t * calendar_btn = lv_list_add_btn(list, LV_SYMBOL_EDIT, "Calendar");
+    lv_obj_add_event_cb(calendar_btn, app_list_event_handler, LV_EVENT_CLICKED, "Calendar");
+
+    lv_obj_t * profile_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "Profile");
+    lv_obj_add_event_cb(profile_btn, app_list_event_handler, LV_EVENT_CLICKED, "Profile");
+}
