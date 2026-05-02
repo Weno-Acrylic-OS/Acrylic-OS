@@ -1,0 +1,58 @@
+# Makefile.arm for Weno Fit OS
+
+TARGET = weno_fit_os
+OUT_DIR = build_arm
+
+# Cross-compiler toolchain
+TOOLCHAIN_PATH = /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin
+CC = $(TOOLCHAIN_PATH)/arm-none-eabi-gcc
+AS = $(TOOLCHAIN_PATH)/arm-none-eabi-as
+LD = $(TOOLCHAIN_PATH)/arm-none-eabi-ld
+OC = $(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
+
+# CPU and FPU settings
+CPU = cortex-m3
+FPU = 
+
+# Compiler flags
+CFLAGS = -mcpu=$(CPU) -mthumb -Wall -Wextra -g
+CFLAGS += -Iinclude -Iinclude/kernel -Iinclude/drivers -Iinclude/ui -Iinclude/libc -Iinclude/arch/arm
+
+# Linker script
+LDSCRIPT = src/arch/arm/linker.ld
+LDFLAGS = -T $(LDSCRIPT) -nostdlib
+
+# Source files
+C_SOURCES = $(wildcard src/kernel/*.c)
+C_SOURCES += $(wildcard src/drivers/*.c)
+C_SOURCES += $(wildcard src/ui/*.c)
+C_SOURCES += $(wildcard src/app/*.c)
+C_SOURCES += $(wildcard src/libc/*.c)
+C_SOURCES += $(wildcard src/arch/arm/*.c)
+
+S_SOURCES = src/arch/arm/startup.s src/arch/arm/context_switch.s
+
+# Object files
+OBJS = $(patsubst src/%.c,$(OUT_DIR)/%.o,$(C_SOURCES))
+OBJS += $(patsubst src/%.s,$(OUT_DIR)/%.o,$(S_SOURCES))
+
+all: $(OUT_DIR)/$(TARGET).elf
+
+$(OUT_DIR)/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OUT_DIR)/%.o: src/%.s
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OUT_DIR)/$(TARGET).elf: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
+
+run-qemu: all
+	qemu-system-arm -M lm3s6965evb -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
+
+clean:
+	rm -rf $(OUT_DIR)
+
+.PHONY: all clean run-qemu

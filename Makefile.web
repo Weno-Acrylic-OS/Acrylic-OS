@@ -1,0 +1,45 @@
+# Makefile.web for Weno Fit OS
+
+TARGET = weno_fit_os
+OUT_DIR = build_web
+
+# Emscripten toolchain
+CC = emcc
+
+# LVGL
+LVGL_DIR = vendor/lvgl
+LVGL_SRC = $(shell find $(LVGL_DIR)/src -name '*.c')
+
+# Compiler flags
+CFLAGS = -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE
+CFLAGS += -I. -Iinclude -Iinclude/app -Iinclude/drivers -I$(LVGL_DIR) -Ivendor/elk -Iweno-fit-os-sdk/include
+
+# Linker flags
+LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_main_loop']" --shell-file src/web/shell.html
+
+# Source files
+C_SOURCES = $(wildcard src/drivers/*.c)
+C_SOURCES += $(wildcard src/app/*.c)
+C_SOURCES += src/js_engine.c
+C_SOURCES += $(LVGL_SRC)
+C_SOURCES += vendor/elk/elk.c
+
+# Object files
+OBJS = $(patsubst %.c,$(OUT_DIR)/%.o,$(C_SOURCES))
+
+all: $(OUT_DIR)/$(TARGET).html
+
+$(OUT_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OUT_DIR)/$(TARGET).html: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
+
+run-web: all
+	emrun $(OUT_DIR)/$(TARGET).html
+
+clean:
+	rm -rf $(OUT_DIR)
+
+.PHONY: all clean run-web
