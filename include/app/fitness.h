@@ -10,6 +10,8 @@
  * @return True if a workout is active, false otherwise.
  */
 bool fitness_app_is_active();
+void fitness_app_start_workout();
+void fitness_app_stop_workout();
 
 /**
  * @brief Creates the fitness application UI.

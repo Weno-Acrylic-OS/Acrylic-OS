@@ -46,3 +46,7 @@ music_track_t phone_service_get_current_track() {
 void phone_service_find_my_phone() {
     emscripten_run_script("alert('Ringing your phone!');");
 }
+
+void phone_service_call_for_help() {
+    emscripten_run_script("alert('Simulating emergency call to contact...');");
+}
