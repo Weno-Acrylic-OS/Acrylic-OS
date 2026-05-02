@@ -32,7 +32,7 @@ static void update_watchface_time(lv_timer_t * timer)
 
     if (current_style < 2) {
         char time_buffer[9];
-        strftime(time_buffer, sizeof(time_buffer), "%H:%M:%S", timeinfo);
+        strftime(time_buffer, sizeof(time_buffer), "%H:%M", timeinfo);
         if(time_label) lv_label_set_text(time_label, time_buffer);
 
         if (show_date) {

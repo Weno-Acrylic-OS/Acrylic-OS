@@ -19,6 +19,7 @@
 #include "app/oobe.h"
 #include "app/sdk_service.h"
 #include "js_engine.h"
+#include "app/privacy_service.h"
 
 #include "src/extra/themes/default/lv_theme_default.h"
 
@@ -55,6 +56,7 @@ void main_loop() {
 // --- Event Handlers & Timers ---
 static void context_updater_cb(lv_timer_t * timer) {
     status_bar_show_workout_indicator(fitness_app_is_active());
+    status_bar_update_privacy_indicators();
 }
 
 static void status_bar_time_updater_task(lv_timer_t * timer) {
@@ -241,6 +243,7 @@ int main() {
     persistence_init();
     sdk_service_init();
     js_engine_init();
+    privacy_service_init();
     datalock_init();
 
     lv_disp_t * disp = lv_disp_get_default();

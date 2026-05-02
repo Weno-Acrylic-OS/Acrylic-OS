@@ -11,5 +11,6 @@ void phone_service_music_next();
 void phone_service_music_prev();
 bool phone_service_is_playing();
 music_track_t phone_service_get_current_track();
+void phone_service_find_my_phone();
 
 #endif // PHONE_SERVICE_H

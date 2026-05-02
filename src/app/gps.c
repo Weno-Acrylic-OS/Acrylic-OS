@@ -1,9 +1,11 @@
 #include "app/gps.h"
+#include "app/privacy_service.h"
 #include "lvgl.h"
 
 // --- Forward Declarations ---
 static void create_destination_selection_screen(lv_obj_t * parent);
 static void update_navigation_display();
+static void start_route(navigation_instruction_t * route, size_t route_size, lv_obj_t * parent);
 
 // --- Mock Navigation Data ---
 static navigation_instruction_t mock_route_home[] = {
@@ -11,16 +13,16 @@ static navigation_instruction_t mock_route_home[] = {
     {TURN_LEFT, "Oak Ave", 500.0},
     {ARRIVED, "Home", 0.0}
 };
-
 static navigation_instruction_t mock_route_work[] = {
-    {STRAIGHT, "Highway 101", 12000.0},
-    {TURN_RIGHT, "Commerce Blvd", 2500.0},
+    {STRAIGHT, "Highway 101", 1200.0},
+    {TURN_RIGHT, "Commerce Blvd", 250.0},
     {TURN_LEFT, "Office Park Rd", 500.0},
     {ARRIVED, "Work", 0.0}
 };
 
 // --- State Management ---
 static navigation_instruction_t * active_route = NULL;
+static size_t active_route_size = 0;
 static int current_route_step = 0;
 static double distance_to_next_turn = 0;
 
@@ -31,20 +33,33 @@ static lv_obj_t * street_label;
 static lv_timer_t * navigation_timer = NULL;
 
 
-static void start_route(navigation_instruction_t * route) {
+static void stop_navigation() {
+    if(navigation_timer) {
+        lv_timer_del(navigation_timer);
+        navigation_timer = NULL;
+    }
+    active_route = NULL;
+    active_route_size = 0;
+    privacy_service_set_sensor_active(PRIVACY_SENSOR_LOCATION, false);
+}
+
+static void start_route(navigation_instruction_t * route, size_t route_size, lv_obj_t * parent) {
     active_route = route;
+    active_route_size = route_size;
     current_route_step = 0;
     distance_to_next_turn = active_route[current_route_step].distance_meters;
-    // Call create_gps_app to refresh the view
-    create_gps_app(lv_obj_get_parent(lv_scr_act())); 
+    privacy_service_set_sensor_active(PRIVACY_SENSOR_LOCATION, true);
+    create_gps_app(parent); // Refresh the view
 }
 
 static void destination_selection_event_handler(lv_event_t * e) {
     const char * selection = lv_event_get_user_data(e);
+    lv_obj_t * parent = lv_obj_get_parent(lv_obj_get_parent(lv_event_get_target(e))); // button -> list -> parent
+
     if (strcmp(selection, "Home") == 0) {
-        start_route(mock_route_home);
+        start_route(mock_route_home, sizeof(mock_route_home) / sizeof(navigation_instruction_t), parent);
     } else if (strcmp(selection, "Work") == 0) {
-        start_route(mock_route_work);
+        start_route(mock_route_work, sizeof(mock_route_work) / sizeof(navigation_instruction_t), parent);
     }
 }
 
@@ -92,36 +107,27 @@ static void update_navigation_display() {
     lv_label_set_text(distance_label, dist_str);
 
     if (current_instruction.direction == ARRIVED) {
-        lv_label_set_text(street_label, "You have arrived");
-        if(navigation_timer) {
-            lv_timer_del(navigation_timer);
-            navigation_timer = NULL;
-            active_route = NULL;
-        }
+        lv_label_set_text(street_label, "You have arrived!");
+        stop_navigation();
     } else {
         lv_label_set_text(street_label, current_instruction.street_name);
     }
 }
 
 static void navigation_updater_task(lv_timer_t * timer) {
-    // Simulate moving at ~10 m/s
+    // Simulate moving at ~10 m/s for a 1 second timer
     distance_to_next_turn -= 10;
 
     if (distance_to_next_turn <= 0) {
         current_route_step++;
-        // Check if route is finished
-        if (active_route[current_route_step].direction == ARRIVED) {
-            distance_to_next_turn = 0;
-        } else if (active_route[current_route_step].street_name == NULL) { // End of route array
-             lv_timer_del(navigation_timer);
-             navigation_timer = NULL;
-             active_route = NULL;
-             create_gps_app(lv_obj_get_parent(lv_scr_act()));
-             return;
+        if (current_route_step >= active_route_size) {
+            stop_navigation();
+            create_gps_app(lv_obj_get_parent(lv_scr_act())); // Should be safe if parent is screen
+            return;
         }
-        else {
-             distance_to_next_turn = active_route[current_route_step].distance_meters;
-        }
+        
+        navigation_instruction_t next_instruction = active_route[current_route_step];
+        distance_to_next_turn = next_instruction.distance_meters;
     }
     update_navigation_display();
 }
@@ -150,7 +156,7 @@ void create_gps_app(lv_obj_t * parent) {
         update_navigation_display();
 
         if (navigation_timer == NULL) {
-            navigation_timer = lv_timer_create(navigation_updater_task, 1000, NULL); // Update every second
+            navigation_timer = lv_timer_create(navigation_updater_task, 1000, NULL);
         }
     } else {
         // --- NO ROUTE VIEW ---
