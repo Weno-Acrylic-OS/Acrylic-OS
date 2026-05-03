@@ -1,20 +1,10 @@
 // src/app/today.c
 #include "app/today.h"
+#include "app/today_service.h"
 
-void create_today_view(lv_obj_t * parent)
-{
-    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(parent, 10, 0);
+// --- Native Widget Implementations ---
 
-    lv_obj_t * title_label = lv_label_create(parent);
-    lv_label_set_text(title_label, "Today's Summary");
-    lv_obj_set_style_text_font(title_label, &lv_font_montserrat_22, 0);
-    lv_obj_set_style_pad_top(title_label, 10, 0);
-    lv_obj_set_style_pad_bottom(title_label, 10, 0);
-    lv_obj_set_width(title_label, lv_pct(100));
-    lv_obj_set_style_text_align(title_label, LV_TEXT_ALIGN_CENTER, 0);
-
-    // Fitness Section
+static void create_fitness_widget(lv_obj_t * parent) {
     lv_obj_t * fitness_panel = lv_obj_create(parent);
     lv_obj_set_size(fitness_panel, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(fitness_panel, lv_color_hex(0x4CAF50), 0); // Green
@@ -32,8 +22,9 @@ void create_today_view(lv_obj_t * parent)
     lv_label_set_text(fitness_data, "Steps: 8,500 | Calories: 350 | Distance: 6.2 km");
     lv_obj_set_style_text_color(fitness_data, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_text_font(fitness_data, &lv_font_montserrat_14, 0);
+}
 
-    // Heart Rate Section
+static void create_hr_widget(lv_obj_t * parent) {
     lv_obj_t * hr_panel = lv_obj_create(parent);
     lv_obj_set_size(hr_panel, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(hr_panel, lv_color_hex(0xF44336), 0); // Red
@@ -41,7 +32,6 @@ void create_today_view(lv_obj_t * parent)
     lv_obj_set_style_radius(hr_panel, 10, 0);
     lv_obj_set_style_pad_all(hr_panel, 10, 0);
     lv_obj_set_flex_flow(hr_panel, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_top(hr_panel, 10, 0);
 
     lv_obj_t * hr_title = lv_label_create(hr_panel);
     lv_label_set_text(hr_title, "Heart Rate");
@@ -52,8 +42,9 @@ void create_today_view(lv_obj_t * parent)
     lv_label_set_text(hr_data, "Avg: 72 bpm | Current: 78 bpm");
     lv_obj_set_style_text_color(hr_data, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_text_font(hr_data, &lv_font_montserrat_14, 0);
+}
 
-    // Sleep Section
+static void create_sleep_widget(lv_obj_t * parent) {
     lv_obj_t * sleep_panel = lv_obj_create(parent);
     lv_obj_set_size(sleep_panel, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(sleep_panel, lv_color_hex(0x2196F3), 0); // Blue
@@ -61,7 +52,6 @@ void create_today_view(lv_obj_t * parent)
     lv_obj_set_style_radius(sleep_panel, 10, 0);
     lv_obj_set_style_pad_all(sleep_panel, 10, 0);
     lv_obj_set_flex_flow(sleep_panel, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_top(sleep_panel, 10, 0);
 
     lv_obj_t * sleep_title = lv_label_create(sleep_panel);
     lv_label_set_text(sleep_title, "Sleep");
@@ -72,4 +62,47 @@ void create_today_view(lv_obj_t * parent)
     lv_label_set_text(sleep_data, "Last Night: 7h 30m | Deep: 2h 15m");
     lv_obj_set_style_text_color(sleep_data, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_text_font(sleep_data, &lv_font_montserrat_14, 0);
+}
+
+// --- Native Widget Registration ---
+
+static const today_widget_descriptor_t fitness_widget_desc = {
+    .name = "Fitness",
+    .create_func = create_fitness_widget,
+};
+
+static const today_widget_descriptor_t hr_widget_desc = {
+    .name = "Heart Rate",
+    .create_func = create_hr_widget,
+};
+
+static const today_widget_descriptor_t sleep_widget_desc = {
+    .name = "Sleep",
+    .create_func = create_sleep_widget,
+};
+
+void today_register_native_widgets() {
+    today_service_register_widget(&fitness_widget_desc);
+    today_service_register_widget(&hr_widget_desc);
+    today_service_register_widget(&sleep_widget_desc);
+}
+
+// --- Main View Creation ---
+
+void create_today_view(lv_obj_t * parent)
+{
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_all(parent, 10, 0);
+    lv_obj_set_style_pad_row(parent, 10, 0); // Add spacing between widgets
+
+    lv_obj_t * title_label = lv_label_create(parent);
+    lv_label_set_text(title_label, "Today's Summary");
+    lv_obj_set_style_text_font(title_label, &lv_font_montserrat_22, 0);
+    lv_obj_set_style_pad_top(title_label, 10, 0);
+    lv_obj_set_style_pad_bottom(title_label, 10, 0);
+    lv_obj_set_width(title_label, lv_pct(100));
+    lv_obj_set_style_text_align(title_label, LV_TEXT_ALIGN_CENTER, 0);
+
+    // Render all registered widgets
+    today_service_render_widgets(parent);
 }

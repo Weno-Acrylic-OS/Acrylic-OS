@@ -19,7 +19,7 @@ void create_status_bar(lv_obj_t * parent)
     /*Time Label Removed due to UI inconsistency and another time label on the watchface.*/
     
     workout_indicator = lv_label_create(status_bar);
-    lv_label_set_text(workout_indicator, LV_SYMBOL_CHARGE); // Placeholder icon
+    lv_label_set_text(workout_indicator, LV_SYMBOL_CHARGE); // Fitness Icon
     lv_obj_set_style_text_color(workout_indicator, lv_color_hex(0xFFFFFF), 0);
     lv_obj_align(workout_indicator, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_flag(workout_indicator, LV_OBJ_FLAG_HIDDEN); // Hidden by default
