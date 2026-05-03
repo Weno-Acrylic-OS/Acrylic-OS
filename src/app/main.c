@@ -19,6 +19,7 @@
 #include "app/persistence.h"
 #include "app/oobe.h"
 #include "app/sdk_service.h"
+#include "app/today_service.h"
 #include "js_engine.h"
 #include "app/privacy_service.h"
 #include "app/gamification_service.h"
@@ -308,6 +309,8 @@ int main() {
     time_service_init();
     persistence_init();
     sdk_service_init();
+    today_service_init();
+    today_register_native_widgets();
     js_engine_init();
     privacy_service_init();
     gamification_service_init();

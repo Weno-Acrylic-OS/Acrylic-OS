@@ -4994,7 +4994,9 @@ var wasmImports = {
   /** @export */
   get_touch_x,
   /** @export */
-  get_touch_y
+  get_touch_y,
+  /** @export */
+  heart_rate_get_bpm
 };
 
 
