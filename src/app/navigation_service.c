@@ -104,3 +104,7 @@ void navigation_service_navigate_to(screen_create_func_t create_func) {
 
     show_nav_bar(true);
 }
+
+void navigation_service_go_back() {
+    navigate_back();
+}

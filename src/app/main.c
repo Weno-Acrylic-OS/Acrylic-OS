@@ -25,6 +25,8 @@
 #include "app/gamification_service.h"
 #include "app/breathing_exercise.h"
 #include "app/navigation_service.h"
+#include "app/spo2_service.h"
+#include "app/temperature_service.h"
 
 #include "src/extra/themes/default/lv_theme_default.h"
 
@@ -68,6 +70,7 @@ static void context_updater_cb(lv_timer_t * timer) {
     (void)timer;
     status_bar_show_workout_indicator(fitness_app_is_active());
     status_bar_update_privacy_indicators();
+    today_view_update();
 }
 
 static void status_bar_time_updater_task(lv_timer_t * timer) {
@@ -188,9 +191,12 @@ void create_datalock_screen(lv_obj_t * parent) {
     lv_obj_set_style_pad_top(datalock_pin_label, 10, 0);
     lv_obj_set_style_pad_bottom(datalock_pin_label, 10, 0);
 
-    static const char * map[] = {"1", "2", "3", "\\n",
-                                "4", "5", "6", "\\n",
-                                "7", "8", "9", "\\n",
+    static const char * map[] = {"1", "2", "3", "\
+",
+                                "4", "5", "6", "\
+",
+                                "7", "8", "9", "\
+",
                                 LV_SYMBOL_BACKSPACE, "0", LV_SYMBOL_OK, ""};
 
     lv_obj_t * keypad = lv_btnmatrix_create(datalock_screen);
@@ -314,6 +320,8 @@ int main() {
     js_engine_init();
     privacy_service_init();
     gamification_service_init();
+    spo2_service_init();
+    temperature_service_init();
     datalock_init();
 
     lv_disp_t * disp = lv_disp_get_default();
