@@ -14,6 +14,7 @@
 #include "app/profile.h"
 #include "app/sdk_service.h"
 #include "app/navigation_service.h"
+#include "app/ecg_app.h"
 
 static void app_list_event_handler(lv_event_t * e)
 {
@@ -43,6 +44,8 @@ static void app_list_event_handler(lv_event_t * e)
         navigation_service_navigate_to(create_calendar_app);
     } else if (strcmp(app_name, "Profile") == 0) {
         navigation_service_navigate_to(create_profile_app);
+    } else if (strcmp(app_name, "ECG") == 0) {
+        navigation_service_navigate_to(create_ecg_app);
     } else {
         sdk_service_run_app(app_name);
     }
@@ -68,7 +71,7 @@ void create_app_list(lv_obj_t * parent)
     lv_obj_t * settings_btn = lv_list_add_btn(list, LV_SYMBOL_SETTINGS, "Settings");
     lv_obj_add_event_cb(settings_btn, app_list_event_handler, LV_EVENT_CLICKED, "Settings");
 
-    lv_obj_t * fitness_btn = lv_list_add_btn(list, LV_SYMBOL_GPS, "Fitness");
+    lv_obj_t * fitness_btn = lv_list_add_btn(list, LV_SYMBOL_CHARGE, "Fitness"); // Symbol Changed for consistency with the status bar.
     lv_obj_add_event_cb(fitness_btn, app_list_event_handler, LV_EVENT_CLICKED, "Fitness");
 
     lv_obj_t * clock_btn = lv_list_add_btn(list, LV_SYMBOL_BELL, "Clock");
@@ -100,4 +103,7 @@ void create_app_list(lv_obj_t * parent)
 
     lv_obj_t * profile_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "Profile");
     lv_obj_add_event_cb(profile_btn, app_list_event_handler, LV_EVENT_CLICKED, "Profile");
+
+    lv_obj_t * ecg_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "ECG");
+    lv_obj_add_event_cb(ecg_btn, app_list_event_handler, LV_EVENT_CLICKED, "ECG");
 }
