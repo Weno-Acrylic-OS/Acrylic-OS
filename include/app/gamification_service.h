@@ -49,6 +49,7 @@ int gamification_get_current_level();
 // Goals
 void gamification_update_goal_progress(goal_type_t type, int value);
 const goal_t * gamification_get_goals(int *count);
+int gamification_get_step_count();
 
 // Achievements
 void gamification_unlock_achievement(achievement_id_t id);

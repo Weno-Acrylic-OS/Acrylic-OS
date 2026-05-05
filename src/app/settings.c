@@ -1,9 +1,9 @@
-// src/app/settings.c
 #include "lvgl.h"
 #include "app_list.h"
 #include "app/datalock.h" // Needed for datalock functions
 #include "app/watchface_aod.h"
 #include "app/watchface.h"
+#include "app/ota_service.h"
 #include <string.h>
 
 // --- Forward Declarations ---
@@ -57,6 +57,10 @@ static void toggle_aod(lv_event_t * e) {
     }
 }
 
+static void ota_update_event_handler(lv_event_t * e) {
+    ota_service_start();
+}
+
 static void settings_list_event_handler(lv_event_t * e) {
     const char * selection = lv_event_get_user_data(e);
     lv_obj_t * parent = lv_obj_get_parent(lv_obj_get_parent(lv_event_get_current_target(e)));
@@ -106,6 +110,10 @@ void create_settings_app(lv_obj_t * parent) {
 
     lv_obj_t* aod_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "Always On Display");
     lv_obj_add_event_cb(aod_btn, toggle_aod, LV_EVENT_CLICKED, NULL);
+
+    lv_list_add_text(list, "System");
+    lv_obj_t* ota_btn = lv_list_add_btn(list, LV_SYMBOL_DOWNLOAD, "OTA Update");
+    lv_obj_add_event_cb(ota_btn, ota_update_event_handler, LV_EVENT_CLICKED, NULL);
 
     lv_list_add_text(list, "Theme");
     lv_obj_t * theme_dropdown = lv_dropdown_create(parent);

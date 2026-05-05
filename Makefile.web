@@ -11,7 +11,7 @@ LVGL_DIR = vendor/lvgl
 LVGL_SRC = $(shell find $(LVGL_DIR)/src -name '*.c')
 
 # Compiler flags
-CFLAGS = -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE
+CFLAGS = -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE -DSIMULATOR_BUILD=1
 CFLAGS += -I. -Iinclude -Iinclude/app -Iinclude/drivers -I$(LVGL_DIR) -Ivendor/elk -Iweno-fit-os-sdk/include -Ivendor/cjson
 
 # Linker flags

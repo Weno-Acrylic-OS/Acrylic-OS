@@ -6,6 +6,8 @@
 #include "app/watchface.h"
 #include "app/status_bar.h"
 
+#include "app/voice_assistant.h"
+
 #define PI 3.14159265
 
 static lv_obj_t * time_label;
@@ -23,6 +25,10 @@ static int current_style = 0;
 static bool show_steps = true;
 static bool show_hr = true;
 static bool show_date = true;
+
+static void watchface_long_press_event_handler(lv_event_t * e) {
+    create_voice_assistant(watchface_parent);
+}
 
 static void update_watchface_time(lv_timer_t * timer)
 {
@@ -78,6 +84,8 @@ void create_watchface(lv_obj_t * parent)
     watchface_parent = parent;
     lv_obj_clean(parent);
     create_status_bar(parent);
+    
+    lv_obj_add_event_cb(parent, watchface_long_press_event_handler, LV_EVENT_LONG_PRESSED, NULL);
 
     if (digital_timer) {
         lv_timer_del(digital_timer);
