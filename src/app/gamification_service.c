@@ -113,6 +113,10 @@ const goal_t* gamification_get_goals(int *count) {
     return goals;
 }
 
+int gamification_get_step_count() {
+    return goals[GOAL_TYPE_DAILY_STEPS].current_value;
+}
+
 // --- Achievements ---
 
 void gamification_unlock_achievement(achievement_id_t id) {

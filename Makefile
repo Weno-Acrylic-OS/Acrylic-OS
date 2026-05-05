@@ -12,13 +12,18 @@ KERNEL_SRC = $(SRC_DIR)/kernel/kernel.c \
              $(SRC_DIR)/kernel/task.c
 
 APP_SRC = $(SRC_DIR)/app/main.c \
+          $(SRC_DIR)/app/ota_service.c \
+          $(SRC_DIR)/app/calculator.c \
           $(SRC_DIR)/app/spo2_service.c \
           $(SRC_DIR)/app/temperature_service.c \
-          $(SRC_DIR)/app/ecg_app.c
+          $(SRC_DIR)/app/ecg_app.c \
+          $(SRC_DIR)/app/ui_tracker.c \
+          $(SRC_DIR)/app/ui_simulator_controls.c
 
 DRIVER_SRC = $(SRC_DIR)/drivers/spo2.c \
              $(SRC_DIR)/drivers/temperature.c \
-             $(SRC_DIR)/drivers/ecg_afe.c
+             $(SRC_DIR)/drivers/ecg_afe.c \
+             $(SRC_DIR)/drivers/sim_heart_rate.c
 
 KERNEL_OBJ = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(KERNEL_SRC))
 APP_OBJ = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(APP_SRC))

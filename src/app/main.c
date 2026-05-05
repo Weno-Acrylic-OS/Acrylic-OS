@@ -27,8 +27,15 @@
 #include "app/navigation_service.h"
 #include "app/spo2_service.h"
 #include "app/temperature_service.h"
+#include "drivers/heart_rate.h"
+#include "drivers/sim_heart_rate.h"
 
 #include "src/extra/themes/default/lv_theme_default.h"
+
+// New includes for UI variants
+#include "weno_config.h"
+#include "app/ui_tracker.h"
+#include "app/ui_simulator_controls.h"
 
 // --- Global UI Objects ---
 static lv_obj_t * quick_settings_panel;
@@ -330,13 +337,27 @@ int main() {
 
     lv_obj_t* screen = lv_scr_act();
 
-    if (persistence_get_oobe_completed() && !datalock_is_locked()) {
-        create_main_ui(screen);
-    } else if (datalock_is_locked()) {
-        create_datalock_screen(screen);
-    } else {
-        create_oobe_screen(screen);
-    }
+#ifdef SIMULATOR_BUILD
+    // In simulator, we always start with Full OS and add the switcher
+    create_main_ui(screen);
+    create_simulator_controls(); // This draws the button on top
+#else
+    // For device builds, use the efficient compile-time switch
+    #if UI_STYLE == UI_STYLE_SMARTWATCH
+        if (persistence_get_oobe_completed() && !datalock_is_locked()) {
+            create_main_ui(screen);
+        } else if (datalock_is_locked()) {
+            create_datalock_screen(screen);
+        } else {
+            create_oobe_screen(screen);
+        }
+    #elif UI_STYLE == UI_STYLE_TRACKER
+        // The simpler tracker UI doesn't have an OOBE or datalock for V1
+        create_tracker_ui(screen);
+    #else
+        #error "No valid UI_STYLE defined in weno_config.h for device build."
+    #endif
+#endif
 
     emscripten_set_main_loop(main_loop, 0, 1);
 
