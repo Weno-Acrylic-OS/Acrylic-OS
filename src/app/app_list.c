@@ -15,6 +15,7 @@
 #include "app/sdk_service.h"
 #include "app/navigation_service.h"
 #include "app/ecg_app.h"
+#include "app/calculator.h"
 
 static void app_list_event_handler(lv_event_t * e)
 {
@@ -46,6 +47,8 @@ static void app_list_event_handler(lv_event_t * e)
         navigation_service_navigate_to(create_profile_app);
     } else if (strcmp(app_name, "ECG") == 0) {
         navigation_service_navigate_to(create_ecg_app);
+    } else if (strcmp(app_name, "Calculator") == 0) {
+        navigation_service_navigate_to(create_calculator_app);
     } else {
         sdk_service_run_app(app_name);
     }
@@ -106,4 +109,7 @@ void create_app_list(lv_obj_t * parent)
 
     lv_obj_t * ecg_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "ECG");
     lv_obj_add_event_cb(ecg_btn, app_list_event_handler, LV_EVENT_CLICKED, "ECG");
+
+    lv_obj_t * calculator_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "Calculator");
+    lv_obj_add_event_cb(calculator_btn, app_list_event_handler, LV_EVENT_CLICKED, "Calculator");
 }
