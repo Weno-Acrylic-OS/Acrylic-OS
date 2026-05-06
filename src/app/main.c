@@ -330,6 +330,7 @@ int main() {
     spo2_service_init();
     temperature_service_init();
     datalock_init();
+    heart_rate_init(&sim_heart_rate_driver);
 
     lv_disp_t * disp = lv_disp_get_default();
     lv_theme_t * theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_lighten(LV_PALETTE_GREY, 3), false, &lv_font_montserrat_14);
