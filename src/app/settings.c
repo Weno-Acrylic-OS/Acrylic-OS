@@ -57,8 +57,34 @@ static void toggle_aod(lv_event_t * e) {
     }
 }
 
+static lv_obj_t* ota_status_label;
+
+static void ota_ui_update_callback(const char* status) {
+    if (ota_status_label) {
+        lv_label_set_text(ota_status_label, status);
+    }
+}
+
+static void create_ota_update_screen(lv_obj_t* parent) {
+    lv_obj_clean(parent);
+
+    lv_obj_t* back_btn = lv_btn_create(parent);
+    lv_obj_align(back_btn, LV_ALIGN_TOP_LEFT, 10, 10);
+    lv_obj_add_event_cb(back_btn, back_to_settings_app, LV_EVENT_CLICKED, NULL);
+    lv_obj_t* back_label = lv_label_create(back_btn);
+    lv_label_set_text(back_label, LV_SYMBOL_LEFT " Back");
+
+    ota_status_label = lv_label_create(parent);
+    lv_obj_center(ota_status_label);
+    lv_label_set_text(ota_status_label, "Starting OTA update...");
+
+    ota_service_start(ota_ui_update_callback);
+}
+
 static void ota_update_event_handler(lv_event_t * e) {
-    ota_service_start();
+    lv_obj_t* btn = lv_event_get_current_target(e);
+    lv_obj_t* parent = lv_obj_get_parent(lv_obj_get_parent(btn));
+    create_ota_update_screen(parent);
 }
 
 static void settings_list_event_handler(lv_event_t * e) {
