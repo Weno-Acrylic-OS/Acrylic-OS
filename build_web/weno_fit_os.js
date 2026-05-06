@@ -4888,7 +4888,6 @@ function checkIncomingModuleAPI() {
 function display_init() { console.log("display_init called"); }
 function display_clear(color) { var ctx = Module.canvas.getContext('2d'); var css_color = "#" + ("000000" + color.toString(16)).slice(-6); ctx.fillStyle = css_color; ctx.fillRect(0, 0, Module.canvas.width, Module.canvas.height); }
 function display_draw_pixel(x,y,color) { var ctx = Module.canvas.getContext('2d'); var css_color = "#" + ("000000" + color.toString(16)).slice(-6); ctx.fillStyle = css_color; ctx.fillRect(x, y, 1, 1); }
-function heart_rate_get_bpm() { return 70 + (Math.random() * 20); }
 function get_touch_x() { return lvgl_touch_x; }
 function get_touch_y() { return lvgl_touch_y; }
 function get_touch_down() { return lvgl_touch_down; }
@@ -4994,9 +4993,7 @@ var wasmImports = {
   /** @export */
   get_touch_x,
   /** @export */
-  get_touch_y,
-  /** @export */
-  heart_rate_get_bpm
+  get_touch_y
 };
 
 
