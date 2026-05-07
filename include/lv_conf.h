@@ -62,4 +62,6 @@
 /*Always set a default font*/
 #define LV_FONT_DEFAULT &lv_font_montserrat_14
 
+#define LV_USE_PNG 1
+
 #endif

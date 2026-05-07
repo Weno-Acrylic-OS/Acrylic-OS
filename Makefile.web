@@ -15,7 +15,9 @@ CFLAGS = -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE -DSIMULATOR_BUILD=1
 CFLAGS += -I. -Iinclude -Iinclude/app -Iinclude/drivers -I$(LVGL_DIR) -Ivendor/elk -Iweno-fit-os-sdk/include -Ivendor/cjson
 
 # Linker flags
-LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_main_loop', '_weno_store_receive_apps_json', '_malloc', '_free', '_weno_store_receive_app_source']" -s EXPORTED_RUNTIME_METHODS='["ccall"]' --shell-file src/web/shell.html
+LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_main_loop', '_weno_store_receive_apps_json', '_malloc', '_free', '_weno_store_receive_app_source']" -s EXPORTED_RUNTIME_METHODS='["ccall"]' --shell-file src/web/shell.html --preload-file assets@assets
+
+LDFLAGS += -s USE_ZLIB=1
 
 # Source files
 C_SOURCES = $(wildcard src/drivers/*.c)
