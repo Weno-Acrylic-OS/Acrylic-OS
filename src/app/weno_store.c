@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "cJSON.h"
+#include "app/app_list.h"
 
 // --- UI Objects ---
 static lv_obj_t * container;
@@ -51,12 +52,19 @@ void weno_store_receive_apps_json(char *json_string) {
     cJSON *app_json = NULL;
     cJSON_ArrayForEach(app_json, apps_json) {
         cJSON *name_json = cJSON_GetObjectItemCaseSensitive(app_json, "name");
+        cJSON *icon_json = cJSON_GetObjectItemCaseSensitive(app_json, "icon");
         
         if (cJSON_IsString(name_json) && (name_json->valuestring != NULL)) {
-            // Memory for user_data needs to persist until the event is handled
             char *app_name_copy = strdup(name_json->valuestring);
+            char *icon_path_copy = NULL;
+            if (cJSON_IsString(icon_json) && (icon_json->valuestring != NULL)) {
+                icon_path_copy = strdup(icon_json->valuestring);
+            }
             
-            lv_obj_t * btn = lv_list_add_btn(list, LV_SYMBOL_DOWNLOAD, app_name_copy);
+            add_to_app_list(app_name_copy, icon_path_copy);
+            
+            // The button will be created in add_to_app_list, we just need to set the event handler
+            lv_obj_t* btn = lv_obj_get_child(lv_obj_get_child(list, -1), -1);
             lv_obj_add_event_cb(btn, install_button_event_handler, LV_EVENT_CLICKED, app_name_copy);
         }
     }

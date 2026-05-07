@@ -12,6 +12,11 @@
 <body>
     <div class="container">
         <h1 class="my-4">Weno Fit OS Dashboard</h1>
+        <div class="row mb-3">
+            <div class="col">
+                <button id="clear-history" class="btn btn-danger">Clear History</button>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
@@ -63,103 +68,84 @@
 
         const heartRateChart = new Chart(heartRateChartCtx, {
             type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Heart Rate',
-                    data: [],
-                    borderColor: 'red',
-                    fill: false
-                }]
-            },
-            options: {
-                scales: {
-                    x: {
-                        type: 'timeseries',
-                    },
-                    y: {
-                        beginAtZero: false
-                    }
-                }
-            }
+            data: { labels: [], datasets: [{ label: 'Heart Rate', data: [], borderColor: 'red', fill: false }] },
+            options: { scales: { x: { type: 'timeseries' }, y: { beginAtZero: false } } }
         });
 
         const stepsChart = new Chart(stepsChartCtx, {
             type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Steps',
-                    data: [],
-                    backgroundColor: 'blue'
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
+            data: { labels: [], datasets: [{ label: 'Steps', data: [], backgroundColor: 'blue' }] },
+            options: { scales: { y: { beginAtZero: true } } }
         });
 
         const sleepChart = new Chart(sleepChartCtx, {
             type: 'bar',
-            data: {
-                labels: ['Sleep'],
-                datasets: [
-                    {
-                        label: 'Light',
-                        data: [0],
-                        backgroundColor: 'lightblue'
-                    },
-                    {
-                        label: 'Deep',
-                        data: [0],
-                        backgroundColor: 'darkblue'
-                    },
-                    {
-                        label: 'REM',
-                        data: [0],
-                        backgroundColor: 'purple'
-                    }
-                ]
-            },
-            options: {
-                indexAxis: 'y',
-                scales: {
-                    x: {
-                        stacked: true,
-                    },
-                    y: {
-                        stacked: true
-                    }
-                }
-            }
+            data: { labels: ['Sleep'], datasets: [ { label: 'Light', data: [0], backgroundColor: 'lightblue' }, { label: 'Deep', data: [0], backgroundColor: 'darkblue' }, { label: 'REM', data: [0], backgroundColor: 'purple' }] },
+            options: { indexAxis: 'y', scales: { x: { stacked: true }, y: { stacked: true } } }
         });
+
+        const getStoredData = (key) => JSON.parse(localStorage.getItem(key)) || [];
+        const saveStoredData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+        const loadChartData = () => {
+            const heartRateData = getStoredData('heartRateHistory');
+            heartRateChart.data.labels = heartRateData.map(d => d.time);
+            heartRateChart.data.datasets[0].data = heartRateData.map(d => d.value);
+            heartRateChart.update();
+
+            const stepsData = getStoredData('stepsHistory');
+            stepsChart.data.labels = stepsData.map(d => new Date(d.time).toLocaleTimeString());
+            stepsChart.data.datasets[0].data = stepsData.map(d => d.value);
+            stepsChart.update();
+
+            const sleepData = getStoredData('sleepHistory');
+            if (sleepData.length > 0) {
+                const lastSleep = sleepData[sleepData.length - 1];
+                sleepChart.data.datasets[0].data[0] = lastSleep.light;
+                sleepChart.data.datasets[1].data[0] = lastSleep.deep;
+                sleepChart.data.datasets[2].data[0] = lastSleep.rem;
+                sleepChart.update();
+            }
+        };
 
         channel.onmessage = (event) => {
             const dataContainer = document.getElementById("data-container");
             dataContainer.innerHTML = `<pre>${JSON.stringify(event.data, null, 2)}</pre>`;
-
             const now = new Date();
 
-            // Update heart rate chart
-            heartRateChart.data.labels.push(now);
-            heartRateChart.data.datasets[0].data.push(event.data.heartRate);
-            heartRateChart.update();
+            let heartRateHistory = getStoredData('heartRateHistory');
+            heartRateHistory.push({ time: now, value: event.data.heartRate });
+            saveStoredData('heartRateHistory', heartRateHistory);
 
-            // Update steps chart
-            stepsChart.data.labels.push(now.toLocaleTimeString());
-            stepsChart.data.datasets[0].data.push(event.data.steps);
-            stepsChart.update();
+            let stepsHistory = getStoredData('stepsHistory');
+            stepsHistory.push({ time: now, value: event.data.steps });
+            saveStoredData('stepsHistory', stepsHistory);
 
-            // Update sleep chart
-            sleepChart.data.datasets[0].data[0] = event.data.sleep.light;
-            sleepChart.data.datasets[1].data[0] = event.data.sleep.deep;
-            sleepChart.data.datasets[2].data[0] = event.data.sleep.rem;
-            sleepChart.update();
+            let sleepHistory = getStoredData('sleepHistory');
+            sleepHistory.push(event.data.sleep);
+            saveStoredData('sleepHistory', sleepHistory);
+            
+            loadChartData();
         };
+
+        document.getElementById('clear-history').addEventListener('click', () => {
+            localStorage.removeItem('heartRateHistory');
+            localStorage.removeItem('stepsHistory');
+            localStorage.removeItem('sleepHistory');
+            // Reset chart data arrays
+            heartRateChart.data.labels = [];
+            heartRateChart.data.datasets[0].data = [];
+            stepsChart.data.labels = [];
+            stepsChart.data.datasets[0].data = [];
+            sleepChart.data.datasets[0].data[0] = 0;
+            sleepChart.data.datasets[1].data[0] = 0;
+            sleepChart.data.datasets[2].data[0] = 0;
+            heartRateChart.update();
+            stepsChart.update();
+            sleepChart.update();
+        });
+
+        document.addEventListener('DOMContentLoaded', loadChartData);
     </script>
 </body>
 </html>

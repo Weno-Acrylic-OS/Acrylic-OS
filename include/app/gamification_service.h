@@ -7,13 +7,16 @@
 
 typedef enum {
     GOAL_TYPE_DAILY_STEPS,
+    GOAL_TYPE_WEEKLY_ACTIVE_MINUTES,
     // Future goal types can be added here
     GOAL_TYPE_COUNT
 } goal_type_t;
 
+#define MAX_GOAL_DESC_LEN 64
+
 typedef struct {
     goal_type_t type;
-    const char * description;
+    char description[MAX_GOAL_DESC_LEN];
     int target_value;
     int current_value;
     int xp_reward;
@@ -49,6 +52,7 @@ int gamification_get_current_level();
 // Goals
 void gamification_update_goal_progress(goal_type_t type, int value);
 const goal_t * gamification_get_goals(int *count);
+void gamification_set_goals(const char *goals_json);
 int gamification_get_step_count();
 
 // Achievements
