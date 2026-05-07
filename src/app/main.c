@@ -29,6 +29,7 @@
 #include "app/temperature_service.h"
 #include "drivers/heart_rate.h"
 #include "drivers/sim_heart_rate.h"
+#include "app/ble_service.h"
 
 #include "src/extra/themes/default/lv_theme_default.h"
 
@@ -36,6 +37,7 @@
 #include "weno_config.h"
 #include "app/ui_tracker.h"
 #include "app/ui_simulator_controls.h"
+
 
 // --- Global UI Objects ---
 static lv_obj_t * quick_settings_panel;
@@ -78,6 +80,10 @@ static void context_updater_cb(lv_timer_t * timer) {
     status_bar_show_workout_indicator(fitness_app_is_active());
     status_bar_update_privacy_indicators();
     today_view_update();
+    
+    int goal_count;
+    const goal_t *goals = gamification_get_goals(&goal_count);
+    ble_service_update_goals(goals, goal_count);
 }
 
 static void status_bar_time_updater_task(lv_timer_t * timer) {
@@ -318,6 +324,7 @@ static void datalock_keypad_event_handler(lv_event_t * e) {
 // --- Main Entry Point ---
 int main() {
     lv_init();
+    lv_png_init();
     lvgl_display_init();
     time_service_init();
     persistence_init();
@@ -331,6 +338,7 @@ int main() {
     temperature_service_init();
     datalock_init();
     heart_rate_init(&sim_heart_rate_driver);
+    ble_service_init();
 
     lv_disp_t * disp = lv_disp_get_default();
     lv_theme_t * theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_lighten(LV_PALETTE_GREY, 3), false, &lv_font_montserrat_14);

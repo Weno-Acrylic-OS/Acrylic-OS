@@ -17,7 +17,8 @@ void sdk_service_init() {
 void register_app(const app_descriptor_t * descriptor) {
     if (num_third_party_apps < MAX_THIRD_PARTY_APPS) {
         third_party_apps[num_third_party_apps] = *descriptor;
-        add_to_app_list(descriptor->name);
+        // Pass a default icon (e.g., LV_SYMBOL_DOWNLOAD) as the second argument
+        add_to_app_list(descriptor->name, LV_SYMBOL_DOWNLOAD); 
         num_third_party_apps++;
     }
 }
