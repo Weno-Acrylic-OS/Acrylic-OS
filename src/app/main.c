@@ -27,6 +27,7 @@
 #include "app/navigation_service.h"
 #include "app/spo2_service.h"
 #include "app/temperature_service.h"
+#include "app/notification_service.h"
 #include "drivers/heart_rate.h"
 #include "drivers/sim_heart_rate.h"
 #include "app/ble_service.h"
@@ -67,6 +68,7 @@ static void context_updater_cb(lv_timer_t * timer);
 static void workout_detect_msgbox_event_handler(lv_event_t * e);
 static void stress_detect_msgbox_event_handler(lv_event_t * e);
 static void stress_simulator_task(lv_timer_t * timer);
+static void notification_simulator_task(lv_timer_t * timer);
 
 
 // --- Main Loop ---
@@ -75,6 +77,14 @@ void main_loop() {
 }
 
 // --- Event Handlers & Timers ---
+static void notification_simulator_task(lv_timer_t * timer) {
+    (void)timer;
+    static int i = 0;
+    char title[100];
+    sprintf(title, "Test Notification %d", i++);
+    notification_service_send("Test App", title, "This is a test notification from the simulator.");
+}
+
 static void context_updater_cb(lv_timer_t * timer) {
     (void)timer;
     status_bar_show_workout_indicator(fitness_app_is_active());
@@ -188,8 +198,11 @@ static void swipe_event_handler(lv_event_t * e) {
         emscripten_log(EM_LOG_CONSOLE, "Opening shortcuts");
         lv_obj_clear_flag(shortcuts_panel, LV_OBJ_FLAG_HIDDEN);
         shortcuts_visible = true;
+    } else if (dir == LV_DIR_RIGHT && shortcuts_visible) {
+        emscripten_log(EM_LOG_CONSOLE, "Closing shortcuts");
+        lv_obj_add_flag(shortcuts_panel, LV_OBJ_FLAG_HIDDEN);
+        shortcuts_visible = false;
     }
-    // Note: RIGHT swipe is free for a future global action
 }
 
 // --- UI Creation Functions ---
@@ -231,6 +244,7 @@ void create_main_ui(lv_obj_t * parent) {
     lv_timer_create(context_updater_cb, 1000, NULL);
     lv_timer_create(step_simulator_task, 2000, NULL);
     lv_timer_create(stress_simulator_task, 10000, NULL);
+    lv_timer_create(notification_simulator_task, 15000, NULL);
 
     lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
 
@@ -246,16 +260,19 @@ void create_main_ui(lv_obj_t * parent) {
     lv_obj_set_size(shortcuts_panel, lv_pct(100), lv_pct(100));
     create_shortcuts_menu(shortcuts_panel);
     lv_obj_add_flag(shortcuts_panel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(shortcuts_panel, LV_OBJ_FLAG_SCROLLABLE);
 
     quick_settings_panel = lv_obj_create(parent);
     lv_obj_set_size(quick_settings_panel, lv_pct(100), lv_pct(100));
     create_quick_settings(quick_settings_panel);
     lv_obj_add_flag(quick_settings_panel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(quick_settings_panel, LV_OBJ_FLAG_SCROLLABLE);
     
     notifications_panel = lv_obj_create(parent);
     lv_obj_set_size(notifications_panel, lv_pct(100), lv_pct(100));
-    // create_notifications_shade(notifications_panel);
+    create_notifications_shade(notifications_panel);
     lv_obj_add_flag(notifications_panel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(notifications_panel, LV_OBJ_FLAG_SCROLLABLE);
 
     // --- Create Main Content Containers ---
     // This container holds the main tab view (Watchface, Today, Apps)
@@ -341,6 +358,7 @@ int main() {
     js_engine_init();
     privacy_service_init();
     gamification_service_init();
+    notification_service_init();
     spo2_service_init();
     temperature_service_init();
     datalock_init();

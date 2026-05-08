@@ -13,9 +13,15 @@ yargs(hideBin(process.argv))
         describe: 'Name of the project to initialize',
         type: 'string'
       })
+      .option('template', {
+        alias: 't',
+        describe: 'Choose a project template',
+        choices: ['basic_app', 'notification_app'],
+        default: 'basic_app'
+      })
   }, (argv) => {
     const projectPath = path.join(process.cwd(), argv.name);
-    const templatePath = path.join(__dirname, '..', 'templates', 'basic_app');
+    const templatePath = path.join(__dirname, '..', 'templates', argv.template);
     
     fs.copySync(templatePath, projectPath);
     
@@ -24,7 +30,7 @@ yargs(hideBin(process.argv))
     appJson.name = argv.name;
     fs.writeJsonSync(appJsonPath, appJson, { spaces: 2 });
 
-    console.log(`Project ${argv.name} initialized successfully.`);
+    console.log(`Project ${argv.name} initialized successfully from '${argv.template}' template.`);
   })
   .command('build', 'Build the application package', () => {}, (argv) => {
     const cwd = process.cwd();
@@ -94,6 +100,24 @@ yargs(hideBin(process.argv))
   .command('debug', 'Start a debug session', () => {}, (argv) => {
     console.log('Starting debug session...');
     // TODO: Implement debug process
+  })
+  .command('run-simulator', 'Run the Weno Fit OS simulator', () => {}, (argv) => {
+    const { exec } = require('child_process');
+    const rootPath = path.join(__dirname, '..', '..');
+    console.log('Starting the Weno Fit OS simulator...');
+    
+    const child = exec('make run-web', { cwd: rootPath }, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error starting simulator: ${error}`);
+        return;
+      }
+      console.log(stdout);
+      console.error(stderr);
+    });
+
+    child.on('exit', (code) => {
+      console.log(`Simulator process exited with code ${code}`);
+    });
   })
   .demandCommand(1, 'You need at least one command before moving on')
   .help()

@@ -1,0 +1,5 @@
+{
+  "name": "Notification Example",
+  "version": "1.0.0",
+  "entry_point": "index.js"
+}

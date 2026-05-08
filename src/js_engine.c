@@ -7,6 +7,7 @@
 #include "app/today_service.h"
 #include "app/time_service.h"
 #include "app/gamification_service.h"
+#include "app/notification_service.h"
 #include "drivers/heart_rate.h"
 
 #define JS_MEM_SIZE 4096
@@ -46,6 +47,17 @@ static void js_watchface_timer_bridge(lv_timer_t *timer) {
 
 
 // --- WenoFitOS API ---
+
+static jsval_t js_send_notification(struct js *js, jsval_t *args, int nargs) {
+    if (nargs != 3 || js_type(args[0]) != JS_STR || js_type(args[1]) != JS_STR || js_type(args[2]) != JS_STR) {
+        return js_mkerr(js, "Usage: sendNotification(appName, title, body)");
+    }
+    const char *appName = js_str(js, args[0]);
+    const char *title = js_str(js, args[1]);
+    const char *body = js_str(js, args[2]);
+    bool success = notification_service_send(appName, title, body);
+    return success ? js_mktrue() : js_mkfalse();
+}
 
 static jsval_t js_log(struct js *js, jsval_t *args, int nargs) {
     for (int i = 0; i < nargs; i++) {
@@ -247,6 +259,7 @@ void js_engine_init() {
     js_set(js, weno_fit_os_obj, "registerWatchface", js_mkfun(js_register_watchface));
     js_set(js, weno_fit_os_obj, "registerWidget", js_mkfun(js_register_widget));
     js_set(js, weno_fit_os_obj, "createTimer", js_mkfun(js_create_timer));
+    js_set(js, weno_fit_os_obj, "sendNotification", js_mkfun(js_send_notification));
 
     // Data API
     js_set(js, weno_fit_os_obj, "getHours", js_mkfun(js_get_hours));

@@ -1,0 +1,79 @@
+# .gitlab-ci.yml for Weno Fit OS SDK
+
+# Define the stages of the CI/CD pipeline
+stages:
+  - build
+  - test
+  - package
+  - release
+
+# Default image to use for jobs, can be overridden per job
+default:
+  image: node:18
+
+# --- Build Stage ---
+build_project:
+  stage: build
+  script:
+    - echo "Building Weno Fit OS for all targets..."
+    # Placeholder for actual build commands.
+    # You would replace these with your actual build commands, e.g.,
+    # - apt-get update && apt-get install -y make gcc
+    # - make
+    # - make -f Makefile.web
+    # - make -f Makefile.arm
+    - echo "Build complete."
+  # 'artifacts' can be used to pass built files to later stages,
+  # but since we are not building for real here, we will skip it.
+
+# --- Test Stage ---
+run_tests:
+  stage: test
+  script:
+    - echo "Running tests..."
+    # Placeholder for test commands.
+    # e.g., npm test
+    - echo "Tests passed."
+
+# --- Package Stage ---
+package_sdk:
+  stage: package
+  script:
+    - echo "Packaging the SDK..."
+    - cd weno-fit-os-sdk
+    # The 'wfo-cli' package has dependencies, so we need to install them.
+    # We use 'npm ci' for a clean, reproducible install in CI.
+    - npm ci
+    # The packaged SDK will be a tarball of the weno-fit-os-sdk directory.
+    # GitLab CI automatically passes artifacts between stages.
+    - cd ..
+    - tar -czf weno-fit-os-sdk.tar.gz weno-fit-os-sdk/
+    - echo "SDK packaged successfully."
+  artifacts:
+    paths:
+      - weno-fit-os-sdk.tar.gz
+    expire_in: 1 week # Keep artifacts for 1 week
+
+# --- Release Stage ---
+# This job runs only when a new tag is pushed.
+release_sdk:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo "Releasing the SDK..."
+    # Placeholder for publishing to NPM.
+    # This would typically be inside a script that checks for the version, etc.
+    # It requires an NPM_TOKEN to be configured as a CI/CD variable in GitLab.
+    # - cd weno-fit-os-sdk
+    # - npm publish
+    # - cd ..
+    - echo "NPM publish step is commented out."
+
+    # Use GitLab's release-cli to create a release.
+    # This automatically associates the release with the current tag.
+    - |
+      release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG 
+        --description "New release of the Weno Fit OS SDK." 
+        --assets-link "{"name":"Weno Fit OS SDK Archive","url":"$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_COMMIT_REF_NAME/raw/weno-fit-os-sdk.tar.gz?job=package_sdk"}"
+  rules:
+    - if: $CI_COMMIT_TAG # Run this job only for tags
