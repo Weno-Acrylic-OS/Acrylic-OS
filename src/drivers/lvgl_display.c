@@ -55,5 +55,6 @@ void lvgl_display_init(void)
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = read_cb;
+    indev_drv.gesture_limit = 20;
     lv_indev_drv_register(&indev_drv);
 }
