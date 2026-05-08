@@ -159,24 +159,33 @@ static void va_close_handler(lv_event_t * e) {
 }
 
 static void swipe_event_handler(lv_event_t * e) {
+    emscripten_log(EM_LOG_CONSOLE, "Swipe event handler called!");
     (void)e;
     if (voice_assistant_visible) return;
 
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+    char buffer[50];
+    sprintf(buffer, "Gesture direction: %d", dir);
+    emscripten_log(EM_LOG_CONSOLE, buffer);
 
     if (dir == LV_DIR_BOTTOM && !quick_settings_visible && !notifications_visible && !shortcuts_visible) {
+        emscripten_log(EM_LOG_CONSOLE, "Opening quick settings");
         lv_obj_clear_flag(quick_settings_panel, LV_OBJ_FLAG_HIDDEN);
         quick_settings_visible = true;
     } else if (dir == LV_DIR_TOP && quick_settings_visible) {
+        emscripten_log(EM_LOG_CONSOLE, "Closing quick settings");
         lv_obj_add_flag(quick_settings_panel, LV_OBJ_FLAG_HIDDEN);
         quick_settings_visible = false;
     } else if (dir == LV_DIR_TOP && !notifications_visible && !quick_settings_visible && !shortcuts_visible) {
+        emscripten_log(EM_LOG_CONSOLE, "Opening notifications");
         lv_obj_clear_flag(notifications_panel, LV_OBJ_FLAG_HIDDEN);
         notifications_visible = true;
     } else if (dir == LV_DIR_BOTTOM && notifications_visible) {
+        emscripten_log(EM_LOG_CONSOLE, "Closing notifications");
         lv_obj_add_flag(notifications_panel, LV_OBJ_FLAG_HIDDEN);
         notifications_visible = false;
     } else if (dir == LV_DIR_LEFT && !shortcuts_visible && !quick_settings_visible && !notifications_visible) {
+        emscripten_log(EM_LOG_CONSOLE, "Opening shortcuts");
         lv_obj_clear_flag(shortcuts_panel, LV_OBJ_FLAG_HIDDEN);
         shortcuts_visible = true;
     }
@@ -204,12 +213,9 @@ void create_datalock_screen(lv_obj_t * parent) {
     lv_obj_set_style_pad_top(datalock_pin_label, 10, 0);
     lv_obj_set_style_pad_bottom(datalock_pin_label, 10, 0);
 
-    static const char * map[] = {"1", "2", "3", "\
-",
-                                "4", "5", "6", "\
-",
-                                "7", "8", "9", "\
-",
+    static const char * map[] = {"1", "2", "3", "\n",
+                                "4", "5", "6", "\n",
+                                "7", "8", "9", "\n",
                                 LV_SYMBOL_BACKSPACE, "0", LV_SYMBOL_OK, ""};
 
     lv_obj_t * keypad = lv_btnmatrix_create(datalock_screen);
@@ -220,6 +226,7 @@ void create_datalock_screen(lv_obj_t * parent) {
 }
 
 void create_main_ui(lv_obj_t * parent) {
+    lv_obj_add_event_cb(parent, swipe_event_handler, LV_EVENT_GESTURE, NULL);
     lv_timer_create(status_bar_time_updater_task, 1000, NULL);
     lv_timer_create(context_updater_cb, 1000, NULL);
     lv_timer_create(step_simulator_task, 2000, NULL);
@@ -253,8 +260,8 @@ void create_main_ui(lv_obj_t * parent) {
     // --- Create Main Content Containers ---
     // This container holds the main tab view (Watchface, Today, Apps)
     lv_obj_t * tab_container = lv_obj_create(parent);
-    lv_obj_set_size(tab_container, lv_pct(100), lv_pct(100));
-    lv_obj_add_event_cb(tab_container, swipe_event_handler, LV_EVENT_GESTURE, NULL);
+    lv_obj_set_size(tab_container, lv_pct(100), lv_pct(95));
+    lv_obj_align(tab_container, LV_ALIGN_CENTER, 0, 0);
     lv_obj_clear_flag(tab_container, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_opa(tab_container, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(tab_container, 0, 0);
@@ -349,7 +356,7 @@ int main() {
 #ifdef SIMULATOR_BUILD
     // In simulator, we always start with Full OS and add the switcher
     create_main_ui(screen);
-    create_simulator_controls(); // This draws the button on top
+     // Permenantly removed due to discontinuation of Weno Fit OS Lite UI.
 #else
     // For device builds, use the efficient compile-time switch
     #if UI_STYLE == UI_STYLE_SMARTWATCH
