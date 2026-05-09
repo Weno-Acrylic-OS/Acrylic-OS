@@ -11,24 +11,42 @@ LD = $(TOOLCHAIN_PATH)/arm-none-eabi-ld
 OC = $(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
 
 # CPU and FPU settings
-CPU = cortex-m3
+CPU = cortex-a9
 FPU = 
 
 # Compiler flags
 CFLAGS = -mcpu=$(CPU) -mthumb -Wall -Wextra -g
-CFLAGS += -Iinclude -Iinclude/kernel -Iinclude/drivers -Iinclude/ui -Iinclude/libc -Iinclude/arch/arm
+CFLAGS += -I. -Iinclude -Iinclude/kernel -Iinclude/drivers -Iinclude/ui -Iinclude/libc -Iinclude/arch/arm -Ivendor/lvgl -Ivendor/cjson -Iinclude/app
 
 # Linker script
 LDSCRIPT = src/arch/arm/linker.ld
-LDFLAGS = -T $(LDSCRIPT) -nostdlib
+LDFLAGS = -T $(LDSCRIPT)
+
+# LVGL
+LVGL_DIR = vendor/lvgl
+LVGL_SRC = $(shell find $(LVGL_DIR)/src -name '*.c')
 
 # Source files
 C_SOURCES = $(wildcard src/kernel/*.c)
-C_SOURCES += $(wildcard src/drivers/*.c)
+
+WEB_DRIVERS = src/drivers/display.c src/drivers/lvgl_display.c src/drivers/sim_heart_rate.c src/drivers/touch.c
+ARM_SPECIFIC_DRIVERS = src/drivers/display_qemu.c src/drivers/lvgl_display_arm.c
+
+# Add common drivers, excluding web-specific ones
+C_SOURCES += $(filter-out $(WEB_DRIVERS), $(wildcard src/drivers/*.c))
+# Add ARM-specific drivers
+C_SOURCES += $(ARM_SPECIFIC_DRIVERS)
+
 C_SOURCES += $(wildcard src/ui/*.c)
-C_SOURCES += $(wildcard src/app/*.c)
+
+WEB_APP_SOURCES = src/app/phone_service.c src/app/shortcuts.c src/app/time_service.c src/app/weno_store.c
+C_SOURCES += $(filter-out $(WEB_APP_SOURCES), $(wildcard src/app/*.c))
+
 C_SOURCES += $(wildcard src/libc/*.c)
 C_SOURCES += $(wildcard src/arch/arm/*.c)
+# Add LVGL sources
+C_SOURCES += $(LVGL_SRC)
+
 
 S_SOURCES = src/arch/arm/startup.s src/arch/arm/context_switch.s
 
@@ -53,7 +71,7 @@ $(OUT_DIR)/$(TARGET).bin: $(OUT_DIR)/$(TARGET).elf
 	$(OC) -O binary $< $@
 
 run-qemu: all
-	qemu-system-arm -M lm3s6965evb -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
+	qemu-system-arm -M vexpress-a9 -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
 
 clean:
 	rm -rf $(OUT_DIR)

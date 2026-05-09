@@ -20,7 +20,8 @@ LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_ma
 LDFLAGS += -s USE_ZLIB=1
 
 # Source files
-C_SOURCES = $(wildcard src/drivers/*.c)
+# Exclude ARM/QEMU-specific display drivers from the web build
+C_SOURCES = $(filter-out src/drivers/display_qemu.c src/drivers/lvgl_display_arm.c, $(wildcard src/drivers/*.c))
 C_SOURCES += $(wildcard src/app/*.c)
 C_SOURCES += src/js_engine.c
 C_SOURCES += $(LVGL_SRC)
