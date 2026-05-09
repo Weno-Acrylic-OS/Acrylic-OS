@@ -3,7 +3,9 @@
 #include <string.h>
 #include "lvgl.h"
 #include "lvgl_display.h"
+#ifdef SIMULATOR_BUILD
 #include <emscripten.h>
+#endif
 #include <stdlib.h> // For rand()
 
 // App-specific includes
@@ -169,37 +171,69 @@ static void va_close_handler(lv_event_t * e) {
 }
 
 static void swipe_event_handler(lv_event_t * e) {
+#ifdef SIMULATOR_BUILD
     emscripten_log(EM_LOG_CONSOLE, "Swipe event handler called!");
+#else
+    printf("Swipe event handler called!\n");
+#endif
     (void)e;
     if (voice_assistant_visible) return;
 
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+#ifdef SIMULATOR_BUILD
     char buffer[50];
     sprintf(buffer, "Gesture direction: %d", dir);
     emscripten_log(EM_LOG_CONSOLE, buffer);
+#else
+    printf("Gesture direction: %d\n", dir);
+#endif
 
     if (dir == LV_DIR_BOTTOM && !quick_settings_visible && !notifications_visible && !shortcuts_visible) {
+#ifdef SIMULATOR_BUILD
         emscripten_log(EM_LOG_CONSOLE, "Opening quick settings");
+#else
+        printf("Opening quick settings\n");
+#endif
         lv_obj_clear_flag(quick_settings_panel, LV_OBJ_FLAG_HIDDEN);
         quick_settings_visible = true;
     } else if (dir == LV_DIR_TOP && quick_settings_visible) {
+#ifdef SIMULATOR_BUILD
         emscripten_log(EM_LOG_CONSOLE, "Closing quick settings");
+#else
+        printf("Closing quick settings\n");
+#endif
         lv_obj_add_flag(quick_settings_panel, LV_OBJ_FLAG_HIDDEN);
         quick_settings_visible = false;
     } else if (dir == LV_DIR_TOP && !notifications_visible && !quick_settings_visible && !shortcuts_visible) {
+#ifdef SIMULATOR_BUILD
         emscripten_log(EM_LOG_CONSOLE, "Opening notifications");
+#else
+        printf("Opening notifications\n");
+#endif
         lv_obj_clear_flag(notifications_panel, LV_OBJ_FLAG_HIDDEN);
         notifications_visible = true;
     } else if (dir == LV_DIR_BOTTOM && notifications_visible) {
+#ifdef SIMULATOR_BUILD
         emscripten_log(EM_LOG_CONSOLE, "Closing notifications");
+#else
+        printf("Closing notifications\n");
+#endif
         lv_obj_add_flag(notifications_panel, LV_OBJ_FLAG_HIDDEN);
         notifications_visible = false;
     } else if (dir == LV_DIR_LEFT && !shortcuts_visible && !quick_settings_visible && !notifications_visible) {
+#ifdef SIMULATOR_BUILD
         emscripten_log(EM_LOG_CONSOLE, "Opening shortcuts");
+#else
+        printf("Opening shortcuts\n");
+#endif
         lv_obj_clear_flag(shortcuts_panel, LV_OBJ_FLAG_HIDDEN);
         shortcuts_visible = true;
     } else if (dir == LV_DIR_RIGHT && shortcuts_visible) {
+#ifdef SIMULATOR_BUILD
         emscripten_log(EM_LOG_CONSOLE, "Closing shortcuts");
+#else
+        printf("Closing shortcuts\n");
+#endif
         lv_obj_add_flag(shortcuts_panel, LV_OBJ_FLAG_HIDDEN);
         shortcuts_visible = false;
     }
@@ -376,24 +410,19 @@ int main() {
     create_main_ui(screen);
      // Permenantly removed due to discontinuation of Weno Fit OS Lite UI.
 #else
-    // For device builds, use the efficient compile-time switch
-    #if UI_STYLE == UI_STYLE_SMARTWATCH
-        if (persistence_get_oobe_completed() && !datalock_is_locked()) {
-            create_main_ui(screen);
-        } else if (datalock_is_locked()) {
-            create_datalock_screen(screen);
-        } else {
-            create_oobe_screen(screen);
-        }
-    #elif UI_STYLE == UI_STYLE_TRACKER
-        // The simpler tracker UI doesn't have an OOBE or datalock for V1
-        create_tracker_ui(screen);
-    #else
-        #error "No valid UI_STYLE defined in weno_config.h for device build."
-    #endif
+    // For device builds, boot directly into the main UI like the simulator
+    create_main_ui(screen);
 #endif
 
+#ifdef SIMULATOR_BUILD
     emscripten_set_main_loop(main_loop, 0, 1);
+#else
+    while (1) {
+        main_loop();
+        // You might need a platform-specific delay or sleep function here
+        // to avoid pinning the CPU at 100%, e.g., platform_sleep_ms(5);
+    }
+#endif
 
     return 0;
 }
