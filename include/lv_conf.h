@@ -6,9 +6,13 @@
 #define LV_MEM_CUSTOM 0
 #define LV_MEM_SIZE (48U * 1024U)
 
+#ifdef SIMULATOR_BUILD
 #define LV_TICK_CUSTOM 1
 #define LV_TICK_CUSTOM_INCLUDE "emscripten.h"
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (emscripten_get_now())
+#else
+#define LV_TICK_CUSTOM 0
+#endif
 
 #define LV_BUILD_EXAMPLES 0
 
