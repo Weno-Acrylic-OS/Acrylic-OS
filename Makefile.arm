@@ -36,7 +36,7 @@ S_SOURCES = src/arch/arm/startup.s src/arch/arm/context_switch.s
 OBJS = $(patsubst src/%.c,$(OUT_DIR)/%.o,$(C_SOURCES))
 OBJS += $(patsubst src/%.s,$(OUT_DIR)/%.o,$(S_SOURCES))
 
-all: $(OUT_DIR)/$(TARGET).elf
+all: $(OUT_DIR)/$(TARGET).elf $(OUT_DIR)/$(TARGET).bin
 
 $(OUT_DIR)/%.o: src/%.c
 	@mkdir -p $(dir $@)
@@ -48,6 +48,9 @@ $(OUT_DIR)/%.o: src/%.s
 
 $(OUT_DIR)/$(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
+
+$(OUT_DIR)/$(TARGET).bin: $(OUT_DIR)/$(TARGET).elf
+	$(OC) -O binary $< $@
 
 run-qemu: all
 	qemu-system-arm -M lm3s6965evb -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
