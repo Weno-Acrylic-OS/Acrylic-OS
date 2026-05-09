@@ -71,7 +71,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmprxz1rhjk.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp6jcpyuvo.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -201,25 +201,25 @@ Module['FS_createPath']("/assets", "icons", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/assets/.DS_Store", "start": 0, "end": 6148}, {"filename": "/assets/icons/.DS_Store", "start": 6148, "end": 12296}, {"filename": "/assets/icons/Clock.png", "start": 12296, "end": 17324}, {"filename": "/assets/icons/Settings.png", "start": 17324, "end": 22211}, {"filename": "/assets/icons/clock.svg", "start": 22211, "end": 22467}, {"filename": "/assets/icons/fitness.png", "start": 22467, "end": 26972}, {"filename": "/assets/icons/fitness.svg", "start": 26972, "end": 27211}, {"filename": "/assets/icons/settings.svg", "start": 27211, "end": 28175}], "remote_package_size": 28175});
+    loadPackage({"files": [{"filename": "/assets/.DS_Store", "start": 0, "end": 6148}, {"filename": "/assets/icons/.DS_Store", "start": 6148, "end": 12296}, {"filename": "/assets/icons/Clock.png", "start": 12296, "end": 17324}, {"filename": "/assets/icons/Messages.png", "start": 17324, "end": 18902}, {"filename": "/assets/icons/Music.png", "start": 18902, "end": 20814}, {"filename": "/assets/icons/Settings.png", "start": 20814, "end": 25701}, {"filename": "/assets/icons/fitness.png", "start": 25701, "end": 30206}, {"filename": "/assets/icons/weno_pay.png", "start": 30206, "end": 32082}], "remote_package_size": 32082});
 
   })();
 
-// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmprxz1rhjk.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp81qpymo4.js
+// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp6jcpyuvo.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpszl6vj36.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp81qpymo4.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpnddjgh0j.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpszl6vj36.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpr1penoll.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpnddjgh0j.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpr1penoll.js
 
 
 var arguments_ = [];

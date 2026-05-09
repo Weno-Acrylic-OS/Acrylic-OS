@@ -3,6 +3,7 @@
 #include "lvgl.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "app/watchface_service.h"
 #include "app/today_service.h"
 #include "app/time_service.h"
@@ -16,11 +17,36 @@ static struct js *js;
 
 // --- C <-> JS Bridges ---
 
+// Struct to hold information about a JS callback
+typedef struct {
+    struct js *js;
+    jsval_t func;
+} js_callback_info_t;
+
 // We can only have one active JS watchface and one active JS widget at a time
 // due to the limitations of this C->JS bridge design.
 static jsval_t js_watchface_create_func = 0;
 static jsval_t js_widget_create_func = 0;
 static jsval_t js_watchface_timer_func = 0; // For the watchface update timer
+
+// A generic event bridge
+static void js_event_bridge(lv_event_t *e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    js_callback_info_t *info = (js_callback_info_t *)lv_event_get_user_data(e);
+
+    if (code == LV_EVENT_CLICKED) {
+        if (info != NULL && info->func != 0) {
+            // We create a temporary global object to hold the callback and call it.
+            js_set(info->js, js_glob(info->js), "_tmp_callback", info->func);
+            js_eval(info->js, "_tmp_callback()", ~0);
+        }
+    } else if (code == LV_EVENT_DELETE) {
+        // When the object is deleted, free the memory we allocated for the callback info.
+        if (info != NULL) {
+            free(info);
+        }
+    }
+}
 
 static void js_watchface_create_bridge(lv_obj_t *parent) {
     if (js_watchface_create_func != 0) {
@@ -153,6 +179,41 @@ static jsval_t js_get_heart_rate(struct js *js, jsval_t *args, int nargs) {
 
 // --- LVGL API ---
 
+static jsval_t js_lvgl_create_button(struct js *js, jsval_t *args, int nargs) {
+    if (nargs < 1 || nargs > 2) return js_mkerr(js, "createButton requires a parent object address and optional text");
+    
+    lv_obj_t *parent = (lv_obj_t *)(uintptr_t)js_getnum(args[0]);
+    lv_obj_t *btn = lv_btn_create(parent);
+
+    if (nargs == 2) {
+        const char *text = js_str(js, args[1]);
+        lv_obj_t *label = lv_label_create(btn);
+        lv_label_set_text(label, text);
+        lv_obj_center(label);
+    }
+
+    return js_mknum((uintptr_t)btn);
+}
+
+static jsval_t js_lvgl_set_on_click(struct js *js, jsval_t *args, int nargs) {
+    if (nargs != 2) return js_mkerr(js, "onClick requires an object address and a callback function");
+    lv_obj_t *obj = (lv_obj_t *)(uintptr_t)js_getnum(args[0]);
+    jsval_t cb = args[1];
+
+    // We need to store the JS engine instance and the callback function value.
+    // We allocate a small struct on the heap and attach it to the LVGL object.
+    js_callback_info_t *info = malloc(sizeof(js_callback_info_t));
+    info->js = js;
+    info->func = cb;
+    
+    lv_obj_set_user_data(obj, info);
+    // Add event callbacks for both CLICKED and DELETE
+    lv_obj_add_event_cb(obj, js_event_bridge, LV_EVENT_CLICKED, info);
+    lv_obj_add_event_cb(obj, js_event_bridge, LV_EVENT_DELETE, info);
+    
+    return js_mkundef();
+}
+
 static jsval_t js_lvgl_create_screen(struct js *js, jsval_t *args, int nargs) {
     (void)js; (void)args; (void)nargs;
     return js_mknum((uintptr_t)lv_scr_act());
@@ -273,6 +334,7 @@ void js_engine_init() {
     js_set(js, lvgl_obj, "createScreen", js_mkfun(js_lvgl_create_screen));
     js_set(js, lvgl_obj, "createLabel", js_mkfun(js_lvgl_create_label));
     js_set(js, lvgl_obj, "createObject", js_mkfun(js_lvgl_create_object));
+    js_set(js, lvgl_obj, "createButton", js_mkfun(js_lvgl_create_button));
     js_set(js, lvgl_obj, "setLabelText", js_mkfun(js_lvgl_set_label_text));
     js_set(js, lvgl_obj, "alignObject", js_mkfun(js_lvgl_align_object));
     js_set(js, lvgl_obj, "setBgColor", js_mkfun(js_lvgl_set_bg_color));
@@ -282,6 +344,8 @@ void js_engine_init() {
     js_set(js, lvgl_obj, "setBorderWidth", js_mkfun(js_lvgl_set_border_width));
     js_set(js, lvgl_obj, "setFlexFlow", js_mkfun(js_lvgl_set_flex_flow));
     js_set(js, lvgl_obj, "setTextColor", js_mkfun(js_lvgl_set_text_color));
+    js_set(js, lvgl_obj, "onClick", js_mkfun(js_lvgl_set_on_click));
+
 
     // Constants
     js_set(js, lvgl_obj, "ALIGN_CENTER", js_mknum(LV_ALIGN_CENTER));

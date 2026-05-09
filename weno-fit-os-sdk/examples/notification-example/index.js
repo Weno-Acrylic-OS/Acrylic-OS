@@ -1,30 +1,21 @@
 // index.js for Notification Example
 
-// Log to the console that the app has started
 WenoFitOS.log("Notification Example app started.");
 
 // Create a simple UI
 let screen = LVGL.createScreen();
-let label = LVGL.createLabel(screen);
-LVGL.setLabelText(label, "Sending a notification...");
-LVGL.alignObject(label, LVGL.ALIGN_CENTER, 0, 0);
 
-// Send a notification
-// This demonstrates how a third-party app can use the notification service.
-const appName = "Notification Example";
-const title = "Hello from an App!";
-const body = "This is a notification from a third-party Javascript app.";
-
-const success = WenoFitOS.sendNotification(appName, title, body);
-
-if (success) {
-    WenoFitOS.log("Notification sent successfully!");
-    LVGL.setLabelText(label, "Notification sent!");
-} else {
-    WenoFitOS.log("Failed to send notification.");
-    LVGL.setLabelText(label, "Failed to send notification.");
+function sendNotification() {
+    WenoFitOS.log("Button clicked! Sending notification...");
+    const appName = "Notification Example";
+    const title = "Button Pressed!";
+    const body = "This notification was sent from a button click.";
+    WenoFitOS.sendNotification(appName, title, body);
 }
 
-// NOTE: The current Weno Fit OS Javascript SDK is very limited and
-// does not expose APIs for creating buttons or handling click events.
-// A more realistic app would send a notification based on some event or user interaction.
+// Create a button with a label
+let btn = LVGL.createButton(screen, "Send Notification");
+LVGL.alignObject(btn, LVGL.ALIGN_CENTER, 0, 0);
+
+// Register a click event handler
+LVGL.onClick(btn, sendNotification);
