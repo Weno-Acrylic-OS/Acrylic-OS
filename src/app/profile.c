@@ -1,5 +1,6 @@
 #include "app/profile.h"
 #include "app/gamification_service.h"
+#include "app/leaderboard.h"
 #include "lvgl.h"
 
 static void create_stats_tab(lv_obj_t * parent) {
@@ -75,8 +76,10 @@ void create_profile_app(lv_obj_t * parent) {
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Profile");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Goals");
     lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "Awards");
+    lv_obj_t * tab4 = lv_tabview_add_tab(tabview, "Leaderboard");
 
     create_stats_tab(tab1);
     create_goals_tab(tab2);
     create_awards_tab(tab3);
+    create_leaderboard_app(tab4);
 }

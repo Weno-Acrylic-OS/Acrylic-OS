@@ -15,14 +15,14 @@ CFLAGS = -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE -DSIMULATOR_BUILD=1
 CFLAGS += -I. -Iinclude -Iinclude/app -Iinclude/drivers -I$(LVGL_DIR) -Ivendor/elk -Iweno-fit-os-sdk/include -Ivendor/cjson
 
 # Linker flags
-LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_main_loop', '_weno_store_receive_apps_json', '_malloc', '_free', '_weno_store_receive_app_source']" -s EXPORTED_RUNTIME_METHODS='["ccall"]' --shell-file src/web/shell.html --preload-file assets@assets
+LDFLAGS = -s WASM=1 -s TOTAL_MEMORY=524288 -s EXPORTED_FUNCTIONS="['_main', '_main_loop', '_weno_store_receive_apps_json', '_malloc', '_free', '_weno_store_receive_app_source']" -s EXPORTED_RUNTIME_METHODS='["ccall"]' --shell-file src/web/shell.html --preload-file assets@assets --preload-file assets/data/leaderboard.json@assets/data/leaderboard.json
 
 LDFLAGS += -s USE_ZLIB=1
 
 # Source files
 # Exclude ARM/QEMU-specific display drivers from the web build
 C_SOURCES = $(filter-out src/drivers/display_qemu.c src/drivers/lvgl_display_arm.c, $(wildcard src/drivers/*.c))
-C_SOURCES += $(wildcard src/app/*.c)
+C_SOURCES += $(filter-out src/app/stubs.c, $(wildcard src/app/*.c))
 C_SOURCES += src/js_engine.c
 C_SOURCES += $(LVGL_SRC)
 C_SOURCES += vendor/elk/elk.c

@@ -11,7 +11,7 @@ LD = $(TOOLCHAIN_PATH)/arm-none-eabi-ld
 OC = $(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
 
 # CPU and FPU settings
-CPU = cortex-a9
+CPU = cortex-m3
 FPU = 
 
 # Compiler flags
@@ -20,35 +20,48 @@ CFLAGS += -I. -Iinclude -Iinclude/kernel -Iinclude/drivers -Iinclude/ui -Iinclud
 
 # Linker script
 LDSCRIPT = src/arch/arm/linker.ld
-LDFLAGS = -T $(LDSCRIPT)
+LDFLAGS = -T $(LDSCRIPT) -lc -lm
 
 # LVGL
 LVGL_DIR = vendor/lvgl
 LVGL_SRC = $(shell find $(LVGL_DIR)/src -name '*.c')
 
 # Source files
+# Kernel
 C_SOURCES = $(wildcard src/kernel/*.c)
 
+# Architecture
+C_SOURCES += $(wildcard src/arch/arm/*.c)
+S_SOURCES = src/arch/arm/startup.s src/arch/arm/context_switch.s
+
+# Libc
+C_SOURCES += $(wildcard src/libc/*.c)
+
+# UI
+C_SOURCES += $(wildcard src/ui/*.c)
+
+# LVGL
+C_SOURCES += $(LVGL_SRC)
+
+# cJSON
+C_SOURCES += vendor/cjson/cJSON.c
+
+# Drivers
+# Define web-specific and ARM-specific drivers
 WEB_DRIVERS = src/drivers/display.c src/drivers/lvgl_display.c src/drivers/sim_heart_rate.c src/drivers/touch.c
 ARM_SPECIFIC_DRIVERS = src/drivers/display_qemu.c src/drivers/lvgl_display_arm.c
 
-# Add common drivers, excluding web-specific ones
-C_SOURCES += $(filter-out $(WEB_DRIVERS), $(wildcard src/drivers/*.c))
-# Add ARM-specific drivers
+# Add common drivers, excluding ALL known specific drivers (web and arm-specific), then add ARM-specific ones explicitly once
+C_SOURCES += $(filter-out $(WEB_DRIVERS) $(ARM_SPECIFIC_DRIVERS), $(wildcard src/drivers/*.c))
 C_SOURCES += $(ARM_SPECIFIC_DRIVERS)
 
-C_SOURCES += $(wildcard src/ui/*.c)
+# Apps
+# Exclude web-specific apps
+WEB_APPS = src/app/phone_service.c src/app/shortcuts.c src/app/time_service.c src/app/weno_store.c src/app/js_engine.c
+C_SOURCES += $(filter-out $(WEB_APPS), $(wildcard src/app/*.c))
+# Add stubs for web-specific app functions
+C_SOURCES += src/app/stubs.c
 
-WEB_APP_SOURCES = src/app/phone_service.c src/app/shortcuts.c src/app/time_service.c src/app/weno_store.c
-C_SOURCES += $(filter-out $(WEB_APP_SOURCES), $(wildcard src/app/*.c))
-
-C_SOURCES += $(wildcard src/libc/*.c)
-C_SOURCES += $(wildcard src/arch/arm/*.c)
-# Add LVGL sources
-C_SOURCES += $(LVGL_SRC)
-
-
-S_SOURCES = src/arch/arm/startup.s src/arch/arm/context_switch.s
 
 # Object files
 OBJS = $(patsubst src/%.c,$(OUT_DIR)/%.o,$(C_SOURCES))
@@ -70,8 +83,10 @@ $(OUT_DIR)/$(TARGET).elf: $(OBJS)
 $(OUT_DIR)/$(TARGET).bin: $(OUT_DIR)/$(TARGET).elf
 	$(OC) -O binary $< $@
 
+# Note: We are back to the original lm3s6965evb machine. 
+# Graphics will not appear yet, but the build should pass.
 run-qemu: all
-	qemu-system-arm -M vexpress-a9 -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
+	qemu-system-arm -M lm3s6965evb -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
 
 clean:
 	rm -rf $(OUT_DIR)

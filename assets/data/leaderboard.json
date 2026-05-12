@@ -1,0 +1,12 @@
+[
+    {"rank": 1, "name": "Jane Doe", "steps": 85234},
+    {"rank": 2, "name": "John Smith", "steps": 78123},
+    {"rank": 3, "name": "You", "steps": 75678},
+    {"rank": 4, "name": "Emily White", "steps": 72019},
+    {"rank": 5, "name": "Michael B.", "steps": 68456},
+    {"rank": 6, "name": "Sarah Green", "steps": 65123},
+    {"rank": 7, "name": "David Chen", "steps": 61890},
+    {"rank": 8, "name": "Laura Jones", "steps": 58765},
+    {"rank": 9, "name": "Chris Lee", "steps": 55432},
+    {"rank": 10, "name": "Amanda Z.", "steps": 52345}
+]

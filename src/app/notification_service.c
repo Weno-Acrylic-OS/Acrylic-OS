@@ -1,5 +1,6 @@
 #include "app/notification_service.h"
 #include <string.h>
+#include "app/dnd_service.h"
 
 static notification_t notifications[MAX_NOTIFICATIONS];
 static int notification_count = 0;
@@ -10,6 +11,10 @@ void notification_service_init(void) {
 }
 
 bool notification_service_send(const char* app_name, const char* title, const char* body) {
+    if (dnd_service_is_active()) {
+        return false; // Do not disturb is active, discard notification
+    }
+
     if (notification_count >= MAX_NOTIFICATIONS) {
         // Here we could implement a strategy to discard old notifications
         return false;

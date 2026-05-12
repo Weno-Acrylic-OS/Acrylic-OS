@@ -17,6 +17,8 @@
 #include "app/ecg_app.h"
 #include "app/calculator.h"
 #include "app/medical_id.h"
+#include "app/handwashing.h"
+#include "app/routines_app.h"
 #include <stdlib.h>
 
 typedef struct {
@@ -31,6 +33,8 @@ static const app_info_t preinstalled_apps[] = {
     {"Settings", "assets/icons/settings.png", create_settings_app},
     {"Fitness", "assets/icons/fitness.png", create_fitness_app},
     {"Clock", "assets/icons/clock.png", create_clock_app},
+    {"Handwashing", LV_SYMBOL_TINT, create_handwashing_app},
+    {"Routines", LV_SYMBOL_LIST, create_routines_app},
     {"Phone", LV_SYMBOL_CALL, create_phone_app},
     {"Watch Face Studio", LV_SYMBOL_EDIT, create_watchface_studio},
     {"Weather", LV_SYMBOL_DUMMY, create_weather_app},

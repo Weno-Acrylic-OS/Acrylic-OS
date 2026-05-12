@@ -30,6 +30,9 @@
 #include "app/spo2_service.h"
 #include "app/temperature_service.h"
 #include "app/notification_service.h"
+#include "app/dnd_service.h"
+#include "app/routines_service.h"
+#include "app/activity_service.h"
 #include "drivers/heart_rate.h"
 #include "drivers/sim_heart_rate.h"
 #include "app/ble_service.h"
@@ -169,6 +172,8 @@ static void va_close_handler(lv_event_t * e) {
         voice_assistant_visible = false;
     }
 }
+
+
 
 static void swipe_event_handler(lv_event_t * e) {
 #ifdef SIMULATOR_BUILD
@@ -393,6 +398,9 @@ int main() {
     privacy_service_init();
     gamification_service_init();
     notification_service_init();
+    dnd_service_init();
+    routines_service_init();
+    activity_service_init();
     spo2_service_init();
     temperature_service_init();
     datalock_init();

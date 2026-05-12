@@ -1,97 +1,101 @@
-// src/app/fitness.c
 #include "app/fitness.h"
-#include "app_list.h"
-#include "app/status_bar.h" // Needed to update status bar workout indicator
+#include "app/navigation_service.h"
+#include "app/workout_active.h"
+#include "lvgl.h"
+#include <stdio.h> // For sprintf
 
-static bool workout_is_active = false;
-static lv_obj_t * status_label; // Made static to be accessible by start/stop functions
+// --- State Management ---
+static bool workout_is_active = false; 
+static const char* selected_workout_type = NULL;
 
-// Public accessor for the workout state
 bool fitness_app_is_active() {
     return workout_is_active;
 }
-
-// Public functions to start/stop workout
 void fitness_app_start_workout() {
-    if (!workout_is_active) {
-        workout_is_active = true;
-        status_bar_show_workout_indicator(true);
-        if (status_label) {
-            lv_label_set_text(status_label, "Workout Active");
-        }
-        // TODO: Integrate with gamification service if needed (e.g., start timer for workout XP)
-    }
+    workout_is_active = true;
 }
-
 void fitness_app_stop_workout() {
-    if (workout_is_active) {
-        workout_is_active = false;
-        status_bar_show_workout_indicator(false);
-        if (status_label) {
-            lv_label_set_text(status_label, "Workout Stopped");
-        }
-        // TODO: Integrate with gamification service if needed (e.g., grant workout XP)
+    workout_is_active = false;
+}
+// --- End State Management ---
+
+
+// --- Navigation Wrapper ---
+// This wrapper allows us to navigate to a screen that requires a parameter.
+void launch_active_workout_screen(lv_obj_t* parent) {
+    if (selected_workout_type != NULL) {
+        create_workout_active_screen(parent, selected_workout_type);
+    } else {
+        // Fallback in case something went wrong
+        lv_obj_t* label = lv_label_create(parent);
+        lv_label_set_text(label, "Error: No workout type selected.");
+        lv_obj_center(label);
     }
 }
 
-static void back_to_app_list(lv_event_t * e) {
-    lv_obj_t * obj = lv_event_get_current_target(e);
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    create_app_list(parent);
+
+// --- Event Handlers ---
+
+static void workout_select_handler(lv_event_t * e) {
+    lv_obj_t * btn = lv_event_get_target(e);
+    // Store the selected workout type in our static variable
+    selected_workout_type = lv_list_get_btn_text(lv_obj_get_parent(btn), btn);
+
+    // Navigate to the screen via our wrapper function
+    navigation_service_navigate_to(launch_active_workout_screen);
 }
 
-static void fitness_button_handler(lv_event_t * e) {
-    const char* action = lv_event_get_user_data(e);
-    // lv_obj_t * container = lv_obj_get_parent(lv_event_get_target(e)); // No longer needed
-    // status_label is static now
-
-    if (strcmp(action, "start") == 0) {
-        fitness_app_start_workout();
-    } else if (strcmp(action, "stop") == 0) {
-        fitness_app_stop_workout();
-    }
+static void go_back_event_handler(lv_event_t * e) {
+    (void)e; // Unused
+    navigation_service_go_back();
 }
+
+// --- UI Creation ---
 
 void create_fitness_app(lv_obj_t * parent) {
     lv_obj_clean(parent);
+    lv_obj_set_style_bg_color(parent, lv_color_black(), 0);
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_all(parent, 10, 0);
 
-    lv_obj_t * back_btn = lv_btn_create(parent);
-    lv_obj_align(back_btn, LV_ALIGN_TOP_LEFT, 10, 10);
-    lv_obj_add_event_cb(back_btn, back_to_app_list, LV_EVENT_CLICKED, NULL);
+    // --- Title Bar ---
+    lv_obj_t * top_bar = lv_obj_create(parent);
+    lv_obj_remove_style_all(top_bar);
+    lv_obj_set_width(top_bar, lv_pct(100));
+    lv_obj_set_height(top_bar, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(top_bar, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(top_bar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    // Back button
+    lv_obj_t * back_btn = lv_btn_create(top_bar);
+    lv_obj_set_style_bg_opa(back_btn, LV_OPA_TRANSP, 0);
+    lv_obj_add_event_cb(back_btn, go_back_event_handler, LV_EVENT_CLICKED, NULL); 
     lv_obj_t * back_label = lv_label_create(back_btn);
     lv_label_set_text(back_label, LV_SYMBOL_LEFT " Back");
+    lv_obj_center(back_label);
 
-    // Container for all fitness elements
-    lv_obj_t* container = lv_obj_create(parent);
-    lv_obj_set_size(container, lv_pct(100), lv_pct(100));
-    lv_obj_set_style_bg_opa(container, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_border_width(container, 0, 0);
-    lv_obj_center(container);
-    lv_obj_set_flex_flow(container, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(container, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_t * title = lv_label_create(top_bar);
+    lv_label_set_text(title, "Start Workout");
+    lv_obj_set_style_text_font(title, &lv_font_montserrat_20, 0);
+    lv_obj_set_style_pad_left(title, 20, 0);
 
-    lv_obj_t * title = lv_label_create(container);
-    lv_label_set_text(title, "Fitness Tracker");
 
-    status_label = lv_label_create(container); // Assign to static variable
-    lv_label_set_text(status_label, workout_is_active ? "Workout Active" : "Workout Stopped");
-    lv_obj_set_style_pad_bottom(status_label, 20, 0);
+    // --- Workout List ---
+    lv_obj_t * list = lv_list_create(parent);
+    lv_obj_set_size(list, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_grow(list, 1);
+    
+    // Add workout types to the list
+    lv_obj_t* btn;
+    btn = lv_list_add_btn(list, LV_SYMBOL_CHARGE, "Outdoor Run");
+    lv_obj_add_event_cb(btn, workout_select_handler, LV_EVENT_CLICKED, NULL);
 
-    // Button container
-    lv_obj_t* btn_container = lv_obj_create(container);
-    lv_obj_set_size(btn_container, lv_pct(100), LV_SIZE_CONTENT);
-    lv_obj_set_flex_flow(btn_container, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(btn_container, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_bg_opa(btn_container, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_border_width(btn_container, 0, 0);
+    btn = lv_list_add_btn(list, LV_SYMBOL_HOME, "Treadmill");
+    lv_obj_add_event_cb(btn, workout_select_handler, LV_EVENT_CLICKED, NULL);
+    
+    btn = lv_list_add_btn(list, LV_SYMBOL_SETTINGS, "Strength");
+    lv_obj_add_event_cb(btn, workout_select_handler, LV_EVENT_CLICKED, NULL);
 
-    lv_obj_t * start_btn = lv_btn_create(btn_container);
-    lv_obj_add_event_cb(start_btn, fitness_button_handler, LV_EVENT_CLICKED, "start");
-    lv_obj_t * start_label = lv_label_create(start_btn);
-    lv_label_set_text(start_label, "Start");
-
-    lv_obj_t * stop_btn = lv_btn_create(btn_container);
-    lv_obj_add_event_cb(stop_btn, fitness_button_handler, LV_EVENT_CLICKED, "stop");
-    lv_obj_t * stop_label = lv_label_create(stop_btn);
-    lv_label_set_text(stop_label, "Stop");
+    btn = lv_list_add_btn(list, LV_SYMBOL_REFRESH, "Yoga");
+    lv_obj_add_event_cb(btn, workout_select_handler, LV_EVENT_CLICKED, NULL);
 }
