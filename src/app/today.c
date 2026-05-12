@@ -3,13 +3,36 @@
 #include "app/today_service.h"
 #include "app/spo2_service.h"
 #include "app/temperature_service.h"
+#include "app/activity_service.h"
 #include <stdio.h>
 
 // --- Widget Labels ---
 static lv_obj_t * spo2_data_label = NULL;
 static lv_obj_t * temp_data_label = NULL;
+static lv_obj_t * activity_data_label = NULL;
+
 
 // --- Native Widget Implementations ---
+
+static void create_activity_widget(lv_obj_t * parent) {
+    lv_obj_t * panel = lv_obj_create(parent);
+    lv_obj_set_size(panel, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_style_bg_color(panel, lv_color_hex(0x000000), 0); // Orange for energy
+    lv_obj_set_style_border_width(panel, 0, 0);
+    lv_obj_set_style_radius(panel, 10, 0);
+    lv_obj_set_style_pad_all(panel, 10, 0);
+    lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_COLUMN);
+
+    lv_obj_t * title = lv_label_create(panel);
+    lv_label_set_text(title, "Fitness Activity"); // Changed to resolve name conflicts with Garmin's intensity minutes
+    lv_obj_set_style_text_font(title, &lv_font_montserrat_18, 0);
+    lv_obj_set_style_text_color(title, lv_color_hex(0xFFFFFF), 0);
+
+    activity_data_label = lv_label_create(panel);
+    lv_label_set_text(activity_data_label, "0 / 30 min");
+    lv_obj_set_style_text_color(activity_data_label, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_style_text_font(activity_data_label, &lv_font_montserrat_14, 0);
+}
 
 static void create_fitness_widget(lv_obj_t * parent) {
     lv_obj_t * fitness_panel = lv_obj_create(parent);
@@ -21,12 +44,12 @@ static void create_fitness_widget(lv_obj_t * parent) {
     lv_obj_set_flex_flow(fitness_panel, LV_FLEX_FLOW_COLUMN);
 
     lv_obj_t * fitness_title = lv_label_create(fitness_panel);
-    lv_label_set_text(fitness_title, "Activity");
+    lv_label_set_text(fitness_title, "Daily Steps");
     lv_obj_set_style_text_font(fitness_title, &lv_font_montserrat_18, 0);
     lv_obj_set_style_text_color(fitness_title, lv_color_hex(0xFFFFFF), 0);
 
     lv_obj_t * fitness_data = lv_label_create(fitness_panel);
-    lv_label_set_text(fitness_data, "Steps: 8,500 | Calories: 350 | Distance: 6.2 km");
+    lv_label_set_text(fitness_data, "8,500 / 10,000");
     lv_obj_set_style_text_color(fitness_data, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_text_font(fitness_data, &lv_font_montserrat_14, 0);
 }
@@ -94,7 +117,7 @@ static void create_spo2_widget(lv_obj_t * parent) {
 static void create_temperature_widget(lv_obj_t * parent) {
     lv_obj_t * temp_panel = lv_obj_create(parent);
     lv_obj_set_size(temp_panel, lv_pct(100), LV_SIZE_CONTENT);
-    lv_obj_set_style_bg_color(temp_panel, lv_color_hex(0xFABE7A), 0); // Orange
+    lv_obj_set_style_bg_color(temp_panel, lv_color_hex(0x7A7A7A), 0); // Orange
     lv_obj_set_style_border_width(temp_panel, 0, 0);
     lv_obj_set_style_radius(temp_panel, 10, 0);
     lv_obj_set_style_pad_all(temp_panel, 10, 0);
@@ -112,6 +135,11 @@ static void create_temperature_widget(lv_obj_t * parent) {
 }
 
 // --- Native Widget Registration ---
+
+static const today_widget_descriptor_t activity_widget_desc = {
+    .name = "Activity",
+    .create_func = create_activity_widget,
+};
 
 static const today_widget_descriptor_t fitness_widget_desc = {
     .name = "Fitness",
@@ -139,6 +167,7 @@ static const today_widget_descriptor_t temp_widget_desc = {
 };
 
 void today_register_native_widgets() {
+    today_service_register_widget(&activity_widget_desc);
     today_service_register_widget(&fitness_widget_desc);
     today_service_register_widget(&hr_widget_desc);
     today_service_register_widget(&sleep_widget_desc);
@@ -168,6 +197,12 @@ void create_today_view(lv_obj_t * parent)
 
 // --- View Update ---
 void today_view_update(void) {
+    if (activity_data_label) {
+        uint16_t points = activity_service_get_points();
+        uint16_t goal = activity_service_get_goal();
+        lv_label_set_text_fmt(activity_data_label, "%d / %d min", points, goal);
+    }
+
     if (spo2_data_label) {
         uint8_t spo2_val = spo2_service_get_latest_value();
         char buffer[32];

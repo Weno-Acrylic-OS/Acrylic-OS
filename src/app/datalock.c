@@ -2,6 +2,7 @@
 #include <app/datalock.h>
 #include <string.h> // For strncmp, strncpy
 #include <stddef.h> // For NULL
+#include "navigation_service.h"
 
 // --- Internal State ---
 
@@ -62,5 +63,6 @@ void datalock_lock_device() {
     if (pin_has_been_set) {
         device_is_locked = true;
         // NOTE: We would persist the locked status here.
+        navigation_service_navigate_to(create_datalock_screen);
     }
 }

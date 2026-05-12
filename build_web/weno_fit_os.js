@@ -71,7 +71,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpzte29pc_.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp1glnjgej.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -160,6 +160,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
         if (!check) throw new Error(msg);
       }
 Module['FS_createPath']("/", "assets", true, true);
+Module['FS_createPath']("/assets", "data", true, true);
 Module['FS_createPath']("/assets", "icons", true, true);
 
     for (var file of metadata['files']) {
@@ -201,25 +202,25 @@ Module['FS_createPath']("/assets", "icons", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/assets/.DS_Store", "start": 0, "end": 6148}, {"filename": "/assets/icons/.DS_Store", "start": 6148, "end": 12296}, {"filename": "/assets/icons/Clock.png", "start": 12296, "end": 17324}, {"filename": "/assets/icons/Messages.png", "start": 17324, "end": 18902}, {"filename": "/assets/icons/Music.png", "start": 18902, "end": 20814}, {"filename": "/assets/icons/Settings.png", "start": 20814, "end": 25701}, {"filename": "/assets/icons/fitness.png", "start": 25701, "end": 30206}, {"filename": "/assets/icons/weno_pay.png", "start": 30206, "end": 32082}], "remote_package_size": 32082});
+    loadPackage({"files": [{"filename": "/assets/.DS_Store", "start": 0, "end": 6148}, {"filename": "/assets/data/leaderboard.json", "start": 6148, "end": 6694}, {"filename": "/assets/icons/.DS_Store", "start": 6694, "end": 12842}, {"filename": "/assets/icons/Clock.png", "start": 12842, "end": 17870}, {"filename": "/assets/icons/Messages.png", "start": 17870, "end": 19448}, {"filename": "/assets/icons/Music.png", "start": 19448, "end": 21360}, {"filename": "/assets/icons/Settings.png", "start": 21360, "end": 26247}, {"filename": "/assets/icons/fitness.png", "start": 26247, "end": 30752}, {"filename": "/assets/icons/weno_pay.png", "start": 30752, "end": 32628}], "remote_package_size": 32628});
 
   })();
 
-// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpzte29pc_.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpnqlwirg5.js
+// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp1glnjgej.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpyfnzn6xp.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpnqlwirg5.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpx_99ifgm.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpyfnzn6xp.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp2atkku0f.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpx_99ifgm.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp2atkku0f.js
 
 
 var arguments_ = [];
@@ -5164,6 +5165,7 @@ function get_touch_x() { return lvgl_touch_x; }
 function get_touch_y() { return lvgl_touch_y; }
 function get_touch_down() { return lvgl_touch_down; }
 function touch_get_event() { var random_event = Math.random() * 100; if (random_event < 5) { return 1; } else if (random_event < 10) { return 2; } return 0; }
+function time_service_get_yday() { const now = new Date(); const start = new Date(now.getFullYear(), 0, 0); const diff = now - start; const oneDay = 1000 * 60 * 60 * 24; const day = Math.floor(diff / oneDay); return day; }
 
 // Imports from the Wasm binary.
 var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
@@ -5269,7 +5271,9 @@ var wasmImports = {
   /** @export */
   get_touch_x,
   /** @export */
-  get_touch_y
+  get_touch_y,
+  /** @export */
+  time_service_get_yday
 };
 
 
