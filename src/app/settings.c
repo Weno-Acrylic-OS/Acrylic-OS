@@ -4,11 +4,15 @@
 #include "app/watchface_aod.h"
 #include "app/watchface.h"
 #include "app/ota_service.h"
+#include "app/profile_service.h" // For getting/setting age
+#include "app/navigation_service.h"
 #include <string.h>
+#include <stdio.h> // For sprintf
 
 // --- Forward Declarations ---
 void create_settings_app(lv_obj_t * parent);
 static void create_datalock_settings_screen(lv_obj_t * parent);
+static void create_health_settings_screen(lv_obj_t * parent);
 static void datalock_settings_keypad_handler(lv_event_t * e);
 static void navigate_to_settings_timer_cb(lv_timer_t * timer);
 static void back_to_app_list(lv_event_t * e);
@@ -24,18 +28,21 @@ typedef enum {
 static pin_setup_state_t current_pin_state;
 static char new_pin_buffer[DATALOCK_PIN_LENGTH + 1];
 
+// --- State for Health Settings ---
+static lv_obj_t * age_value_label;
+static uint8_t current_age_in_ui;
+
+
 // --- Event Handlers & Timers ---
 
 static void back_to_app_list(lv_event_t * e) {
-    lv_obj_t * obj = lv_event_get_current_target(e);
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    create_app_list(parent);
+    (void)e;
+    navigation_service_go_back();
 }
 
 static void back_to_settings_app(lv_event_t * e) {
-    lv_obj_t * obj = lv_event_get_current_target(e);
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    create_settings_app(parent);
+    (void)e;
+    create_settings_app(lv_obj_get_parent(lv_obj_get_parent(lv_event_get_target(e))));
 }
 
 static void navigate_to_settings_timer_cb(lv_timer_t * timer) {
@@ -93,28 +100,83 @@ static void settings_list_event_handler(lv_event_t * e) {
 
     if (strcmp(selection, "Security") == 0) {
         create_datalock_settings_screen(parent);
+    } else if (strcmp(selection, "Health") == 0) {
+        create_health_settings_screen(parent);
     }
 }
 
-static void theme_dropdown_event_handler(lv_event_t * e) {
-    lv_obj_t * dropdown = lv_event_get_target(e);
-    int selected_option = lv_dropdown_get_selected(dropdown);
+static void age_change_event_handler(lv_event_t * e) {
+    int adjustment = (int)lv_event_get_user_data(e);
+    current_age_in_ui += adjustment;
 
-    lv_disp_t * disp = lv_disp_get_default();
-    lv_theme_t * theme = NULL;
+    if (current_age_in_ui < 10) current_age_in_ui = 10;
+    if (current_age_in_ui > 99) current_age_in_ui = 99;
 
-    if (selected_option == 0) { // Dark
-        theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_lighten(LV_PALETTE_GREY, 3), false, &lv_font_montserrat_14);
-    } else { // Light
-        theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_lighten(LV_PALETTE_GREY, 3), true, &lv_font_montserrat_14);
-    }
-    lv_disp_set_theme(disp, theme);
+    lv_label_set_text_fmt(age_value_label, "%d", current_age_in_ui);
+    profile_service_set_age(current_age_in_ui);
 }
+
 
 // --- UI Creation ---
 
+static void create_health_settings_screen(lv_obj_t * parent) {
+    lv_obj_clean(parent);
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, 0);
+    lv_obj_set_style_pad_top(parent, 20, 0);
+
+    lv_obj_t * back_btn = lv_btn_create(parent);
+    lv_obj_align(back_btn, LV_ALIGN_TOP_LEFT, 10, 10);
+    lv_obj_add_event_cb(back_btn, back_to_settings_app, LV_EVENT_CLICKED, NULL);
+    lv_obj_t * back_label = lv_label_create(back_btn);
+    lv_label_set_text(back_label, LV_SYMBOL_LEFT " Back");
+
+    lv_obj_t * title = lv_label_create(parent);
+    lv_label_set_text(title, "Health Settings");
+    lv_obj_set_style_text_font(title, &lv_font_montserrat_22, 0);
+    lv_obj_set_style_pad_bottom(title, 30, 0);
+
+    // --- Age Setting ---
+    lv_obj_t * age_cont = lv_obj_create(parent);
+    lv_obj_remove_style_all(age_cont);
+    lv_obj_set_width(age_cont, lv_pct(100));
+    lv_obj_set_height(age_cont, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(age_cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(age_cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_hor(age_cont, 20, 0);
+
+    lv_obj_t * age_label = lv_label_create(age_cont);
+    lv_label_set_text(age_label, "Your Age");
+    lv_obj_set_style_text_font(age_label, &lv_font_montserrat_18, 0);
+
+    lv_obj_t* age_value_cont = lv_obj_create(age_cont);
+    lv_obj_remove_style_all(age_value_cont);
+    lv_obj_set_size(age_value_cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(age_value_cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(age_value_cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_gap(age_value_cont, 15, 0);
+
+    current_age_in_ui = profile_service_get_age();
+
+    lv_obj_t* minus_btn = lv_btn_create(age_value_cont);
+    lv_obj_add_event_cb(minus_btn, age_change_event_handler, LV_EVENT_CLICKED, (void*)-1);
+    lv_obj_t* minus_label = lv_label_create(minus_btn);
+    lv_label_set_text(minus_label, LV_SYMBOL_MINUS);
+
+    age_value_label = lv_label_create(age_value_cont);
+    lv_obj_set_style_text_font(age_value_label, &lv_font_montserrat_22, 0);
+    lv_label_set_text_fmt(age_value_label, "%d", current_age_in_ui);
+
+    lv_obj_t* plus_btn = lv_btn_create(age_value_cont);
+    lv_obj_add_event_cb(plus_btn, age_change_event_handler, LV_EVENT_CLICKED, (void*)1);
+    lv_obj_t* plus_label = lv_label_create(plus_btn);
+    lv_label_set_text(plus_label, LV_SYMBOL_PLUS);
+}
+
+
 void create_settings_app(lv_obj_t * parent) {
     lv_obj_clean(parent);
+    lv_obj_set_style_bg_color(parent, lv_color_black(), 0);
 
     lv_obj_t * back_btn = lv_btn_create(parent);
     lv_obj_align(back_btn, LV_ALIGN_TOP_LEFT, 10, 10);
@@ -128,26 +190,19 @@ void create_settings_app(lv_obj_t * parent) {
 
     lv_list_add_text(list, "Settings");
 
-    lv_obj_t* security_btn = lv_list_add_btn(list, LV_SYMBOL_SETTINGS, "Security");
+    lv_obj_t* health_btn = lv_list_add_btn(list, LV_SYMBOL_BELL, "Health"); // Using BELL as a placeholder
+    lv_obj_add_event_cb(health_btn, settings_list_event_handler, LV_EVENT_CLICKED, "Health");
+    
+    lv_obj_t* security_btn = lv_list_add_btn(list, LV_SYMBOL_EYE_CLOSE, "Security");
     lv_obj_add_event_cb(security_btn, settings_list_event_handler, LV_EVENT_CLICKED, "Security");
 
-    lv_list_add_btn(list, LV_SYMBOL_WIFI, "Bluetooth");
+    lv_list_add_btn(list, LV_SYMBOL_BLUETOOTH, "Bluetooth");
     lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Display");
-
-    lv_obj_t* aod_btn = lv_list_add_btn(list, LV_SYMBOL_DUMMY, "Always On Display");
-    lv_obj_add_event_cb(aod_btn, toggle_aod, LV_EVENT_CLICKED, NULL);
 
     lv_list_add_text(list, "System");
     lv_obj_t* ota_btn = lv_list_add_btn(list, LV_SYMBOL_DOWNLOAD, "OTA Update");
     lv_obj_add_event_cb(ota_btn, ota_update_event_handler, LV_EVENT_CLICKED, NULL);
 
-    lv_list_add_text(list, "Theme");
-    lv_obj_t * theme_dropdown = lv_dropdown_create(parent);
-    lv_dropdown_set_options(theme_dropdown, "Dark\nLight");
-    lv_obj_align(theme_dropdown, LV_ALIGN_CENTER, 0, 40);
-    lv_obj_add_event_cb(theme_dropdown, theme_dropdown_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
-
-    lv_list_add_btn(list, LV_SYMBOL_BELL, "Alarms");
 }
 
 static void create_datalock_settings_screen(lv_obj_t * parent) {
@@ -179,7 +234,10 @@ static void create_datalock_settings_screen(lv_obj_t * parent) {
     lv_obj_set_style_pad_top(pin_label, 10, 0);
     lv_obj_set_style_pad_bottom(pin_label, 10, 0);
 
-    static const char * map[] = {"1", "2", "3", "\n", "4", "5", "6", "\n", "7", "8", "9", "\n", LV_SYMBOL_BACKSPACE, "0", LV_SYMBOL_OK, ""};
+    static const char * map[] = {"1", "2", "3", "\n",
+                                        "4", "5", "6", "\n",
+                                        "7", "8", "9", "\n",
+                                        LV_SYMBOL_BACKSPACE, "0", LV_SYMBOL_OK, ""};
     lv_obj_t * keypad = lv_btnmatrix_create(container);
     lv_btnmatrix_set_map(keypad, map);
     lv_obj_set_size(keypad, 220, 180);

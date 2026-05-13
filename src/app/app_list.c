@@ -29,6 +29,24 @@ typedef struct {
 
 static void app_list_event_handler(lv_event_t* e);
 
+static void anim_scale_exec_cb(void * var, int32_t v) {
+    lv_obj_set_style_transform_zoom(var, v, LV_STATE_DEFAULT);
+    lv_obj_set_style_transform_pivot_x(var, lv_obj_get_width(var) / 2, LV_STATE_DEFAULT);
+    lv_obj_set_style_transform_pivot_y(var, lv_obj_get_height(var) / 2, LV_STATE_DEFAULT);
+}
+
+static void navigate_to_app_ready_cb(lv_anim_t *a) {
+    const app_info_t * app_info = a->user_data;
+    if (app_info->launch_func) {
+        navigation_service_navigate_to(app_info->launch_func);
+    } else {
+        sdk_service_run_app(app_info->name);
+    }
+    // Reset scale for when we come back
+    lv_obj_set_style_transform_zoom(a->var, 256, LV_STATE_DEFAULT);
+}
+
+
 static const app_info_t preinstalled_apps[] = {
     {"Settings", "assets/icons/settings.png", create_settings_app},
     {"Fitness", "assets/icons/fitness.png", create_fitness_app},
@@ -53,12 +71,18 @@ static lv_obj_t* list;
 
 static void app_list_event_handler(lv_event_t * e)
 {
+    lv_obj_t * btn = lv_event_get_target(e);
     const app_info_t * app_info = lv_event_get_user_data(e);
-    if (app_info->launch_func) {
-        navigation_service_navigate_to(app_info->launch_func);
-    } else {
-        sdk_service_run_app(app_info->name);
-    }
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, btn);
+    lv_anim_set_exec_cb(&a, anim_scale_exec_cb);
+    lv_anim_set_values(&a, 256, 384); // 1.5x zoom
+    lv_anim_set_time(&a, 200);
+    lv_anim_set_ready_cb(&a, navigate_to_app_ready_cb);
+    a.user_data = (void*)app_info;
+    lv_anim_start(&a);
 }
 
 void add_to_app_list(const char* app_name, const char* icon_path) {
@@ -79,12 +103,18 @@ void create_app_list(lv_obj_t * parent)
     list = lv_list_create(parent);
     lv_obj_set_size(list, lv_pct(100), lv_pct(100));
     lv_obj_center(list);
-
-    lv_list_add_text(list, "Apps");
+    
+    // Make the list itself transparent and borderless
+    lv_obj_set_style_bg_opa(list, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(list, 0, 0);
 
     for (size_t i = 0; i < sizeof(preinstalled_apps) / sizeof(preinstalled_apps[0]); i++) {
         const app_info_t* app = &preinstalled_apps[i];
         lv_obj_t* btn = lv_list_add_btn(list, app->icon_path, app->name);
         lv_obj_add_event_cb(btn, app_list_event_handler, LV_EVENT_CLICKED, (void*)app);
+        
+        // Make the button background and border transparent
+        lv_obj_set_style_bg_opa(btn, LV_OPA_TRANSP, LV_STATE_DEFAULT);
+        lv_obj_set_style_border_width(btn, 0, LV_STATE_DEFAULT);
     }
 }

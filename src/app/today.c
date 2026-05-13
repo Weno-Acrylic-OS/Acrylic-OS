@@ -4,12 +4,14 @@
 #include "app/spo2_service.h"
 #include "app/temperature_service.h"
 #include "app/activity_service.h"
+#include "app/gamification_service.h"
 #include <stdio.h>
 
 // --- Widget Labels ---
 static lv_obj_t * spo2_data_label = NULL;
 static lv_obj_t * temp_data_label = NULL;
 static lv_obj_t * activity_data_label = NULL;
+static lv_obj_t * fitness_zone_label = NULL;
 
 
 // --- Native Widget Implementations ---
@@ -134,6 +136,26 @@ static void create_temperature_widget(lv_obj_t * parent) {
     lv_obj_set_style_text_font(temp_data_label, &lv_font_montserrat_14, 0);
 }
 
+static void create_fitness_zone_widget(lv_obj_t * parent) {
+    lv_obj_t * zone_panel = lv_obj_create(parent);
+    lv_obj_set_size(zone_panel, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_style_bg_color(zone_panel, lv_color_hex(0xFFD700), 0); // Gold
+    lv_obj_set_style_border_width(zone_panel, 0, 0);
+    lv_obj_set_style_radius(zone_panel, 10, 0);
+    lv_obj_set_style_pad_all(zone_panel, 10, 0);
+    lv_obj_set_flex_flow(zone_panel, LV_FLEX_FLOW_COLUMN);
+
+    lv_obj_t * zone_title = lv_label_create(zone_panel);
+    lv_label_set_text(zone_title, "Fitness Zone");
+    lv_obj_set_style_text_font(zone_title, &lv_font_montserrat_18, 0);
+    lv_obj_set_style_text_color(zone_title, lv_color_hex(0x000000), 0);
+
+    fitness_zone_label = lv_label_create(zone_panel);
+    lv_label_set_text(fitness_zone_label, "Current Zone: --");
+    lv_obj_set_style_text_color(fitness_zone_label, lv_color_hex(0x000000), 0);
+    lv_obj_set_style_text_font(fitness_zone_label, &lv_font_montserrat_14, 0);
+}
+
 // --- Native Widget Registration ---
 
 static const today_widget_descriptor_t activity_widget_desc = {
@@ -166,6 +188,11 @@ static const today_widget_descriptor_t temp_widget_desc = {
     .create_func = create_temperature_widget,
 };
 
+static const today_widget_descriptor_t fitness_zone_widget_desc = {
+    .name = "Fitness Zone",
+    .create_func = create_fitness_zone_widget,
+};
+
 void today_register_native_widgets() {
     today_service_register_widget(&activity_widget_desc);
     today_service_register_widget(&fitness_widget_desc);
@@ -173,6 +200,7 @@ void today_register_native_widgets() {
     today_service_register_widget(&sleep_widget_desc);
     today_service_register_widget(&spo2_widget_desc);
     today_service_register_widget(&temp_widget_desc);
+    today_service_register_widget(&fitness_zone_widget_desc);
 }
 
 // --- Main View Creation ---
@@ -223,5 +251,22 @@ void today_view_update(void) {
             snprintf(buffer, sizeof(buffer), "Trend: -- C");
         }
         lv_label_set_text(temp_data_label, buffer);
+    }
+
+    if (fitness_zone_label) {
+        fitness_zone_t zone = gamification_get_fitness_zone();
+        const char *zone_str;
+        switch (zone) {
+            case FITNESS_ZONE_PROMOTION:
+                zone_str = "Promotion";
+                break;
+            case FITNESS_ZONE_DEMOTION:
+                zone_str = "Demotion";
+                break;
+            default:
+                zone_str = "Active";
+                break;
+        }
+        lv_label_set_text_fmt(fitness_zone_label, "Current Zone: %s", zone_str);
     }
 }

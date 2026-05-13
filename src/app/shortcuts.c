@@ -66,7 +66,7 @@ void create_shortcuts_menu(lv_obj_t * parent)
 {
     lv_obj_t * panel = lv_obj_create(parent);
     lv_obj_set_size(panel, lv_pct(100), lv_pct(100));
-    lv_obj_set_style_bg_color(panel, lv_color_hex(0x02F7BE), 0);
+    lv_obj_set_style_bg_color(panel, lv_color_hex(0x4A4A4A), 0);
     lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_all(panel, 20, 0);
     lv_obj_set_style_pad_top(panel, 40, 0);

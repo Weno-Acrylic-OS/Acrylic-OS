@@ -33,6 +33,7 @@
 #include "app/dnd_service.h"
 #include "app/routines_service.h"
 #include "app/activity_service.h"
+#include "app/profile_service.h"
 #include "drivers/heart_rate.h"
 #include "drivers/sim_heart_rate.h"
 #include "app/ble_service.h"
@@ -74,6 +75,7 @@ static void workout_detect_msgbox_event_handler(lv_event_t * e);
 static void stress_detect_msgbox_event_handler(lv_event_t * e);
 static void stress_simulator_task(lv_timer_t * timer);
 static void notification_simulator_task(lv_timer_t * timer);
+void gamification_daily_update_task();
 
 
 // --- Main Loop ---
@@ -94,6 +96,7 @@ static void context_updater_cb(lv_timer_t * timer) {
     (void)timer;
     status_bar_show_workout_indicator(fitness_app_is_active());
     status_bar_update_privacy_indicators();
+    status_bar_show_dnd_indicator(dnd_service_is_active());
     today_view_update();
     
     int goal_count;
@@ -284,6 +287,7 @@ void create_main_ui(lv_obj_t * parent) {
     lv_timer_create(step_simulator_task, 2000, NULL);
     lv_timer_create(stress_simulator_task, 10000, NULL);
     lv_timer_create(notification_simulator_task, 15000, NULL);
+    lv_timer_create(gamification_daily_update_task, 86400000, NULL); // 24 hours
 
     lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
 
@@ -329,9 +333,27 @@ void create_main_ui(lv_obj_t * parent) {
 
     // Create the tabview inside the tab_container
     lv_obj_t * tabview = lv_tabview_create(tab_container, LV_DIR_TOP, 50);
-    lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Home");
-    lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Today");
-    lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "Apps");
+
+    // Make the entire tabview background transparent
+    lv_obj_set_style_bg_opa(tabview, LV_OPA_TRANSP, LV_PART_MAIN);
+    
+    // Get the button matrix that holds the tab buttons
+    lv_obj_t * tab_btns = lv_tabview_get_tab_btns(tabview);
+    
+    // Make the button matrix background transparent
+    lv_obj_set_style_bg_opa(tab_btns, LV_OPA_TRANSP, LV_PART_MAIN);
+
+    // Make the tab buttons themselves transparent (for unselected and selected states)
+    lv_obj_set_style_bg_opa(tab_btns, LV_OPA_TRANSP, LV_PART_ITEMS | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(tab_btns, LV_OPA_TRANSP, LV_PART_ITEMS | LV_STATE_CHECKED);
+    
+    // Ensure the indicator (the blue line) stays visible but its background is transparent
+    lv_obj_set_style_bg_opa(tab_btns, LV_OPA_TRANSP, LV_PART_INDICATOR);
+    lv_obj_set_style_radius(tab_btns, 50, LV_PART_INDICATOR);
+
+    lv_obj_t * tab1 = lv_tabview_add_tab(tabview, LV_SYMBOL_HOME);
+    lv_obj_t * tab2 = lv_tabview_add_tab(tabview, LV_SYMBOL_CHARGE);
+    lv_obj_t * tab3 = lv_tabview_add_tab(tabview, LV_SYMBOL_LIST);
 
     create_watchface(tab1);
     create_today_view(tab2);
@@ -401,6 +423,7 @@ int main() {
     dnd_service_init();
     routines_service_init();
     activity_service_init();
+    profile_service_init();
     spo2_service_init();
     temperature_service_init();
     datalock_init();
@@ -408,7 +431,7 @@ int main() {
     ble_service_init();
 
     lv_disp_t * disp = lv_disp_get_default();
-    lv_theme_t * theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_lighten(LV_PALETTE_GREY, 3), false, &lv_font_montserrat_14);
+    lv_theme_t * theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_lighten(LV_PALETTE_GREY, 3), true, &lv_font_montserrat_14);
     lv_disp_set_theme(disp, theme);
 
     lv_obj_t* screen = lv_scr_act();

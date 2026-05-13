@@ -6,6 +6,12 @@
 // --- Data Structures ---
 
 typedef enum {
+    FITNESS_ZONE_DEMOTION,  // Decreased engagement
+    FITNESS_ZONE_ACTIVE,      // Normal engagement
+    FITNESS_ZONE_PROMOTION    // Increased engagement
+} fitness_zone_t;
+
+typedef enum {
     GOAL_TYPE_DAILY_STEPS,
     GOAL_TYPE_WEEKLY_ACTIVE_MINUTES,
     // Future goal types can be added here
@@ -48,6 +54,9 @@ void gamification_add_xp(int xp_to_add);
 int gamification_get_current_xp();
 int gamification_get_xp_for_next_level();
 int gamification_get_current_level();
+
+fitness_zone_t gamification_get_fitness_zone();
+void gamification_daily_update_task();
 
 // Goals
 void gamification_update_goal_progress(goal_type_t type, int value);
