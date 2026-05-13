@@ -6,6 +6,7 @@ static lv_obj_t * time_label;
 static lv_obj_t * workout_indicator;
 static lv_obj_t * location_indicator;
 static lv_obj_t * mic_indicator;
+static lv_obj_t * dnd_indicator;
 
 void create_status_bar(lv_obj_t * parent)
 {
@@ -42,6 +43,13 @@ void create_status_bar(lv_obj_t * parent)
     lv_obj_set_style_text_color(mic_indicator, lv_color_hex(0x00FF00), 0); // Green
     lv_obj_add_flag(mic_indicator, LV_OBJ_FLAG_HIDDEN);
     lv_obj_align_to(mic_indicator, location_indicator, LV_ALIGN_OUT_LEFT_MID, -5, 0);
+
+    // DND indicator
+    dnd_indicator = lv_label_create(status_bar);
+    lv_label_set_text(dnd_indicator, LV_SYMBOL_MUTE); // Using MUTE for DND
+    lv_obj_set_style_text_color(dnd_indicator, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_add_flag(dnd_indicator, LV_OBJ_FLAG_HIDDEN); // Hidden by default
+    lv_obj_align_to(dnd_indicator, mic_indicator, LV_ALIGN_OUT_LEFT_MID, -5, 0);
 }
 
 void status_bar_update_privacy_indicators() {
@@ -72,6 +80,17 @@ void status_bar_show_workout_indicator(bool show)
             lv_obj_clear_flag(workout_indicator, LV_OBJ_FLAG_HIDDEN);
         } else {
             lv_obj_add_flag(workout_indicator, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+}
+
+void status_bar_show_dnd_indicator(bool show)
+{
+    if (dnd_indicator) {
+        if (show) {
+            lv_obj_clear_flag(dnd_indicator, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_add_flag(dnd_indicator, LV_OBJ_FLAG_HIDDEN);
         }
     }
 }

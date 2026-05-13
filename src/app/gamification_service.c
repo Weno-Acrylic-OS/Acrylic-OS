@@ -9,6 +9,12 @@
 static int current_xp = 0;
 static int current_level = 1;
 
+// --- Fitness Zones State ---
+static fitness_zone_t current_fitness_zone = FITNESS_ZONE_ACTIVE;
+static int last_xp = 0;
+static int last_active_minutes = 0;
+
+
 // --- Achievement Definitions ---
 static achievement_t achievements[ACHIEVEMENT_COUNT] = {
     [ACHIEVEMENT_FIRST_1K_STEPS] = { .id = ACHIEVEMENT_FIRST_1K_STEPS, .name = "Step Up", .description = "Take your first 1,000 steps.", .is_unlocked = false },
@@ -44,6 +50,12 @@ static void load_goals() {
 
 void gamification_service_init() {
     load_goals();
+    
+    // Load persisted fitness zone data
+    persistence_read("last_xp", &last_xp, sizeof(last_xp));
+    persistence_read("last_active_mins", &last_active_minutes, sizeof(last_active_minutes));
+    persistence_read("fitness_zone", &current_fitness_zone, sizeof(current_fitness_zone));
+
     // In a real app, xp, level and achievements would also be persisted
     current_xp = 0;
     current_level = 1;
@@ -66,6 +78,38 @@ void gamification_add_xp(int xp_to_add) {
 int gamification_get_current_xp() { return current_xp; }
 int gamification_get_xp_for_next_level() { return calculate_xp_for_next_level(current_level); }
 int gamification_get_current_level() { return current_level; }
+
+// --- Fitness Zones ---
+fitness_zone_t gamification_get_fitness_zone() {
+    return current_fitness_zone;
+}
+
+void gamification_daily_update_task() {
+    // Calculate current total activity
+    int current_total_activity = current_xp + goals[GOAL_TYPE_WEEKLY_ACTIVE_MINUTES].current_value;
+
+    // Calculate previous total activity
+    int last_total_activity = last_xp + last_active_minutes;
+
+    // Determine the new fitness zone
+    if (current_total_activity > last_total_activity * 1.1) { // 10% increase
+        current_fitness_zone = FITNESS_ZONE_PROMOTION;
+    } else if (current_total_activity < last_total_activity * 0.9) { // 10% decrease
+        current_fitness_zone = FITNESS_ZONE_DEMOTION;
+    } else {
+        current_fitness_zone = FITNESS_ZONE_ACTIVE;
+    }
+
+    // Update last known values for the next calculation
+    last_xp = current_xp;
+    last_active_minutes = goals[GOAL_TYPE_WEEKLY_ACTIVE_MINUTES].current_value;
+
+    // Persist the new values for the next boot
+    persistence_write("last_xp", &last_xp, sizeof(last_xp));
+    persistence_write("last_active_mins", &last_active_minutes, sizeof(last_active_minutes));
+    persistence_write("fitness_zone", &current_fitness_zone, sizeof(current_fitness_zone));
+}
+
 
 // --- Goals ---
 
