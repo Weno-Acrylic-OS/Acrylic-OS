@@ -7,15 +7,31 @@ EM_JS(void, display_init, (), {
 });
 
 EM_JS(void, display_clear, (uint16_t color), {
+  // Decode RGB565 color to RGB888
+  var r = (color >> 11) & 0x1F;
+  var g = (color >> 5) & 0x3F;
+  var b = color & 0x1F;
+  r = Math.round((r * 255) / 31);
+  g = Math.round((g * 255) / 63);
+  b = Math.round((b * 255) / 31);
+  var css_color = "rgb(" + r + "," + g + "," + b + ")";
+
   var ctx = Module.canvas.getContext('2d');
-  var css_color = "#" + ("000000" + color.toString(16)).slice(-6);
   ctx.fillStyle = css_color;
   ctx.fillRect(0, 0, Module.canvas.width, Module.canvas.height);
 });
 
 EM_JS(void, display_draw_pixel, (int x, int y, uint16_t color), {
+  // Decode RGB565 color to RGB888
+  var r = (color >> 11) & 0x1F;
+  var g = (color >> 5) & 0x3F;
+  var b = color & 0x1F;
+  r = Math.round((r * 255) / 31);
+  g = Math.round((g * 255) / 63);
+  b = Math.round((b * 255) / 31);
+  var css_color = "rgb(" + r + "," + g + "," + b + ")";
+
   var ctx = Module.canvas.getContext('2d');
-  var css_color = "#" + ("000000" + color.toString(16)).slice(-6);
   ctx.fillStyle = css_color;
   ctx.fillRect(x, y, 1, 1);
 });

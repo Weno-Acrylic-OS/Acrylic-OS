@@ -71,7 +71,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp1glnjgej.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpe6cnf59z.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -206,21 +206,21 @@ Module['FS_createPath']("/assets", "icons", true, true);
 
   })();
 
-// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp1glnjgej.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpyfnzn6xp.js
+// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpe6cnf59z.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp9qms5lh1.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpyfnzn6xp.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp2atkku0f.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp9qms5lh1.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp8n8p_2kc.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp2atkku0f.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp8n8p_2kc.js
 
 
 var arguments_ = [];
@@ -5159,8 +5159,8 @@ function checkIncomingModuleAPI() {
   ignoredModuleProp('onSbrkGrow');
 }
 function display_init() { console.log("display_init called"); }
-function display_clear(color) { var ctx = Module.canvas.getContext('2d'); var css_color = "#" + ("000000" + color.toString(16)).slice(-6); ctx.fillStyle = css_color; ctx.fillRect(0, 0, Module.canvas.width, Module.canvas.height); }
-function display_draw_pixel(x,y,color) { var ctx = Module.canvas.getContext('2d'); var css_color = "#" + ("000000" + color.toString(16)).slice(-6); ctx.fillStyle = css_color; ctx.fillRect(x, y, 1, 1); }
+function display_clear(color) { var r = (color >> 11) & 0x1F; var g = (color >> 5) & 0x3F; var b = color & 0x1F; r = Math.round((r * 255) / 31); g = Math.round((g * 255) / 63); b = Math.round((b * 255) / 31); var css_color = "rgb(" + r + "," + g + "," + b + ")"; var ctx = Module.canvas.getContext('2d'); ctx.fillStyle = css_color; ctx.fillRect(0, 0, Module.canvas.width, Module.canvas.height); }
+function display_draw_pixel(x,y,color) { var r = (color >> 11) & 0x1F; var g = (color >> 5) & 0x3F; var b = color & 0x1F; r = Math.round((r * 255) / 31); g = Math.round((g * 255) / 63); b = Math.round((b * 255) / 31); var css_color = "rgb(" + r + "," + g + "," + b + ")"; var ctx = Module.canvas.getContext('2d'); ctx.fillStyle = css_color; ctx.fillRect(x, y, 1, 1); }
 function get_touch_x() { return lvgl_touch_x; }
 function get_touch_y() { return lvgl_touch_y; }
 function get_touch_down() { return lvgl_touch_down; }
