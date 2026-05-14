@@ -5,10 +5,24 @@
 #include <math.h>
 #include "app/watchface.h"
 #include "app/status_bar.h"
+#include "app/custom_watch_face.h"
+#include "app/persistence.h"
+#include "app/widget_registry.h"
 
 #include "app/voice_assistant.h"
 
 #define PI 3.14159265
+
+// --- Font Definitions ---
+LV_FONT_DECLARE(lv_font_montserrat_24);
+LV_FONT_DECLARE(lv_font_montserrat_32);
+LV_FONT_DECLARE(lv_font_montserrat_48);
+
+static const lv_font_t * fonts[] = {
+    &lv_font_montserrat_24,
+    &lv_font_montserrat_32,
+    &lv_font_montserrat_48,
+};
 
 static lv_obj_t * time_label;
 static lv_obj_t * date_label;
@@ -25,6 +39,40 @@ static int current_style = 0;
 static bool show_steps = true;
 static bool show_hr = true;
 static bool show_date = true;
+
+static void apply_custom_style(void) {
+    custom_watch_face_t custom_face;
+    if (persistence_read("custom_watch_face_0", &custom_face, sizeof(custom_watch_face_t)) > 0) {
+        if (time_label) {
+            watchface_set_time_font(fonts[custom_face.font_index]);
+            watchface_set_time_color(custom_face.time_color);
+        }
+        if (date_label) {
+            watchface_set_date_color(custom_face.date_color);
+        }
+
+        watchface_set_wallpaper(custom_face.wallpaper_path);
+
+        // Clear existing widgets before adding new ones
+        if (steps_label) lv_obj_del(steps_label);
+        steps_label = NULL;
+        if (hr_label) lv_obj_del(hr_label);
+        hr_label = NULL;
+
+        extern const widget_descriptor_t available_widgets[];
+        extern const int num_available_widgets;
+        
+        for (int i = 0; i < MAX_WIDGETS; i++) {
+            if (custom_face.widgets[i] != WIDGET_TYPE_NONE && custom_face.widgets[i] < num_available_widgets) {
+                // For simplicity, directly create widgets on watchface_parent.
+                // In a real app, layout and positioning would be more sophisticated.
+                lv_obj_t * widget_obj = available_widgets[custom_face.widgets[i]].create_func(watchface_parent);
+                lv_obj_align(widget_obj, LV_ALIGN_BOTTOM_LEFT, 10, -(20 * i + 10)); // Example positioning
+            }
+        }
+    }
+}
+
 
 static void watchface_long_press_event_handler(lv_event_t * e) {
     create_voice_assistant(watchface_parent);
@@ -105,17 +153,7 @@ void create_watchface(lv_obj_t * parent)
             date_label = lv_label_create(parent);
             lv_obj_set_style_text_font(date_label, &lv_font_montserrat_24, 0);
             lv_obj_align(date_label, LV_ALIGN_CENTER, 0, 20);
-
-            steps_label = lv_label_create(parent);
-            lv_label_set_text(steps_label, "Steps: 8,500");
-            lv_obj_align(steps_label, LV_ALIGN_CENTER, 0, 60);
-
-            hr_label = lv_label_create(parent);
-            lv_label_set_text(hr_label, "HR: 72 bpm");
-            lv_obj_align(hr_label, LV_ALIGN_CENTER, 0, 90);
             
-            if (!show_steps) lv_obj_add_flag(steps_label, LV_OBJ_FLAG_HIDDEN);
-            if (!show_hr) lv_obj_add_flag(hr_label, LV_OBJ_FLAG_HIDDEN);
             if (!show_date) lv_obj_add_flag(date_label, LV_OBJ_FLAG_HIDDEN);
 
             digital_timer = lv_timer_create(update_watchface_time, 1000, NULL);
@@ -159,4 +197,45 @@ void create_watchface(lv_obj_t * parent)
             analog_timer = lv_timer_create(update_watchface_time, 1000, NULL);
             break;
     }
+
+    apply_custom_style();
 }
+
+// --- Watch Face Studio v2 Functions ---
+
+lv_obj_t * watchface_get_time_label(void) {
+    return time_label;
+}
+
+lv_obj_t * watchface_get_date_label(void) {
+    return date_label;
+}
+
+void watchface_set_time_font(const lv_font_t *font) {
+    if (time_label) {
+        lv_obj_set_style_text_font(time_label, font, 0);
+    }
+}
+
+void watchface_set_time_color(lv_color_t color) {
+    if (time_label) {
+        lv_obj_set_style_text_color(time_label, color, 0);
+    }
+}
+
+void watchface_set_date_color(lv_color_t color) {
+    if (date_label) {
+        lv_obj_set_style_text_color(date_label, color, 0);
+    }
+}
+
+void watchface_set_wallpaper(const char *path) {
+    if (watchface_parent) {
+        if (strlen(path) > 0) {
+            lv_obj_set_style_bg_img_src(watchface_parent, path, 0);
+        } else {
+            lv_obj_set_style_bg_img_src(watchface_parent, NULL, 0);
+        }
+    }
+}
+
