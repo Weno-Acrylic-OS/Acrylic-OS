@@ -3,8 +3,8 @@ ENTRY(Reset_Handler)
 
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 2M
-  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 256K}
+FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
+  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 64K}
 
 _estack = ORIGIN(RAM) + LENGTH(RAM);
 
@@ -16,16 +16,20 @@ SECTIONS
     KEEP(*(.isr_vector))
   } >FLASH
 
-  .text :
+ .text :
   {
     . = ALIGN(4);
     *(.text*)
     *(.rodata*)
+    *(.init)    /* Explicitly include .init here so it doesn't float */
+    *(.fini)
     . = ALIGN(4);
-    _etext = .;
   } >FLASH
 
-  .data : AT ( _etext )
+  /* Use the keyword LOADADDR or a dedicated variable to ensure no overlap */
+  _etext_flash_end = .; 
+
+  .data : AT ( _etext_flash_end )
   {
     . = ALIGN(4);
     _sdata = .;
@@ -38,9 +42,12 @@ SECTIONS
   {
     . = ALIGN(4);
     _sbss = .;
+    __bss_start__ = _sbss; /* Add this */
     *(.bss*)
+    *(COMMON)              /* Add this to catch uninitialized globals */
     . = ALIGN(4);
     _ebss = .;
+    __bss_end__ = _ebss;   /* Add this */
   } >RAM
 
   .stack :

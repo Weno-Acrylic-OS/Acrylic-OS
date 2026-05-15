@@ -19,6 +19,7 @@
 #include "app/fitness.h"
 #include "app/time_service.h"
 #include "app/persistence.h"
+#include "app/persistence_service.h"
 #include "app/oobe.h"
 #include "app/sdk_service.h"
 #include "app/today_service.h"
@@ -75,7 +76,7 @@ static void workout_detect_msgbox_event_handler(lv_event_t * e);
 static void stress_detect_msgbox_event_handler(lv_event_t * e);
 static void stress_simulator_task(lv_timer_t * timer);
 static void notification_simulator_task(lv_timer_t * timer);
-void gamification_daily_update_task();
+void gamification_daily_update_task(lv_timer_t * timer);
 
 
 // --- Main Loop ---
@@ -412,6 +413,8 @@ int main() {
     lv_png_init();
     lvgl_display_init();
     time_service_init();
+    persistence_service_init();
+    quick_settings_init();
     persistence_init();
     sdk_service_init();
     today_service_init();
