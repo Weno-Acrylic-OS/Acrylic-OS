@@ -6,6 +6,7 @@
 #include "app/ota_service.h"
 #include "app/profile_service.h" // For getting/setting age
 #include "app/navigation_service.h"
+#include "app/settings_quick_settings.h"
 #include <string.h>
 #include <stdio.h> // For sprintf
 
@@ -102,6 +103,8 @@ static void settings_list_event_handler(lv_event_t * e) {
         create_datalock_settings_screen(parent);
     } else if (strcmp(selection, "Health") == 0) {
         create_health_settings_screen(parent);
+    } else if (strcmp(selection, "QuickSettings") == 0) {
+        create_quick_settings_settings_screen(parent);
     }
 }
 
@@ -197,7 +200,11 @@ void create_settings_app(lv_obj_t * parent) {
     lv_obj_add_event_cb(security_btn, settings_list_event_handler, LV_EVENT_CLICKED, "Security");
 
     lv_list_add_btn(list, LV_SYMBOL_BLUETOOTH, "Bluetooth");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Display");
+    
+    lv_obj_t* display_btn = lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Display");
+    
+    lv_obj_t* quick_settings_btn = lv_list_add_btn(list, LV_SYMBOL_SETTINGS, "Quick Settings");
+    lv_obj_add_event_cb(quick_settings_btn, settings_list_event_handler, LV_EVENT_CLICKED, "QuickSettings");
 
     lv_list_add_text(list, "System");
     lv_obj_t* ota_btn = lv_list_add_btn(list, LV_SYMBOL_DOWNLOAD, "OTA Update");

@@ -15,12 +15,17 @@ CPU = cortex-m3
 FPU = 
 
 # Compiler flags
-CFLAGS = -mcpu=$(CPU) -mthumb -Wall -Wextra -g
+CFLAGS = -mcpu=$(CPU) -mthumb -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE -Os -ffunction-sections -fdata-sections
 CFLAGS += -I. -Iinclude -Iinclude/kernel -Iinclude/drivers -Iinclude/ui -Iinclude/libc -Iinclude/arch/arm -Ivendor/lvgl -Ivendor/cjson -Iinclude/app
+
+# Add the specific directory where your lv_conf.h lives 
+CFLAGS += -Iinclude
+
+# Tell LVGL to stop using relative paths and just use #include "lv_conf.h"
 
 # Linker script
 LDSCRIPT = src/arch/arm/linker.ld
-LDFLAGS = -T $(LDSCRIPT) -lc -lm
+LDFLAGS = -T $(LDSCRIPT) -mcpu=$(CPU) -mthumb --specs=nano.specs --specs=nosys.specs -lc -lm -lgcc -Wl,--gc-sections
 
 # LVGL
 LVGL_DIR = vendor/lvgl
@@ -33,9 +38,6 @@ C_SOURCES = $(wildcard src/kernel/*.c)
 # Architecture
 C_SOURCES += $(wildcard src/arch/arm/*.c)
 S_SOURCES = src/arch/arm/startup.s src/arch/arm/context_switch.s
-
-# Libc
-C_SOURCES += $(wildcard src/libc/*.c)
 
 # UI
 C_SOURCES += $(wildcard src/ui/*.c)
@@ -59,8 +61,6 @@ C_SOURCES += $(ARM_SPECIFIC_DRIVERS)
 # Exclude web-specific apps
 WEB_APPS = src/app/phone_service.c src/app/shortcuts.c src/app/time_service.c src/app/weno_store.c src/app/js_engine.c
 C_SOURCES += $(filter-out $(WEB_APPS), $(wildcard src/app/*.c))
-# Add stubs for web-specific app functions
-C_SOURCES += src/app/stubs.c
 
 
 # Object files
@@ -78,7 +78,7 @@ $(OUT_DIR)/%.o: src/%.s
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OUT_DIR)/$(TARGET).elf: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
+	$(CC) $(OBJS) $(LDFLAGS) -o $@
 
 $(OUT_DIR)/$(TARGET).bin: $(OUT_DIR)/$(TARGET).elf
 	$(OC) -O binary $< $@

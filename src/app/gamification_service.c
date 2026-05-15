@@ -84,7 +84,8 @@ fitness_zone_t gamification_get_fitness_zone() {
     return current_fitness_zone;
 }
 
-void gamification_daily_update_task() {
+void gamification_daily_update_task(lv_timer_t * timer) {
+    (void)timer; // Unused parameter
     // Calculate current total activity
     int current_total_activity = current_xp + goals[GOAL_TYPE_WEEKLY_ACTIVE_MINUTES].current_value;
 

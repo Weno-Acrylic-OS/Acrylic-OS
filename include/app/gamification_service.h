@@ -2,6 +2,7 @@
 #define GAMIFICATION_SERVICE_H
 
 #include <stdbool.h>
+#include "lvgl.h"
 
 // --- Data Structures ---
 
@@ -56,7 +57,7 @@ int gamification_get_xp_for_next_level();
 int gamification_get_current_level();
 
 fitness_zone_t gamification_get_fitness_zone();
-void gamification_daily_update_task();
+void gamification_daily_update_task(lv_timer_t * timer);
 
 // Goals
 void gamification_update_goal_progress(goal_type_t type, int value);
