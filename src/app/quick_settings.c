@@ -102,7 +102,7 @@ static lv_obj_t* create_icon_button(lv_obj_t* parent, const quick_setting_item_t
     
     if (item->id == QUICK_SETTING_DND || item->id == QUICK_SETTING_FLASHLIGHT || item->id == QUICK_SETTING_BLUETOOTH) {
         lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
-        lv_obj_set_style_bg_color(btn, lv_color_hex(0x888888), LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(btn, lv_color_hex(0x4FAEB7), LV_STATE_CHECKED);
     }
 
     lv_obj_t * cont = lv_obj_create(btn);
