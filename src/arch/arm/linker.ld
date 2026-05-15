@@ -16,18 +16,33 @@ SECTIONS
     KEEP(*(.isr_vector))
   } >FLASH
 
- .text :
+  .text :
   {
     . = ALIGN(4);
-    *(.text*)
-    *(.rodata*)
-    *(.init)    /* Explicitly include .init here so it doesn't float */
-    *(.fini)
+    KEEP(*(.isr_vector))  /* Keep vector table at the very start of Flash [cite: 3] */
+    *(.text*)             /* All code [cite: 4] */
+    *(.rodata*)           /* All constants/read-only data [cite: 4] */
+    
+    /* Optional but recommended: include these to prevent floating overlaps */
+    KEEP(*(.init))
+    KEEP(*(.fini))
+    
     . = ALIGN(4);
   } >FLASH
 
-  /* Use the keyword LOADADDR or a dedicated variable to ensure no overlap */
-  _etext_flash_end = .; 
+  /* Exception index table required for ARM standard libraries [cite: 7] */
+  .ARM.exidx : 
+  {
+    __exidx_start = .;
+    *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    __exidx_end = .;
+  } >FLASH
+
+  /* _etext marks the absolute end of stuff in FLASH. 
+     The .data section will be copied FROM here into RAM. [cite: 8] */
+  _etext = .; 
+  __etext = .; 
+  _etext_flash_end = .;
 
   .data : AT ( _etext_flash_end )
   {
@@ -40,14 +55,14 @@ SECTIONS
 
   .bss :
   {
-    . = ALIGN(4);
     _sbss = .;
-    __bss_start__ = _sbss; /* Add this */
+    __bss_start__ = .;
     *(.bss*)
-    *(COMMON)              /* Add this to catch uninitialized globals */
-    . = ALIGN(4);
+    *(COMMON)
     _ebss = .;
-    __bss_end__ = _ebss;   /* Add this */
+    __bss_end__ = .;
+    end = .;           /* Add this for _sbrk */
+    _end = .;          /* Add this for _sbrk */
   } >RAM
 
   .stack :

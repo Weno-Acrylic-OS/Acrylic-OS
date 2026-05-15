@@ -15,7 +15,8 @@ CPU = cortex-m3
 FPU = 
 
 # Compiler flags
-CFLAGS = -mcpu=$(CPU) -mthumb -Wall -Wextra -g -DLV_CONF_INCLUDE_SIMPLE -Os -ffunction-sections -fdata-sections
+CFLAGS = -mcpu=$(CPU) -mthumb -Wall -Wextra -g -Os -ffunction-sections -fdata-sections
+CFLAGS += -DLV_CONF_INCLUDE_SIMPLE
 CFLAGS += -I. -Iinclude -Iinclude/kernel -Iinclude/drivers -Iinclude/ui -Iinclude/libc -Iinclude/arch/arm -Ivendor/lvgl -Ivendor/cjson -Iinclude/app
 
 # Add the specific directory where your lv_conf.h lives 
@@ -29,7 +30,9 @@ LDFLAGS = -T $(LDSCRIPT) -mcpu=$(CPU) -mthumb --specs=nano.specs --specs=nosys.s
 
 # LVGL
 LVGL_DIR = vendor/lvgl
-LVGL_SRC = $(shell find $(LVGL_DIR)/src -name '*.c')
+ALL_LVGL_C = $(shell find $(LVGL_DIR)/src -name '*.c')
+# Specifically filter out the SDL directory
+LVGL_SRC = $(filter-out %/draw/sdl/%, $(ALL_LVGL_C))
 
 # Source files
 # Kernel
@@ -78,7 +81,7 @@ $(OUT_DIR)/%.o: src/%.s
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OUT_DIR)/$(TARGET).elf: $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $@
 
 $(OUT_DIR)/$(TARGET).bin: $(OUT_DIR)/$(TARGET).elf
 	$(OC) -O binary $< $@
@@ -86,7 +89,7 @@ $(OUT_DIR)/$(TARGET).bin: $(OUT_DIR)/$(TARGET).elf
 # Note: We are back to the original lm3s6965evb machine. 
 # Graphics will not appear yet, but the build should pass.
 run-qemu: all
-	qemu-system-arm -M lm3s6965evb -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
+	qemu-system-arm -M vexpress-a9 -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
 
 clean:
 	rm -rf $(OUT_DIR)

@@ -2,12 +2,27 @@
 #include <stdbool.h>
 #include "lvgl.h"
 #include "drivers/heart_rate.h"
-
+#include <sys/types.h>  /* Required for mode_t [cite: 17] */
+#include <sys/stat.h>   /* Standard header for mkdir [cite: 17] */
 /*
  * This file provides dummy (stub) implementations for functions that are
  * web-specific and not available in the native ARM/QEMU build.
  * This allows the project to link correctly without full functionality.
 */
+
+/* Manually define the missing font symbols to satisfy the linker.
+   They will all point to the small 12pt font to save Flash space. */
+   extern const lv_font_t lv_font_montserrat_12;
+
+   const lv_font_t * lv_font_montserrat_14 = &lv_font_montserrat_12;
+   const lv_font_t * lv_font_montserrat_16 = &lv_font_montserrat_12;
+   const lv_font_t * lv_font_montserrat_18 = &lv_font_montserrat_12;
+   const lv_font_t * lv_font_montserrat_20 = &lv_font_montserrat_12;
+   const lv_font_t * lv_font_montserrat_22 = &lv_font_montserrat_12;
+   const lv_font_t * lv_font_montserrat_24 = &lv_font_montserrat_12;
+   const lv_font_t * lv_font_montserrat_28 = &lv_font_montserrat_12;
+   const lv_font_t * lv_font_montserrat_32 = &lv_font_montserrat_12;
+   const lv_font_t * lv_font_montserrat_48 = &lv_font_montserrat_12;
 
 // --- Stubs for time_service.c ---
 void time_service_init(void) { }
@@ -33,6 +48,21 @@ void create_weno_store_app(lv_obj_t * parent) { (void)parent; }
 void weno_store_receive_apps_json(char* json) { (void)json; }
 void weno_store_receive_app_source(char* source) { (void)source; }
 
+// Add this stub to satisfy activity_service and routines_service
+
+
+
+// Satisfies activity_service.c and routines_service.c
+int time_service_get_yday(void) {
+    return 0; 
+}
+
+// Satisfies persistence.c
+int mkdir(const char *pathname, mode_t mode) {
+    (void)pathname; 
+    (void)mode;
+    return -1; // Standard return for not implemented/failed
+}
 
 // --- Stubs for js_engine.c ---
 void js_engine_init(void) { }
