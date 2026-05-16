@@ -409,6 +409,9 @@ static void datalock_keypad_event_handler(lv_event_t * e) {
 
 // --- Main Entry Point ---
 int main() {
+    *(volatile uint32_t *)0x40004000 = '!'; 
+    *(volatile uint32_t *)0x40004000 = '\n';
+    /* --- BARE METAL DEBUG END --- */
     lv_init();
     lv_png_init();
     lvgl_display_init();
