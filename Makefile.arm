@@ -42,6 +42,9 @@ C_SOURCES = $(wildcard src/kernel/*.c)
 C_SOURCES += $(wildcard src/arch/arm/*.c)
 S_SOURCES = src/arch/arm/startup.s src/arch/arm/context_switch.s
 
+# SDK
+C_SOURCES += $(wildcard src/sdk/*.c)
+
 # UI
 C_SOURCES += $(wildcard src/ui/*.c)
 
