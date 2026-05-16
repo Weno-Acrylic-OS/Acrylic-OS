@@ -9,6 +9,7 @@
 #include "app/time_service.h"
 #include "app/gamification_service.h"
 #include "app/notification_service.h"
+#include "app/phone_connection_service.h"
 #include "drivers/heart_rate.h"
 
 #define JS_MEM_SIZE 4096
@@ -176,6 +177,17 @@ static jsval_t js_get_heart_rate(struct js *js, jsval_t *args, int nargs) {
     return js_mknum(heart_rate_get_bpm());
 }
 
+static jsval_t js_weno_phone_is_connected(struct js *js, jsval_t *args, int nargs) {
+    (void)js; (void)args; (void)nargs;
+    return phone_connection_service_is_connected() ? js_mktrue() : js_mkfalse();
+}
+
+static jsval_t js_weno_phone_show_required_screen(struct js *js, jsval_t *args, int nargs) {
+    (void)js; (void)args; (void)nargs;
+    phone_connection_service_show_required_screen();
+    return js_mkundef();
+}
+
 
 // --- LVGL API ---
 
@@ -328,6 +340,8 @@ void js_engine_init() {
     js_set(js, weno_fit_os_obj, "getSeconds", js_mkfun(js_get_seconds));
     js_set(js, weno_fit_os_obj, "getSteps", js_mkfun(js_get_steps));
     js_set(js, weno_fit_os_obj, "getHeartRate", js_mkfun(js_get_heart_rate));
+    js_set(js, weno_fit_os_obj, "isPhoneConnected", js_mkfun(js_weno_phone_is_connected));
+    js_set(js, weno_fit_os_obj, "showPhoneRequiredScreen", js_mkfun(js_weno_phone_show_required_screen));
 
     jsval_t lvgl_obj = js_mkobj(js);
     js_set(js, js_glob(js), "LVGL", lvgl_obj);
