@@ -68,7 +68,7 @@ static const quick_setting_item_t available_settings[] = {
     {QUICK_SETTING_SETTINGS, LV_SYMBOL_SETTINGS, "Settings", settings_event_handler},
     {QUICK_SETTING_FLASHLIGHT, LV_SYMBOL_POWER, "Flashlight", flashlight_event_handler},
     {QUICK_SETTING_BLUETOOTH, LV_SYMBOL_BLUETOOTH, "Bluetooth", bluetooth_event_handler},
-    {QUICK_SETTING_AIRPLANE, LV_SYMBOL_PLANE, "Airplane", airplane_mode_event_handler},
+    {QUICK_SETTING_AIRPLANE, LV_SYMBOL_PLAY, "Airplane", airplane_mode_event_handler},
 };
 static const int num_available_settings = sizeof(available_settings) / sizeof(quick_setting_item_t);
 
