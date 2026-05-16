@@ -9,6 +9,7 @@
 #include "app/flashlight_service.h"
 #include "app/bluetooth.h"
 #include "app/persistence_service.h"
+#include "app/airplane_mode_service.h"
 
 // --- Event Handlers for Quick Settings Buttons ---
 
@@ -48,7 +49,16 @@ static void bluetooth_event_handler(lv_event_t * e) {
     bluetooth_toggle();
 }
 
+static void airplane_mode_event_handler(lv_event_t * e) {
+    (void)e;
+    airplane_mode_service_toggle();
+}
+
 // --- Data Definition ---
+
+#ifdef SIMULATOR_BUILD
+#define LV_SYMBOL_PLANE LV_SYMBOL_SHUFFLE
+#endif
 
 // Array of all *possible* quick settings items
 static const quick_setting_item_t available_settings[] = {
@@ -58,6 +68,7 @@ static const quick_setting_item_t available_settings[] = {
     {QUICK_SETTING_SETTINGS, LV_SYMBOL_SETTINGS, "Settings", settings_event_handler},
     {QUICK_SETTING_FLASHLIGHT, LV_SYMBOL_POWER, "Flashlight", flashlight_event_handler},
     {QUICK_SETTING_BLUETOOTH, LV_SYMBOL_BLUETOOTH, "Bluetooth", bluetooth_event_handler},
+    {QUICK_SETTING_AIRPLANE, LV_SYMBOL_PLANE, "Airplane", airplane_mode_event_handler},
 };
 static const int num_available_settings = sizeof(available_settings) / sizeof(quick_setting_item_t);
 
@@ -100,9 +111,9 @@ static lv_obj_t* create_icon_button(lv_obj_t* parent, const quick_setting_item_t
     lv_obj_set_style_radius(btn, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(btn, lv_color_hex(0x444444), 0);
     
-    if (item->id == QUICK_SETTING_DND || item->id == QUICK_SETTING_FLASHLIGHT || item->id == QUICK_SETTING_BLUETOOTH) {
+    if (item->id == QUICK_SETTING_DND || item->id == QUICK_SETTING_FLASHLIGHT || item->id == QUICK_SETTING_BLUETOOTH || item->id == QUICK_SETTING_AIRPLANE) {
         lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
-        lv_obj_set_style_bg_color(btn, lv_color_hex(0x4FAEB7), LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(btn, lv_color_hex(0x4FAEB7), LV_STATE_CHECKED); // Changed for an easier indicator to see.
     }
 
     lv_obj_t * cont = lv_obj_create(btn);
@@ -157,6 +168,9 @@ void create_quick_settings(lv_obj_t * parent) {
                 lv_obj_add_state(btn, LV_STATE_CHECKED);
             }
             if (item->id == QUICK_SETTING_BLUETOOTH && bluetooth_is_enabled()) {
+                lv_obj_add_state(btn, LV_STATE_CHECKED);
+            }
+            if (item->id == QUICK_SETTING_AIRPLANE && airplane_mode_service_is_active()) {
                 lv_obj_add_state(btn, LV_STATE_CHECKED);
             }
         }

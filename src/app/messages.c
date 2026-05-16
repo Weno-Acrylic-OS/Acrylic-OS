@@ -1,5 +1,6 @@
 #include "lvgl.h"
 #include "app/navigation_service.h"
+#include "app/phone_connection_service.h"
 
 static void back_event_handler(lv_event_t * e) {
     (void)e;
@@ -16,6 +17,11 @@ static void keyboard_event_handler(lv_event_t * e)
 }
 
 void create_messages_app(lv_obj_t * parent) {
+    if (!phone_connection_service_is_connected()) {
+        phone_connection_service_show_required_screen();
+        return;
+    }
+
     lv_obj_clean(parent);
     lv_obj_set_style_bg_color(parent, lv_color_hex(0x000000), 0);
 

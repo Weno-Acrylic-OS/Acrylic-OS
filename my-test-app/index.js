@@ -1,7 +1,12 @@
-// index.js
-WenoFitOS.log("Hello, World! app started.");
+// Phone Test App
+WenoFitOS.log("Phone Test App started.");
 
-let screen = LVGL.createScreen();
-let label = LVGL.createLabel(screen);
-LVGL.setLabelText(label, "Hello, Weno Fit OS!");
-LVGL.alignObject(label, LVGL.ALIGN_CENTER, 0, 0);
+if (WenoFitOS.isPhoneConnected()) {
+    let screen = LVGL.createScreen();
+    let label = LVGL.createLabel(screen);
+    LVGL.setLabelText(label, "Phone is connected!");
+    LVGL.alignObject(label, LVGL.ALIGN_CENTER, 0, 0);
+} else {
+    WenoFitOS.showPhoneRequiredScreen();
+}
+

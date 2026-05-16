@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "cJSON.h"
+#include "app/find_my_watch_service.h"
 
 /**
  * @file ble_service.c
@@ -116,16 +117,45 @@ int ble_service_on_medical_id_read(char* out_buffer, size_t buffer_size) {
     cJSON_Delete(root);
 
     return strlen(out_buffer);
-}
+    }
+
+    /**
+    * @brief Called when the companion app writes to the Device Control characteristic.
+    */
+    void ble_service_on_device_control_write(const char* json_string) {
+    printf("BLE Service: Received write for Device Control\n");
+    cJSON *root = cJSON_Parse(json_string);
+    if (root == NULL) {
+        printf("BLE Service: Error parsing Device Control JSON\n");
+        return;
+    }
+
+    cJSON *command = cJSON_GetObjectItem(root, "command");
+    if (cJSON_IsString(command) && (command->valuestring != NULL)) {
+        if (strcmp(command->valuestring, "find_my_watch") == 0) {
+            cJSON *action = cJSON_GetObjectItem(root, "action");
+            if (cJSON_IsString(action) && (action->valuestring != NULL)) {
+                if (strcmp(action->valuestring, "start") == 0) {
+                    find_my_watch_service_start();
+                } else if (strcmp(action->valuestring, "stop") == 0) {
+                    find_my_watch_service_stop();
+                }
+            }
+        }
+    }
+
+    cJSON_Delete(root);
+    }
 
 
-// --- Service Initialization and Updates ---
+    // --- Service Initialization and Updates ---
 
-void ble_service_init() {
-    printf("BLE Service: Initializing (stub)\\n");
+    void ble_service_init() {
+    printf("BLE Service: Initializing (stub)\n");
     // On a real device, this function would register the read/write handlers:
-    printf("BLE Service: 'Registering' Medical ID read/write handlers\\n");
-}
+    printf("BLE Service: 'Registering' Medical ID read/write handlers\n");
+    printf("BLE Service: 'Registering' Device Control write handler\n");
+    }
 
 void ble_service_update_heart_rate(uint8_t heart_rate) {
     printf("BLE Service: Updating heart rate to %u (stub)\\n", heart_rate);

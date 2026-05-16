@@ -75,4 +75,12 @@
 
 #define LV_USE_PNG 1
 
+#ifdef SIMULATOR_BUILD
+// Enable additional fonts and features for the simulator
+#undef LV_FONT_MONTSERRAT_22
+#define LV_FONT_MONTSERRAT_22 1
+#undef LV_FONT_MONTSERRAT_48
+#define LV_FONT_MONTSERRAT_48 1
+#endif
+
 #endif

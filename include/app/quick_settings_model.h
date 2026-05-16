@@ -12,6 +12,7 @@ typedef enum {
     QUICK_SETTING_SETTINGS,
     QUICK_SETTING_FLASHLIGHT,
     QUICK_SETTING_BLUETOOTH,
+    QUICK_SETTING_AIRPLANE,
     // Add more potential settings here in the future
     // e.g., QUICK_SETTING_WIFI, QUICK_SETTING_BLUETOOTH
     QUICK_SETTING_MAX // Sentinel value
