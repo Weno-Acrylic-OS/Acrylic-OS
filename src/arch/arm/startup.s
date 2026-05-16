@@ -1,6 +1,6 @@
 /* src/arch/arm/startup.s */
 .syntax unified
-.cpu cortex-m3
+.cpu cortex-m7
 .thumb
 
 .global Reset_Handler
@@ -12,20 +12,19 @@
 .global _estack
 
 .section .isr_vector, "a", %progbits
-.word _estack
+.global isr_vector    /* Add this line */
+isr_vector:           /* Add this label */
+.word _estack         /* Top of Stack */
 .word Reset_Handler + 1
-.word 0 /* NMI_Handler */
-.word HardFault_Handler + 1
-.word 0 /* MemManage_Handler */
-.word 0 /* BusFault_Handler */
-.word 0 /* UsageFault_Handler */
-.word 0
-.word 0
-.word 0
-.word 0
-.word 0 /* SVCall_Handler */
-.word 0 /* DebugMon_Handler */
-.word 0
+.word 0                  /* NMI_Handler */
+.word HardFault_Handler + 1 
+.word 0                  /* MemManage_Handler */
+.word 0                  /* BusFault_Handler */
+.word 0                  /* UsageFault_Handler */
+.fill 4, 4, 0            /* Reserved slots */
+.word 0                  /* SVCall_Handler */
+.word 0                  /* DebugMon_Handler */
+.word 0                  /* Reserved */
 .word PendSV_Handler + 1
 .word SysTick_Handler + 1
 

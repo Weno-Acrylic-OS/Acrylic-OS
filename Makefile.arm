@@ -11,11 +11,11 @@ LD = $(TOOLCHAIN_PATH)/arm-none-eabi-ld
 OC = $(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
 
 # CPU and FPU settings
-CPU = cortex-m3
-FPU = 
+CPU = cortex-m7
+FPU_FLAGS = -mfloat-abi=hard -mfpu=fpv5-d16
 
 # Compiler flags
-CFLAGS = -mcpu=$(CPU) -mthumb -Wall -Wextra -g -Os -ffunction-sections -fdata-sections
+CFLAGS = -mcpu=$(CPU) $(FPU_FLAGS) -mthumb -Wall -Wextra -g -Os -ffunction-sections -fdata-sections
 CFLAGS += -DLV_CONF_INCLUDE_SIMPLE
 CFLAGS += -I. -Iinclude -Iinclude/kernel -Iinclude/drivers -Iinclude/ui -Iinclude/libc -Iinclude/arch/arm -Ivendor/lvgl -Ivendor/cjson -Iinclude/app
 
@@ -26,7 +26,17 @@ CFLAGS += -Iinclude
 
 # Linker script
 LDSCRIPT = src/arch/arm/linker.ld
-LDFLAGS = -T $(LDSCRIPT) -mcpu=$(CPU) -mthumb --specs=nano.specs --specs=nosys.specs -lc -lm -lgcc -Wl,--gc-sections
+LDFLAGS = -T $(LDSCRIPT) -mcpu=$(CPU) $(FPU_FLAGS) -mthumb --specs=nano.specs --specs=nosys.specs -lc -lm -lgcc -Wl,--gc-sections
+
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_14=lv_font_montserrat_12
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_16=lv_font_montserrat_12
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_18=lv_font_montserrat_12
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_20=lv_font_montserrat_12
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_22=lv_font_montserrat_12
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_24=lv_font_montserrat_12
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_28=lv_font_montserrat_12
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_32=lv_font_montserrat_12
+LDFLAGS += -Wl,--defsym,lv_font_montserrat_48=lv_font_montserrat_12
 
 # LVGL
 LVGL_DIR = vendor/lvgl
@@ -66,6 +76,9 @@ C_SOURCES += $(ARM_SPECIFIC_DRIVERS)
 # Apps
 # Exclude web-specific apps
 WEB_APPS = src/app/phone_service.c src/app/shortcuts.c src/app/time_service.c src/app/weno_store.c src/app/js_engine.c
+
+# Add all app files EXCEPT the web-specific ones
+# This will now correctly include stubs.c if it is in src/app/
 C_SOURCES += $(filter-out $(WEB_APPS), $(wildcard src/app/*.c))
 
 
@@ -91,8 +104,14 @@ $(OUT_DIR)/$(TARGET).bin: $(OUT_DIR)/$(TARGET).elf
 
 # Note: We are back to the original lm3s6965evb machine. 
 # Graphics will not appear yet, but the build should pass.
+# Change your run-qemu command in Makefile.arm 
 run-qemu: all
-	qemu-system-arm -M vexpress-a9 -serial stdio -kernel $(OUT_DIR)/$(TARGET).elf
+	qemu-system-arm -M mps2-an500 \
+		-cpu cortex-m7 \
+		-nographic \
+		-serial stdio \
+		-monitor none \
+		-kernel $(OUT_DIR)/$(TARGET).elf
 
 clean:
 	rm -rf $(OUT_DIR)
