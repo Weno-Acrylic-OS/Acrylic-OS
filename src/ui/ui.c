@@ -1,7 +1,7 @@
 // src/ui/ui.c
-#include <ui.h>
+#include "ui/ui.h"
 #include <display.h> // Include display driver to draw
-#include <font.h>    // Include font data
+#include "ui/font.h"
 #include <stddef.h>  // For NULL
 
 #define BLACK 0x0000
