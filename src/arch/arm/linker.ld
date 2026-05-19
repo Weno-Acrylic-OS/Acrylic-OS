@@ -38,7 +38,7 @@ SECTIONS
 
   .data : AT ( _etext )
   {
-    . = ALIGN(4);
+    . = ALIGN(4);  /* Ensure 4-byte alignment */
     _sdata = .;
     *(.data*)
     . = ALIGN(4);
