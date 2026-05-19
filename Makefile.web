@@ -22,6 +22,7 @@ LDFLAGS += -s USE_ZLIB=1
 # Source files
 # Exclude ARM/QEMU-specific display drivers from the web build
 C_SOURCES = $(filter-out src/drivers/display_qemu.c src/drivers/lvgl_display_arm.c, $(wildcard src/drivers/*.c))
+C_SOURCES += $(wildcard src/ui/*.c)
 C_SOURCES += $(filter-out src/app/stubs.c, $(wildcard src/app/*.c))
 C_SOURCES += src/js_engine.c
 C_SOURCES += $(LVGL_SRC)
