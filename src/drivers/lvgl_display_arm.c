@@ -1,5 +1,5 @@
 #include "lvgl.h"
-#include "display.h" // For display_draw_pixel
+#include "drivers/display.h" // For display_draw_pixel
 
 // Native ARM implementation for LVGL display initialization
 // This version uses the display_qemu.c driver for pixel drawing.
