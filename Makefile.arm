@@ -14,9 +14,15 @@ OC = $(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
 CPU = cortex-m7
 FPU_FLAGS = -mfloat-abi=hard -mfpu=fpv5-d16
 
+# Include flags
+CFLAGS += -Isrc/include
+
 # Compiler flags
-CFLAGS = -mcpu=$(CPU) $(FPU_FLAGS) -mthumb -Wall -Wextra -g -Os -ffunction-sections -fdata-sections
-CFLAGS += -DLV_CONF_INCLUDE_SIMPLE
+# Define the CPU target clearly
+CPU_FLAGS = -mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv5-d16
+
+CFLAGS  += $(CPU_FLAGS)
+ASFLAGS += $(CPU_FLAGS)
 CFLAGS += -I. -Iinclude -Iinclude/kernel -Iinclude/drivers -Iinclude/ui -Iinclude/libc -Iinclude/arch/arm -Ivendor/lvgl -Ivendor/cjson -Iinclude/app
 
 # Add the specific directory where your lv_conf.h lives 
@@ -90,11 +96,11 @@ all: $(OUT_DIR)/$(TARGET).elf $(OUT_DIR)/$(TARGET).bin
 
 $(OUT_DIR)/%.o: src/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -mthumb -c $< -o $@
 
 $(OUT_DIR)/%.o: src/%.s
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CPU_FLAGS) -mthumb -c $< -o $@
 
 $(OUT_DIR)/$(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $@
@@ -108,10 +114,9 @@ $(OUT_DIR)/$(TARGET).bin: $(OUT_DIR)/$(TARGET).elf
 run-qemu: all
 	qemu-system-arm -M mps2-an500 \
 		-cpu cortex-m7 \
-		-nographic \
 		-serial stdio \
 		-monitor none \
-		-kernel $(OUT_DIR)/$(TARGET).elf
+		-kernel $(OUT_DIR)/$(TARGET).elf -vnc :0
 
 clean:
 	rm -rf $(OUT_DIR)

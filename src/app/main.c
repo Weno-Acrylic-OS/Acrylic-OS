@@ -46,6 +46,8 @@
 #include "app/ui_tracker.h"
 #include "app/ui_simulator_controls.h"
 
+#include "drivers/display.h"
+
 
 // --- Global UI Objects ---
 static lv_obj_t * quick_settings_panel;
@@ -409,10 +411,20 @@ static void datalock_keypad_event_handler(lv_event_t * e) {
 
 // --- Main Entry Point ---
 int main() {
-    *(volatile uint32_t *)0x40004000 = '!'; 
-    *(volatile uint32_t *)0x40004000 = '\n';
-    /* --- BARE METAL DEBUG END --- */
-    lv_init();
+    #ifndef __EMSCRIPTEN__
+    // --- THIS ONLY RUNS ON THE REAL ARM QEMU ---
+    // Enable UART0 and send "WENO"
+    volatile uint32_t *uart0_dr = (uint32_t *)0x40004000;
+    *uart0_dr = 'W'; *uart0_dr = 'E'; *uart0_dr = 'N'; *uart0_dr = 'O';
+    
+    // Initialize the physical LCD controller
+    display_init(); 
+#else
+    // --- THIS ONLY RUNS IN THE BROWSER ---
+    printf("Weno Fit OS starting in Web Simulator...\n");
+#endif
+
+   lv_init();
     lv_png_init();
     lvgl_display_init();
     time_service_init();
