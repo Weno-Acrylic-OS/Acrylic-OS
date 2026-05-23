@@ -1,5 +1,6 @@
 #include "app/navigation_service.h"
 #include <stdlib.h> // For NULL
+#include <stdio.h> // For printf
 
 #define MAX_NAV_STACK_SIZE 10
 
@@ -87,6 +88,7 @@ void navigation_service_init(lv_obj_t * app_container, lv_obj_t * tab_container)
 }
 
 void navigation_service_navigate_to(screen_create_func_t create_func) {
+    printf("navigation_service_navigate_to called\n");
     if (stack_top >= MAX_NAV_STACK_SIZE - 1) return;
 
     if (stack_top == -1) {

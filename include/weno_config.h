@@ -3,6 +3,6 @@
 
 // UI Personality: "wearable", "desktop", "phone", or "smarthome"
 // This setting determines which user interface is compiled and launched.
-#define ACRYLIC_OS_PERSONALITY "desktop"
+#define ACRYLIC_OS_PERSONALITY "acrylic"
 
 #endif // WENO_CONFIG_H

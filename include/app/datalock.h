@@ -37,10 +37,5 @@ bool datalock_check_pin(const char* pin_attempt);
  */
 void datalock_lock_device();
 
-/**
- * @brief Creates the datalock screen UI.
- * @param parent The parent object for the screen.
- */
-void create_datalock_screen(lv_obj_t * parent);
 
 #endif // DATALOCK_H
