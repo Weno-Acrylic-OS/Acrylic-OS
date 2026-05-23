@@ -49,7 +49,6 @@
 #include "ui/phone.h"
 #include "ui/smarthome.h"
 
-
 // --- Main Loop ---
 void main_loop() {
     lv_timer_handler();
@@ -94,9 +93,7 @@ int main() {
     lv_theme_t * theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_lighten(LV_PALETTE_GREY, 3), true, &lv_font_montserrat_14);
     lv_disp_set_theme(disp, theme);
 
-    lv_obj_t* screen = lv_scr_act();
-
-    // --- Personality Selection ---
+    // Initial UI setup
     ui_personality_t* current_personality;
     if (strcmp(ACRYLIC_OS_PERSONALITY, "desktop") == 0) {
         current_personality = get_desktop_personality();
@@ -105,11 +102,9 @@ int main() {
     } else if (strcmp(ACRYLIC_OS_PERSONALITY, "smarthome") == 0) {
         current_personality = get_smarthome_personality();
     } else {
-        // Default to wearable
         current_personality = get_wearable_personality();
     }
-    
-    current_personality->init_ui(screen);
+    current_personality->init_ui(lv_scr_act());
 
 
 #ifdef SIMULATOR_BUILD

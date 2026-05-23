@@ -32,13 +32,52 @@
     <h1>Weno Fit OS Simulator</h1>
     <div class="canvas-container">
       <canvas id="canvas" width="240" height="320"></canvas>
+      <iframe id="react-app" style="display: none; width: 100%; height: 100%; border: 2px solid red;"></iframe>
     </div>
 
     <div class="controls">
+      <h3>UI Personalities:</h3>
+      <button onclick="setPersonality('wearable')">Wearable</button>
+      <button onclick="setPersonality('desktop')">Desktop</button>
+      <button onclick="setPersonality('phone')">Phone</button>
+      <button onclick="setPersonality('smarthome')">Smart Home</button>
+      <br/><br/>
       <button id="btn_toggle_qs">Toggle Quick Settings</button>
       <button id="btn_toggle_notifications">Toggle Notifications</button>
       <button id="btn_toggle_shortcuts">Toggle Shortcuts</button>
     </div>
+
+    <script>
+      function setPersonality(personality) {
+        const canvas = document.getElementById('canvas');
+        const iframe = document.getElementById('react-app');
+        const canvasContainer = document.querySelector('.canvas-container');
+
+        if (personality === 'wearable') {
+            canvas.style.display = 'block';
+            iframe.style.display = 'none';
+            canvasContainer.style.width = '240px';
+            canvasContainer.style.height = '320px';
+        } else {
+            canvas.style.display = 'none';
+            iframe.style.display = 'block';
+            iframe.src = 'http://localhost:3000'; // Assuming the react app is running on port 3000
+            
+            if (personality === 'desktop') {
+                canvasContainer.style.width = '1024px';
+                canvasContainer.style.height = '768px';
+            } else if (personality === 'phone') {
+                canvasContainer.style.width = '375px';
+                canvasContainer.style.height = '667px';
+            } else if (personality === 'smarthome') {
+                canvasContainer.style.width = '800px';
+                canvasContainer.style.height = '600px';
+            }
+            const channel = new BroadcastChannel('weno-fit-os');
+            channel.postMessage({ personality: personality });
+        }
+      }
+    </script>
 
     <script type='text/javascript'>
       var Module = {

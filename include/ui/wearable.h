@@ -3,10 +3,8 @@
 
 #include "ui/ui_hal.h"
 
-// Gets the personality struct for the wearable UI
+// Function to get the wearable personality
 ui_personality_t* get_wearable_personality();
-
-// The main UI creation function for the wearable personality
-void create_main_ui(lv_obj_t* parent);
+void create_main_ui(lv_obj_t * parent);
 
 #endif // WEARABLE_H

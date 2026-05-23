@@ -6,7 +6,7 @@ const fs = require('fs');
 const tar = require('tar');
 
 const app = express();
-const port = 3000;
+const port = 3001;
 const dbPath = path.join(__dirname, 'db.json');
 
 // --- Database ---

@@ -1,0 +1,32 @@
+.app-menu {
+    position: absolute;
+    top: 30px; /* Below the top bar */
+    left: 100px; /* Approximate position */
+    background: #D8E3F8;
+    border: none;
+    min-width: 150px;
+    z-index: 1002; /* On top of everything */
+    border-radius: 26px;
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.23), 0px 16px 48px rgba(0, 0, 0, 0.35);
+    padding: 2px;
+    font-family: sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.app-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.app-menu li {
+    padding: 5px 20px;
+    cursor: pointer;
+}
+
+.app-menu li:hover {
+    background: #204876;
+    color: #ffffff;
+    border-radius: 50px;
+}
