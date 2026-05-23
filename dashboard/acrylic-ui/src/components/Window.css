@@ -1,0 +1,77 @@
+.window {
+    position: absolute;
+    top: 50px;
+    left: 100px;
+    width: 400px;
+    height: 300px;
+    background: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100; /* Default window z-index */
+    border-radius: 26px;
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.23), 0px 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.title-bar {
+    height: 28px;
+    background: #D8E3F8;
+    border-radius: 26px 26px 0px 0px;
+    color: #3C4758;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    cursor: move;
+}
+
+.title {
+    padding-left: 5px;
+}
+
+.title-bar-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.title-bar-button {
+    width: 14px;
+    height: 14px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button {
+    /* Specific styles for the close button if needed */
+}
+
+.window-content {
+    flex-grow: 1;
+    padding: 10px;
+    background: #ffffff;
+    color: #000000;
+    border-radius: 0px 0px 26px 26px;
+}
+
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    cursor: se-resize;
+    z-index: 110;
+}
+
+.window.maximized {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+}

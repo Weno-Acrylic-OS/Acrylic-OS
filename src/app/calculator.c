@@ -28,6 +28,7 @@ static void btn_event_handler(lv_event_t * e) {
 }
 
 void create_calculator_app(lv_obj_t * parent) {
+    printf("create_calculator_app called\n");
     lv_obj_clean(parent);
     display_buffer[0] = '\0';
 

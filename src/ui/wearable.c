@@ -1,12 +1,9 @@
-// src/app/main.c
+#include "ui/wearable.h"
+#include "ui/ui_hal.h"
 #include <stdio.h>
 #include <string.h>
-#include "lvgl.h"
-#include "lvgl_display.h"
-#ifdef SIMULATOR_BUILD
-#include <emscripten.h>
-#endif
 #include <stdlib.h> // For rand()
+#include "lvgl.h"
 
 // App-specific includes
 #include "app/datalock.h"
@@ -35,18 +32,7 @@
 #include "app/routines_service.h"
 #include "app/activity_service.h"
 #include "app/profile_service.h"
-#include "drivers/heart_rate.h"
-#include "drivers/sim_heart_rate.h"
-#include "app/ble_service.h"
-
-#include "src/extra/themes/default/lv_theme_default.h"
-
-// New includes for UI variants
-#include "weno_config.h"
-#include "app/ui_tracker.h"
-#include "app/ui_simulator_controls.h"
-
-#include "drivers/display.h"
+#include "ui/ui_datalock_screen.h"
 
 
 // --- Global UI Objects ---
@@ -54,10 +40,16 @@ static lv_obj_t * quick_settings_panel;
 static lv_obj_t * notifications_panel;
 static lv_obj_t * shortcuts_panel;
 static lv_obj_t * voice_assistant_panel;
-static lv_obj_t * datalock_screen;
-static lv_obj_t * datalock_pin_label;
 static lv_obj_t * workout_detect_msgbox = NULL;
 static lv_obj_t * stress_detect_msgbox = NULL;
+
+// --- Timers ---
+static lv_timer_t* status_bar_timer;
+static lv_timer_t* context_updater_timer;
+static lv_timer_t* step_simulator_timer;
+static lv_timer_t* stress_simulator_timer;
+static lv_timer_t* notification_simulator_timer;
+static lv_timer_t* gamification_daily_update_timer;
 
 // --- Global State ---
 static bool quick_settings_visible = false;
@@ -66,20 +58,22 @@ static bool shortcuts_visible = false;
 static bool voice_assistant_visible = false;
 
 // --- Forward Declarations ---
-void create_main_ui(lv_obj_t * parent);
 void create_watchface(lv_obj_t * parent);
 void create_app_list(lv_obj_t * parent);
 void create_today_view(lv_obj_t * parent);
 void create_shortcuts_menu(lv_obj_t * parent);
 void create_voice_assistant(lv_obj_t * parent);
-static void datalock_keypad_event_handler(lv_event_t * e);
 static void context_updater_cb(lv_timer_t * timer);
 static void workout_detect_msgbox_event_handler(lv_event_t * e);
 static void stress_detect_msgbox_event_handler(lv_event_t * e);
 static void stress_simulator_task(lv_timer_t * timer);
 static void notification_simulator_task(lv_timer_t * timer);
 void gamification_daily_update_task(lv_timer_t * timer);
-
+static void swipe_event_handler(lv_event_t * e);
+static void status_bar_time_updater_task(lv_timer_t * timer);
+static void step_simulator_task(lv_timer_t * timer);
+void create_wearable_home_screen(lv_obj_t * parent);
+void wearable_deinit_ui();
 
 // --- Event Handlers & Timers ---
 static void notification_simulator_task(lv_timer_t * timer) {
@@ -99,7 +93,7 @@ static void context_updater_cb(lv_timer_t * timer) {
     
     int goal_count;
     const goal_t *goals = gamification_get_goals(&goal_count);
-    ble_service_update_goals(goals, goal_count);
+    //ble_service_update_goals(goals, goal_count);
 }
 
 static void status_bar_time_updater_task(lv_timer_t * timer) {
@@ -133,7 +127,6 @@ static void stress_simulator_task(lv_timer_t * timer) {
     }
 }
 
-
 static void workout_detect_msgbox_event_handler(lv_event_t * e) {
     lv_obj_t * obj = lv_event_get_current_target(e);
     if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
@@ -160,12 +153,6 @@ static void stress_detect_msgbox_event_handler(lv_event_t * e) {
     }
 }
 
-
-static void long_press_event_handler(lv_event_t * e) {
-    (void)e;
-    // Now handled by nav bar
-}
-
 static void va_close_handler(lv_event_t * e) {
     (void)e;
     if (voice_assistant_visible) {
@@ -174,123 +161,44 @@ static void va_close_handler(lv_event_t * e) {
     }
 }
 
-
-
 static void swipe_event_handler(lv_event_t * e) {
-#ifdef SIMULATOR_BUILD
-    emscripten_log(EM_LOG_CONSOLE, "Swipe event handler called!");
-#else
-    printf("Swipe event handler called!\n");
-#endif
-    (void)e;
     if (voice_assistant_visible) return;
 
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
-#ifdef SIMULATOR_BUILD
-    char buffer[50];
-    sprintf(buffer, "Gesture direction: %d", dir);
-    emscripten_log(EM_LOG_CONSOLE, buffer);
-#else
-    printf("Gesture direction: %d\n", dir);
-#endif
 
     if (dir == LV_DIR_BOTTOM && !quick_settings_visible && !notifications_visible && !shortcuts_visible) {
-#ifdef SIMULATOR_BUILD
-        emscripten_log(EM_LOG_CONSOLE, "Opening quick settings");
-#else
-        printf("Opening quick settings\n");
-#endif
         lv_obj_clear_flag(quick_settings_panel, LV_OBJ_FLAG_HIDDEN);
         quick_settings_visible = true;
     } else if (dir == LV_DIR_TOP && quick_settings_visible) {
-#ifdef SIMULATOR_BUILD
-        emscripten_log(EM_LOG_CONSOLE, "Closing quick settings");
-#else
-        printf("Closing quick settings\n");
-#endif
         lv_obj_add_flag(quick_settings_panel, LV_OBJ_FLAG_HIDDEN);
         quick_settings_visible = false;
     } else if (dir == LV_DIR_TOP && !notifications_visible && !quick_settings_visible && !shortcuts_visible) {
-#ifdef SIMULATOR_BUILD
-        emscripten_log(EM_LOG_CONSOLE, "Opening notifications");
-#else
-        printf("Opening notifications\n");
-#endif
         lv_obj_clear_flag(notifications_panel, LV_OBJ_FLAG_HIDDEN);
         notifications_visible = true;
     } else if (dir == LV_DIR_BOTTOM && notifications_visible) {
-#ifdef SIMULATOR_BUILD
-        emscripten_log(EM_LOG_CONSOLE, "Closing notifications");
-#else
-        printf("Closing notifications\n");
-#endif
         lv_obj_add_flag(notifications_panel, LV_OBJ_FLAG_HIDDEN);
         notifications_visible = false;
     } else if (dir == LV_DIR_LEFT && !shortcuts_visible && !quick_settings_visible && !notifications_visible) {
-#ifdef SIMULATOR_BUILD
-        emscripten_log(EM_LOG_CONSOLE, "Opening shortcuts");
-#else
-        printf("Opening shortcuts\n");
-#endif
         lv_obj_clear_flag(shortcuts_panel, LV_OBJ_FLAG_HIDDEN);
         shortcuts_visible = true;
     } else if (dir == LV_DIR_RIGHT && shortcuts_visible) {
-#ifdef SIMULATOR_BUILD
-        emscripten_log(EM_LOG_CONSOLE, "Closing shortcuts");
-#else
-        printf("Closing shortcuts\n");
-#endif
         lv_obj_add_flag(shortcuts_panel, LV_OBJ_FLAG_HIDDEN);
         shortcuts_visible = false;
     }
 }
 
-// --- UI Creation Functions ---
-
-void create_datalock_screen(lv_obj_t * parent) {
-    datalock_screen = lv_obj_create(parent);
-    lv_obj_set_size(datalock_screen, lv_pct(100), lv_pct(100));
-    lv_obj_set_style_bg_color(datalock_screen, lv_color_black(), 0);
-    lv_obj_set_style_border_width(datalock_screen, 0, 0);
-    lv_obj_set_flex_flow(datalock_screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(datalock_screen, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * title = lv_label_create(datalock_screen);
-    lv_label_set_text(title, "Enter PIN");
-    lv_obj_set_style_text_color(title, lv_color_white(), 0);
-
-    datalock_pin_label = lv_label_create(datalock_screen);
-    lv_label_set_text(datalock_pin_label, "_ _ _ _");
-    lv_obj_set_style_text_font(datalock_pin_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_color(datalock_pin_label, lv_color_white(), 0);
-    lv_obj_set_style_pad_top(datalock_pin_label, 10, 0);
-    lv_obj_set_style_pad_bottom(datalock_pin_label, 10, 0);
-
-    static const char * map[] = {"1", "2", "3", "\n",
-                                "4", "5", "6", "\n",
-                                "7", "8", "9", "\n",
-                                LV_SYMBOL_BACKSPACE, "0", LV_SYMBOL_OK, ""};
-
-    lv_obj_t * keypad = lv_btnmatrix_create(datalock_screen);
-    lv_btnmatrix_set_map(keypad, map);
-    lv_obj_set_size(keypad, 220, 180);
-    lv_obj_align(keypad, LV_ALIGN_CENTER, 0, 40);
-    lv_obj_add_event_cb(keypad, datalock_keypad_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
-}
-
-void create_main_ui(lv_obj_t * parent) {
+void create_wearable_home_screen(lv_obj_t * parent) {
     lv_obj_add_event_cb(parent, swipe_event_handler, LV_EVENT_GESTURE, NULL);
-    lv_timer_create(status_bar_time_updater_task, 1000, NULL);
-    lv_timer_create(context_updater_cb, 1000, NULL);
-    lv_timer_create(step_simulator_task, 2000, NULL);
-    lv_timer_create(stress_simulator_task, 10000, NULL);
-    lv_timer_create(notification_simulator_task, 15000, NULL);
-    lv_timer_create(gamification_daily_update_task, 86400000, NULL); // 24 hours
+    status_bar_timer = lv_timer_create(status_bar_time_updater_task, 1000, NULL);
+    context_updater_timer = lv_timer_create(context_updater_cb, 1000, NULL);
+    step_simulator_timer = lv_timer_create(step_simulator_task, 2000, NULL);
+    stress_simulator_timer = lv_timer_create(stress_simulator_task, 10000, NULL);
+    notification_simulator_timer = lv_timer_create(notification_simulator_task, 15000, NULL);
+    gamification_daily_update_timer = lv_timer_create(gamification_daily_update_task, 86400000, NULL); // 24 hours
 
     lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
 
     // --- Create Overlay Panels ---
-    // (These are full-screen panels that appear on top of everything else)
     voice_assistant_panel = lv_obj_create(parent);
     lv_obj_set_size(voice_assistant_panel, lv_pct(100), lv_pct(100));
     create_voice_assistant(voice_assistant_panel);
@@ -316,7 +224,6 @@ void create_main_ui(lv_obj_t * parent) {
     lv_obj_clear_flag(notifications_panel, LV_OBJ_FLAG_SCROLLABLE);
 
     // --- Create Main Content Containers ---
-    // This container holds the main tab view (Watchface, Today, Apps)
     lv_obj_t * tab_container = lv_obj_create(parent);
     lv_obj_set_size(tab_container, lv_pct(100), lv_pct(95));
     lv_obj_align(tab_container, LV_ALIGN_CENTER, 0, 0);
@@ -324,28 +231,21 @@ void create_main_ui(lv_obj_t * parent) {
     lv_obj_set_style_bg_opa(tab_container, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(tab_container, 0, 0);
 
-    // This container is where individual apps will be rendered
     lv_obj_t * app_container = lv_obj_create(parent);
     lv_obj_set_size(app_container, lv_pct(100), lv_pct(100));
-    lv_obj_add_flag(app_container, LV_OBJ_FLAG_HIDDEN); // Hidden by default
+    lv_obj_add_flag(app_container, LV_OBJ_FLAG_HIDDEN);
 
-    // Create the tabview inside the tab_container
     lv_obj_t * tabview = lv_tabview_create(tab_container, LV_DIR_TOP, 50);
 
-    // Make the entire tabview background transparent
     lv_obj_set_style_bg_opa(tabview, LV_OPA_TRANSP, LV_PART_MAIN);
     
-    // Get the button matrix that holds the tab buttons
     lv_obj_t * tab_btns = lv_tabview_get_tab_btns(tabview);
     
-    // Make the button matrix background transparent
     lv_obj_set_style_bg_opa(tab_btns, LV_OPA_TRANSP, LV_PART_MAIN);
 
-    // Make the tab buttons themselves transparent (for unselected and selected states)
     lv_obj_set_style_bg_opa(tab_btns, LV_OPA_TRANSP, LV_PART_ITEMS | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(tab_btns, LV_OPA_TRANSP, LV_PART_ITEMS | LV_STATE_CHECKED);
     
-    // Ensure the indicator (the blue line) stays visible but its background is transparent
     lv_obj_set_style_bg_opa(tab_btns, LV_OPA_TRANSP, LV_PART_INDICATOR);
     lv_obj_set_style_radius(tab_btns, 50, LV_PART_INDICATOR);
 
@@ -357,59 +257,35 @@ void create_main_ui(lv_obj_t * parent) {
     create_today_view(tab2);
     create_app_list(tab3);
     
-    // Initialize the navigation service with both containers
     navigation_service_init(app_container, tab_container); 
 }
 
-static void datalock_keypad_event_handler(lv_event_t * e) {
-    lv_obj_t * obj = lv_event_get_target(e);
-    uint32_t id = lv_btnmatrix_get_selected_btn(obj);
-    const char * txt = lv_btnmatrix_get_btn_text(obj, id);
+void wearable_deinit_ui() {
+    lv_timer_del(status_bar_timer);
+    lv_timer_del(context_updater_timer);
+    lv_timer_del(step_simulator_timer);
+    lv_timer_del(stress_simulator_timer);
+    lv_timer_del(notification_simulator_timer);
+    lv_timer_del(gamification_daily_update_timer);
+}
 
-    static char entered_pin[DATALOCK_PIN_LENGTH + 1] = {0};
-    static int pin_len = 0;
+void unlock_wearable_cb() {
+    create_wearable_home_screen(lv_scr_act());
+}
 
-    if (strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
-        if (pin_len > 0) {
-            pin_len--;
-            entered_pin[pin_len] = '\0';
-        }
-    } else if (strcmp(txt, LV_SYMBOL_OK) == 0) {
-        if (pin_len == DATALOCK_PIN_LENGTH) {
-            if (datalock_check_pin(entered_pin)) {
-                lv_obj_del(datalock_screen);
-                datalock_screen = NULL;
-                create_main_ui(lv_scr_act());
-            } else {
-                lv_label_set_text(datalock_pin_label, "Wrong PIN");
-                pin_len = 0;
-                memset(entered_pin, 0, sizeof(entered_pin));
-            }
-        }
+void create_main_ui(lv_obj_t * parent) {
+    if (datalock_is_locked()) {
+        create_ui_datalock_screen(parent, unlock_wearable_cb);
     } else {
-        if (pin_len < DATALOCK_PIN_LENGTH) {
-            strcat(entered_pin, txt);
-            pin_len++;
-        }
-    }
-
-    if (strcmp(txt, LV_SYMBOL_OK) != 0) {
-        char pin_display[20] = {0};
-        for (int i = 0; i < DATALOCK_PIN_LENGTH; i++) {
-            if (i < pin_len) strcat(pin_display, "* ");
-            else strcat(pin_display, "_ ");
-        }
-        if(strlen(pin_display) > 0) pin_display[strlen(pin_display)-1] = 0;
-        lv_label_set_text(datalock_pin_label, pin_display);
+        create_wearable_home_screen(parent);
     }
 }
 
-#include "ui/ui_hal.h"
-#include "ui/wearable.h"
 
 // --- Personality Definition ---
 static ui_personality_t wearable_personality = {
-    .init_ui = create_main_ui
+    .init_ui = create_main_ui,
+    .deinit_ui = wearable_deinit_ui
 };
 
 ui_personality_t* get_wearable_personality() {

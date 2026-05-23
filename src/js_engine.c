@@ -12,6 +12,8 @@
 #include "app/phone_connection_service.h"
 #include "drivers/heart_rate.h"
 
+extern void set_acrylic_os_personality(const char* new_personality); // From main.c
+
 #define JS_MEM_SIZE 4096
 static char js_mem[JS_MEM_SIZE];
 static struct js *js;
@@ -188,9 +190,17 @@ static jsval_t js_weno_phone_show_required_screen(struct js *js, jsval_t *args, 
     return js_mkundef();
 }
 
+static jsval_t js_set_personality(struct js *js, jsval_t *args, int nargs) {
+    if (nargs != 1 || js_type(args[0]) != JS_STR) {
+        return js_mkerr(js, "Usage: setPersonality(personalityName)");
+    }
+    const char *personality_name = js_str(js, args[0]);
+    set_acrylic_os_personality(personality_name);
+    return js_mkundef();
+}
+
 
 // --- LVGL API ---
-
 static jsval_t js_lvgl_create_button(struct js *js, jsval_t *args, int nargs) {
     if (nargs < 1 || nargs > 2) return js_mkerr(js, "createButton requires a parent object address and optional text");
     
