@@ -1,5 +1,6 @@
 #include "app/dnd_service.h"
 #include "app/persistence.h"
+#include <stdio.h> // For sprintf
 
 #ifdef SIMULATOR_BUILD
 #include <emscripten.h>
@@ -18,8 +19,9 @@ void dnd_service_toggle(void) {
     persistence_set_int("dnd_is_active", dnd_active_state);
 
     #ifdef SIMULATOR_BUILD
-    // Notify the web UI about the change
-    emscripten_run_script_int("window.notifyDndChanged(%d)", dnd_active_state);
+    char script[64]; // Buffer to hold the script string
+    sprintf(script, "window.notifyDndChanged(%d);", dnd_active_state);
+    emscripten_run_script_int(script);
     #endif
 }
 

@@ -71,7 +71,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp8flaq3ra.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp9ivo6mih.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -206,21 +206,21 @@ Module['FS_createPath']("/assets", "icons", true, true);
 
   })();
 
-// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp8flaq3ra.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpojlhoed2.js
+// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp9ivo6mih.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp5010kur0.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpojlhoed2.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpn65_gbh1.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp5010kur0.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp7egidv_0.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpn65_gbh1.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp7egidv_0.js
 
 
 var arguments_ = [];
@@ -5172,6 +5172,8 @@ var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
 var _main_loop = Module['_main_loop'] = makeInvalidEarlyAccess('_main_loop');
 var _main = Module['_main'] = makeInvalidEarlyAccess('_main');
 var _free = Module['_free'] = makeInvalidEarlyAccess('_free');
+var _get_dnd_status = Module['_get_dnd_status'] = makeInvalidEarlyAccess('_get_dnd_status');
+var _toggle_dnd_status = Module['_toggle_dnd_status'] = makeInvalidEarlyAccess('_toggle_dnd_status');
 var _weno_store_receive_app_source = Module['_weno_store_receive_app_source'] = makeInvalidEarlyAccess('_weno_store_receive_app_source');
 var _weno_store_receive_apps_json = Module['_weno_store_receive_apps_json'] = makeInvalidEarlyAccess('_weno_store_receive_apps_json');
 var _fflush = makeInvalidEarlyAccess('_fflush');
@@ -5193,6 +5195,8 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['main_loop'] != 'undefined', 'missing Wasm export: main_loop');
   assert(typeof wasmExports['main'] != 'undefined', 'missing Wasm export: main');
   assert(typeof wasmExports['free'] != 'undefined', 'missing Wasm export: free');
+  assert(typeof wasmExports['get_dnd_status'] != 'undefined', 'missing Wasm export: get_dnd_status');
+  assert(typeof wasmExports['toggle_dnd_status'] != 'undefined', 'missing Wasm export: toggle_dnd_status');
   assert(typeof wasmExports['weno_store_receive_app_source'] != 'undefined', 'missing Wasm export: weno_store_receive_app_source');
   assert(typeof wasmExports['weno_store_receive_apps_json'] != 'undefined', 'missing Wasm export: weno_store_receive_apps_json');
   assert(typeof wasmExports['fflush'] != 'undefined', 'missing Wasm export: fflush');
@@ -5210,6 +5214,8 @@ function assignWasmExports(wasmExports) {
   _main_loop = Module['_main_loop'] = createExportWrapper('main_loop', 0);
   _main = Module['_main'] = createExportWrapper('main', 2);
   _free = Module['_free'] = createExportWrapper('free', 1);
+  _get_dnd_status = Module['_get_dnd_status'] = createExportWrapper('get_dnd_status', 0);
+  _toggle_dnd_status = Module['_toggle_dnd_status'] = createExportWrapper('toggle_dnd_status', 0);
   _weno_store_receive_app_source = Module['_weno_store_receive_app_source'] = createExportWrapper('weno_store_receive_app_source', 1);
   _weno_store_receive_apps_json = Module['_weno_store_receive_apps_json'] = createExportWrapper('weno_store_receive_apps_json', 1);
   _fflush = createExportWrapper('fflush', 1);

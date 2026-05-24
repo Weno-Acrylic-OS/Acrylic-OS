@@ -4,4 +4,5 @@
     background-image: url('/public/wallpaper.png');
     overflow: hidden;
     position: relative;
+    cursor: url('/public/cursors/Pointers.png') 0 0, auto; /* 0 0 for hotspot, auto as fallback */
 }

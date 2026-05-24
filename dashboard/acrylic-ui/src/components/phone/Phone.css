@@ -1,0 +1,91 @@
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background-image: url('../../../public/wallpaper.png');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.phone-dock-placeholder {
+    height: 90px;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    margin: 0 10px 10px 10px;
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.app-drawer {
+    position: absolute;
+    bottom: 0px; /* Position it above the dock (90px height + 10px margin) */
+    left: 0px;
+    width: 100%;
+    height: 90%; /* Adjust height to not overlap status bar or dock */
+    background-color: #D8E3F8;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    transform: translateY(100%); /* Start off-screen */
+    transition: transform 0.4s ease-in-out;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-drawer.visible {
+    transform: translateY(0);
+}
+
+.drawer-handle-area {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.drawer-handle {
+    width: 40px;
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+}
+
+.app-view-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 20;
+    touch-action: none;
+    transition: transform 0.3s ease-out;
+}
+
+.gesture-handle-area {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 30;
+    cursor: grab;
+}
+
+.gesture-handle {
+    width: 150px;
+    height: 5px;
+    background-color: white;
+    border-radius: 5px;
+}
