@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Desktop from './components/Desktop';
 import Phone from './components/phone/Phone';
+import SmartHome from './components/smarthome/SmartHome';
 
-const SmartHomeUI = () => <div className="smarthome-ui">Smart Home UI</div>;
 
 function App() {
   const [personality, setPersonality] = useState('desktop');
@@ -37,7 +37,7 @@ function App() {
       case 'phone':
         return <Phone />;
       case 'smarthome':
-        return <SmartHomeUI />;
+        return <SmartHome />;
       default:
         return <div>Unknown Personality</div>;
     }

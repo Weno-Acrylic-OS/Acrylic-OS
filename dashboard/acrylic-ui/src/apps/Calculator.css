@@ -42,7 +42,7 @@
 
 .calculator-keypad button {
     height: 50px;
-    border: 1px solid #ccc;
+    border: none;
     font-size: 1.2em;
     background: #e0e0e0;
 }
