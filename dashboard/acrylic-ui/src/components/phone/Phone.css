@@ -54,7 +54,7 @@
 .drawer-handle {
     width: 40px;
     height: 5px;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: #5a5a5a;
     border-radius: 5px;
 }
 
@@ -84,8 +84,8 @@
 }
 
 .gesture-handle {
-    width: 150px;
-    height: 5px;
+    width: 108px;
+    height: 3px;
     background-color: white;
     border-radius: 5px;
 }
