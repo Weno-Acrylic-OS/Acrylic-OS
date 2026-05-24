@@ -5,8 +5,7 @@
     padding: 10px 25px;
     height: 24px;
     font-size: 14px;
-    font-weight: 600;
-    font-family: sans-serif;
+    font-weight: 100;
     color: white;
     font-family: 'RobotoVariable', sans-serif;
     /* Semi-transparent background for status bar items to sit on */
@@ -21,4 +20,5 @@
 .status-icons img {
     height: 16px; /* Adjust size as needed */
     width: auto;
+    color: white;
 }
