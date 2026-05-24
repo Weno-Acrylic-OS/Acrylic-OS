@@ -1,0 +1,32 @@
+.dock {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 90px;
+    z-index: 15; /* Above wallpaper, below drawer/apps */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dock-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    background-color: #D8E3F8;
+    border-radius: 25px;
+    border: none;
+}
+
+.dock-app-icon {
+    cursor: pointer;
+}
+
+.dock-app-icon img {
+    width: 64px;
+    height: 64px;
+    border-radius: 15px;
+}

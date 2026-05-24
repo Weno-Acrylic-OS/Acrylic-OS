@@ -27,25 +27,28 @@
 
 .window-preview {
     height: 150px;
-    border: 1px solid #fff;
-    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    background: white;
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    border-radius: 26px;
 }
 
 .window-preview:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: #fafafa
 }
 
 .preview-title-bar {
     height: 25px;
-    background: rgba(0,0,0,0.4);
+    background: #D4E3FF;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 5px;
+    padding: 5px;
     font-size: 12px;
+    color: black;
+    border-radius: 26px 26px 0px 0px;
 }
 
 .preview-close-button {
@@ -57,6 +60,8 @@
     color: #9d0000;
     cursor: pointer;
     line-height: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .preview-content {

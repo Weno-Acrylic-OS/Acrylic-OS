@@ -35,11 +35,20 @@ OBJS = $(patsubst %.c,$(OUT_DIR)/%.o,$(C_SOURCES))
 
 all: $(OUT_DIR)/$(TARGET).html
 
+.PHONY: all clean run-web build-react
+
+build-react:
+	@echo "Building React UI..."
+	npm run build --prefix dashboard/acrylic-ui
+	@echo "Copying React build to output directory..."
+	mkdir -p $(OUT_DIR)/dashboard
+	cp -r dashboard/acrylic-ui/build/* $(OUT_DIR)/dashboard
+
 $(OUT_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OUT_DIR)/$(TARGET).html: $(OBJS)
+$(OUT_DIR)/$(TARGET).html: build-react $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
 
 run-web: all

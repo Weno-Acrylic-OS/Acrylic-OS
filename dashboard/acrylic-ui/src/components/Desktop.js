@@ -10,6 +10,9 @@ import Browser from '../apps/Browser';
 import Files from '../apps/Files';
 import WenoStore from '../apps/WenoStore';
 import Settings from '../apps/Settings';
+import Messages from '../apps/Messages';
+import Mail from '../apps/Mail';
+import Photos from '../apps/Photos';
 
 const appMap = {
     'Calculator': <Calculator />,
@@ -17,6 +20,9 @@ const appMap = {
     'Files': <Files />,
     'Weno Store': <WenoStore />,
     'Settings': <Settings />,
+    'Messages': <Messages />,
+    'Mail': <Mail />,
+    'Photos': <Photos />,
 };
 const renderApp = (appName) => {
     return appMap[appName] || <p>{appName} Application not found.</p>;

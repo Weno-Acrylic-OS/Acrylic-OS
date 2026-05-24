@@ -1,37 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import './Settings.css';
 
-// Create a single channel instance for the app
-const channel = new BroadcastChannel('weno-fit-os');
-
 const Settings = () => {
     const [isDndActive, setIsDndActive] = useState(false);
 
-    // Get initial state and listen for external changes
     useEffect(() => {
         const handleMessage = (event) => {
-            if (event.data && event.data.type === 'dnd_update') {
-                console.log('DND status updated via BroadcastChannel:', event.data.status);
-                setIsDndActive(event.data.status);
+            // Security check and ensure it's the right type of message
+            if (event.origin !== 'http://localhost:8000' || !event.data || event.data.type !== 'dnd_update') {
+                return;
             }
+            console.log('Settings.js: DND status updated via postMessage:', event.data.status);
+            setIsDndActive(event.data.status);
         };
-        channel.addEventListener('message', handleMessage);
 
-        // Request initial state
-        console.log('Requesting initial DND status...');
-        channel.postMessage({ command: 'get_dnd_status' });
+        window.addEventListener('message', handleMessage);
+
+        // Request initial state from the parent
+        console.log('Settings.js: Requesting initial DND status...');
+        window.parent.postMessage({ command: 'get_dnd_status' }, '*');
 
         return () => {
-            channel.removeEventListener('message', handleMessage);
-            // Do not close the channel, it's shared
+            window.removeEventListener('message', handleMessage);
         };
     }, []);
 
     const handleToggle = () => {
-        // Post a command to toggle the state in the C backend.
-        // The backend will then broadcast the 'dnd_update' message.
-        console.log('Requesting DND toggle...');
-        channel.postMessage({ command: 'toggle_dnd_status' });
+        console.log('Settings.js: Requesting DND toggle...');
+        window.parent.postMessage({ command: 'toggle_dnd_status' }, '*');
     };
 
     return (

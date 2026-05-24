@@ -11,6 +11,7 @@
     z-index: 1001; /* Above taskbar */
     border-radius: 10px;
     margin: 10px;
+    font-family: 'RobotoVariable', sans-serif;
 }
 
 .start-menu-main {
