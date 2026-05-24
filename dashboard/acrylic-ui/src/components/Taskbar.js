@@ -13,7 +13,7 @@ const Taskbar = ({ onAppClick, windows, onTaskbarAppClick }) => {
             {showStartMenu && <StartMenu onAppClick={onAppClick} />}
             <div className="taskbar">
                 <button className="start-button" onClick={toggleStartMenu}>
-                    <img src="/all_apps.svg" alt="All Apps" style={{ width: '20px', height: '20px' }} />
+                    <img src="all_apps.svg" alt="All Apps" style={{ width: '20px', height: '20px' }} />
                 </button>
 
                 <div className="taskbar-apps">

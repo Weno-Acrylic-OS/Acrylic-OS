@@ -25,16 +25,14 @@ const TopBar = ({ onActivitiesClick }) => {
         <>
             <div className="top-bar">
                 <div className="top-bar-left">
-                    <span className="time">{formatTime(currentTime)}</span>
-                    {/* Status icons will go here */}
-                </div>
-                <div className="top-bar-center">
                     <button className="app-menu-button" onClick={toggleAppMenu}>
                         <strong>App</strong>
                     </button>
+                    <button className="activities-button" onClick={onActivitiesClick}>Activities</button>
                 </div>
                 <div className="top-bar-right">
-                    <button className="activities-button" onClick={onActivitiesClick}>Activities</button>
+                <span className="time">{formatTime(currentTime)}</span>
+                {/* Status icons will go here */}
                 </div>
             </div>
             {showAppMenu && <AppMenu items={fileMenuItems} />}

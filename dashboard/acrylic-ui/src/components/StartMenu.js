@@ -21,6 +21,9 @@ const StartMenu = ({ onAppClick }) => {
                     <li onClick={() => handleAppClick('Weno Store')}>Weno Store</li>
                     <li onClick={() => handleAppClick('Settings')}>Settings</li>
                     <li onClick={() => handleAppClick('Calculator')}>Calculator</li>
+                    <li onClick={() => handleAppClick('Messages')}>Messages</li>
+                    <li onClick={() => handleAppClick('Mail')}>Mail</li>
+                    <li onClick={() => handleAppClick('Photos')}>Photos</li>
                     <li className="start-menu-divider"></li>
                     <li>Shut Down...</li>
                 </ul>

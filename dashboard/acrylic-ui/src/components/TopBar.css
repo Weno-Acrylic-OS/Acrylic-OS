@@ -16,6 +16,7 @@
     z-index: 1000;
     font-family: sans-serif;
     font-size: 14px;
+    font-family: 'RobotoVariable', sans-serif;
 }
 
 .top-bar-left, .top-bar-center, .top-bar-right {
@@ -25,18 +26,19 @@
 }
 
 .time {
-    font-weight: bold;
+    font-weight: regular;
 }
 
 .app-menu-button, .activities-button {
-    background: none;
+    background: #D4E3FF;
     border: none;
-    color: black;
+    color: #204876;
     padding: 4px 10px;
-    border-radius: 5px;
+    border-radius: 50px;
     cursor: pointer;
+    font-family: 'RobotoVariable', sans-serif;
 }
 
 .app-menu-button:hover, .activities-button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: #B3CEFF
 }

@@ -17,7 +17,7 @@
     background: #D8E3F8;
     border-radius: 26px 26px 0px 0px;
     color: #3C4758;
-    font-family: sans-serif;
+    font-family: 'RobotoVariable', sans-serif;
     font-size: 14px;
     font-weight: bold;
     display: flex;
@@ -71,7 +71,7 @@
 }
 
 .window.maximized {
-    border-radius: 0;
+    border-radius: 26;
     border: none;
     box-shadow: none;
 }
