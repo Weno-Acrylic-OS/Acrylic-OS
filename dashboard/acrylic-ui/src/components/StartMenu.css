@@ -48,7 +48,7 @@
 }
 
 .start-menu-divider {
-    height: 2px;
+    height: 0.01px;
     background: #808080;
     border-radius: 50px;
     margin: 2px 0;
