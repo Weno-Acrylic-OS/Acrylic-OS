@@ -4,7 +4,6 @@ import './SmartHomeDock.css';
 const AppIcon = ({ name, icon, onClick }) => (
     <div className="smarthome-dock-icon" onClick={onClick}>
         <img src={`/dashboard/${icon}sm.png`} alt={name} />
-        <span>{name}</span>
     </div>
 );
 
