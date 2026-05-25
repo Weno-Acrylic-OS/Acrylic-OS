@@ -6,7 +6,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px; /* More spacing for a large dock */
+    gap: 175px; /* More spacing for a large dock */
     z-index: 15;
 }
 
@@ -21,18 +21,12 @@
     width: 80px; /* Wider touch area */
 }
 
-.smarthome-icon-placeholder {
-    width: 64px;
-    height: 64px;
-    background-color: rgba(255, 255, 255, 0.1);
+
+.smarthome-dock-icon img {
+    width: 218px;
+    height: 130px;
     border-radius: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 32px; /* For the emoji icon */
-    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.smarthome-dock-icon:hover .smarthome-icon-placeholder {
-    background-color: rgba(255, 255, 255, 0.2);
-}
+
+
