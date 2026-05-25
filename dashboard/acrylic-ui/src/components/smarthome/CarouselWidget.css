@@ -4,7 +4,7 @@
     border-radius: 20px;
     overflow: hidden;
     position: relative;
-    background-color: #2c2c2e;
+    background-color: #D8E3F8;
 }
 
 .carousel-inner {
@@ -27,13 +27,14 @@
 .carousel-slide h3 {
     margin: 0;
     font-size: 16px;
-    color: #a0a0a0;
+    color: #3C4758;
 }
 
 .carousel-slide p {
     margin: 5px 0 0 0;
     font-size: 24px;
     font-weight: 600;
+    color: #3C4758;
 }
 
 .carousel-dots {
@@ -49,11 +50,11 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: #20487650;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 .dot.active {
-    background-color: #fff;
+    background-color: #204876;
 }

@@ -8,6 +8,10 @@
     align-items: center;
     gap: 175px; /* More spacing for a large dock */
     z-index: 15;
+    background-color: #D4E3FF;
+    border-radius: 45px;
+    height: 170px;
+    width: 775px;
 }
 
 .smarthome-dock-icon {
