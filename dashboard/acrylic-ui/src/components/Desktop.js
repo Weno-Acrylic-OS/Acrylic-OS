@@ -12,9 +12,10 @@ import WenoStore from '../apps/WenoStore';
 import Settings from '../apps/Settings';
 import Messages from '../apps/Messages';
 import Mail from '../apps/Mail';
+import NativeAppWrapper from './NativeAppWrapper';
 import Photos from '../apps/Photos';
 
-const Desktop = ({ onLock, onPinChange, pin }) => {
+const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
     const [windows, setWindows] = useState([]);
     const [showActivities, setShowActivities] = useState(false);
     const [topZIndex, setTopZIndex] = useState(100); // Initial z-index
@@ -28,13 +29,14 @@ const Desktop = ({ onLock, onPinChange, pin }) => {
         'Messages': () => <Messages />,
         'Mail': () => <Mail />,
         'Photos': () => <Photos />,
+        'HelloAcrylic': () => <NativeAppWrapper uiTree={appUITree} />,
     };
 
     const renderApp = (appName) => {
         const appRenderer = appMap[appName];
         return appRenderer ? appRenderer() : <p>{appName} Application not found.</p>;
     }
-
+// ...
     const openWindow = (appName) => {
         const existingWindow = windows.find(w => w.title === appName);
         if (existingWindow) {
