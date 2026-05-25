@@ -16,40 +16,58 @@
 
 .start-menu-main {
     width: 75%;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.start-menu-app-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    flex-grow: 1;
+}
+
+.start-menu-app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
     padding: 5px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    color: #333;
+    font-size: 12px;
 }
 
-.start-menu-main ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.start-menu-app-icon:hover {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
-.start-menu-main li {
+.start-menu-app-icon img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 5px;
+}
+
+.start-menu-footer {
+    padding-top: 10px;
+}
+
+.start-menu-footer-item {
     padding: 5px 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    margin-bottom: 2px;
+    border-radius: 50px;
+    font-size: 14px;
 }
 
-.start-menu-main li:hover {
+.start-menu-footer-item:hover {
     background: #204876;
-    border-radius: 50px;
-    color: #ffffff;
+    color: white;
 }
 
-.start-menu-main li span {
-    display: inline-block;
-    width: 20px; /* Space for an icon */
-    height: 20px;
-    margin-right: 5px;
-    background: lightgray; /* Placeholder for icon */
-}
-
-.start-menu-divider {
-    height: 0.01px;
-    background: #808080;
-    border-radius: 50px;
-    margin: 2px 0;
-}

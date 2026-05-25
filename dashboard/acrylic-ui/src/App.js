@@ -3,10 +3,12 @@ import './App.css';
 import Desktop from './components/Desktop';
 import Phone from './components/phone/Phone';
 import SmartHome from './components/smarthome/SmartHome';
-
+import LockScreen from './components/lockscreen/LockScreen';
 
 function App() {
   const [personality, setPersonality] = useState('desktop');
+  const [isLocked, setIsLocked] = useState(true); // Start locked
+  const [pin, setPin] = useState(localStorage.getItem('acrylic-os-pin') || '0000');
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -16,6 +18,9 @@ function App() {
       if (event.data.personality) {
         console.log(`App.js: Received personality -> ${event.data.personality}`);
         setPersonality(event.data.personality);
+      }
+      if (event.data.lock) {
+          setIsLocked(true);
       }
     };
 
@@ -30,14 +35,32 @@ function App() {
     };
   }, []);
 
+  const handleUnlock = (enteredPin) => {
+      if (enteredPin === pin) {
+          setIsLocked(false);
+      } else {
+          console.error('Incorrect PIN');
+      }
+  };
+
+  const handleLock = () => {
+      setIsLocked(true);
+  }
+
+  const handlePinChange = (newPin) => {
+      setPin(newPin);
+      localStorage.setItem('acrylic-os-pin', newPin);
+      // Maybe show a confirmation message here
+  };
+
   const renderPersonality = () => {
     switch (personality) {
       case 'desktop':
-        return <Desktop />;
+        return <Desktop onLock={handleLock} onPinChange={handlePinChange} pin={pin} />;
       case 'phone':
-        return <Phone />;
+        return <Phone onLock={handleLock} onPinChange={handlePinChange} pin={pin} />;
       case 'smarthome':
-        return <SmartHome />;
+        return <SmartHome onLock={handleLock} onPinChange={handlePinChange} pin={pin} />;
       default:
         return <div>Unknown Personality</div>;
     }
@@ -45,7 +68,7 @@ function App() {
 
   return (
     <div className="App">
-      {renderPersonality()}
+        {isLocked ? <LockScreen onUnlock={handleUnlock} /> : renderPersonality()}
     </div>
   );
 }

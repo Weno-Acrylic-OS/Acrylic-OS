@@ -14,28 +14,35 @@ import Messages from '../apps/Messages';
 import Mail from '../apps/Mail';
 import Photos from '../apps/Photos';
 
-const appMap = {
-    'Calculator': <Calculator />,
-    'Browser': <Browser />,
-    'Files': <Files />,
-    'Weno Store': <WenoStore />,
-    'Settings': <Settings />,
-    'Messages': <Messages />,
-    'Mail': <Mail />,
-    'Photos': <Photos />,
-};
-const renderApp = (appName) => {
-    return appMap[appName] || <p>{appName} Application not found.</p>;
-}
-const Desktop = () => {
+const Desktop = ({ onLock, onPinChange, pin }) => {
     const [windows, setWindows] = useState([]);
     const [showActivities, setShowActivities] = useState(false);
     const [topZIndex, setTopZIndex] = useState(100); // Initial z-index
 
+    const appMap = {
+        'Calculator': () => <Calculator />,
+        'Browser': () => <Browser />,
+        'Files': () => <Files />,
+        'Weno Store': () => <WenoStore />,
+        'Settings': () => <Settings onPinChange={onPinChange} pin={pin} />,
+        'Messages': () => <Messages />,
+        'Mail': () => <Mail />,
+        'Photos': () => <Photos />,
+    };
+
+    const renderApp = (appName) => {
+        const appRenderer = appMap[appName];
+        return appRenderer ? appRenderer() : <p>{appName} Application not found.</p>;
+    }
+
     const openWindow = (appName) => {
-        if (windows.find(w => w.title === appName)) {
-            // If window is already open, just focus it
-            focusWindow(windows.find(w => w.title === appName).id);
+        const existingWindow = windows.find(w => w.title === appName);
+        if (existingWindow) {
+            if (existingWindow.isMinimized) {
+                toggleMinimize(existingWindow.id);
+            } else {
+                focusWindow(existingWindow.id);
+            }
             return;
         }
 
@@ -51,6 +58,7 @@ const Desktop = () => {
             app: renderApp(appName),
             position: newPosition,
             zIndex: newZIndex,
+            isMinimized: false,
         };
         setTopZIndex(newZIndex);
         setWindows(prev => [...prev, newWindow]);
@@ -64,8 +72,25 @@ const Desktop = () => {
         const newZIndex = topZIndex + 1;
         setTopZIndex(newZIndex);
         setWindows(windows.map(win => 
-            win.id === id ? { ...win, zIndex: newZIndex } : win
+            win.id === id ? { ...win, zIndex: newZIndex, isMinimized: false } : win
         ));
+    };
+
+    const minimizeWindow = (id) => {
+        setWindows(windows.map(win => 
+            win.id === id ? { ...win, isMinimized: true } : win
+        ));
+    };
+
+    const toggleMinimize = (id) => {
+        const win = windows.find(w => w.id === id);
+        if (!win) return;
+
+        if (win.isMinimized) {
+            focusWindow(id); // This will also un-minimize and bring to front
+        } else {
+            minimizeWindow(id);
+        }
     };
 
     const toggleActivitiesView = () => {
@@ -79,13 +104,14 @@ const Desktop = () => {
 
     return (
         <div className="desktop">
-            <TopBar onActivitiesClick={toggleActivitiesView} />
+            <TopBar onActivitiesClick={toggleActivitiesView} onLock={onLock} />
 
-            {windows.map(win => (
+            {windows.filter(w => !w.isMinimized).map(win => (
                 <Window 
                     key={win.id} 
                     title={win.title} 
                     onClose={() => closeWindow(win.id)}
+                    onMinimize={() => minimizeWindow(win.id)}
                     onFocus={() => focusWindow(win.id)}
                     initialPosition={win.position}
                     zIndex={win.zIndex}
@@ -102,7 +128,7 @@ const Desktop = () => {
                 />
             )}
 
-            <Taskbar onAppClick={openWindow} windows={windows} onTaskbarAppClick={focusWindow} />
+            <Taskbar onAppClick={openWindow} windows={windows} onTaskbarAppClick={toggleMinimize} />
         </div>
     );
 };

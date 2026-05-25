@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './Settings.css';
 
-const Settings = () => {
+const Settings = ({ onPinChange, pin: currentPin }) => {
     const [isDndActive, setIsDndActive] = useState(false);
+    const [oldPin, setOldPin] = useState('');
+    const [newPin, setNewPin] = useState('');
+    const [confirmPin, setConfirmPin] = useState('');
+    const [pinMessage, setPinMessage] = useState({ text: '', type: '' });
 
     useEffect(() => {
         const handleMessage = (event) => {
@@ -30,6 +34,27 @@ const Settings = () => {
         window.parent.postMessage({ command: 'toggle_dnd_status' }, '*');
     };
 
+    const handlePinSave = () => {
+        if (oldPin !== currentPin) {
+            setPinMessage({ text: 'Incorrect old PIN.', type: 'error' });
+            return;
+        }
+        if (newPin.length !== 4) {
+            setPinMessage({ text: 'New PIN must be 4 digits.', type: 'error' });
+            return;
+        }
+        if (newPin !== confirmPin) {
+            setPinMessage({ text: 'New PINs do not match.', type: 'error' });
+            return;
+        }
+
+        onPinChange(newPin);
+        setPinMessage({ text: 'PIN updated successfully!', type: 'success' });
+        setOldPin('');
+        setNewPin('');
+        setConfirmPin('');
+    };
+
     return (
         <div className="settings-app">
             <h1>Settings</h1>
@@ -45,7 +70,16 @@ const Settings = () => {
                         <span className="slider round"></span>
                     </label>
                 </div>
-                {/* More settings will go here */}
+                <div className="settings-item-column">
+                    <span>Change PIN</span>
+                    <div className="pin-change-form">
+                        <input type="password" placeholder="Old PIN" value={oldPin} onChange={e => setOldPin(e.target.value)} maxLength="4" />
+                        <input type="password" placeholder="New PIN" value={newPin} onChange={e => setNewPin(e.target.value)} maxLength="4" />
+                        <input type="password" placeholder="Confirm New PIN" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} maxLength="4" />
+                        <button onClick={handlePinSave}>Save PIN</button>
+                        {pinMessage.text && <p className={`pin-message ${pinMessage.type}`}>{pinMessage.text}</p>}
+                    </div>
+                </div>
             </div>
         </div>
     );
