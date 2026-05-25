@@ -16,9 +16,10 @@ import Messages from '../../apps/Messages';
 import Mail from '../../apps/Mail';
 import Photos from '../../apps/Photos';
 import Home from '../../apps/Home';
+import NativeAppWrapper from '../NativeAppWrapper';
 import Music from '../../apps/Music';
 
-const SmartHome = ({ onLock, onPinChange, pin }) => {
+const SmartHome = ({ onLock, onPinChange, pin, appUITree }) => {
     const [showAppDrawer, setShowAppDrawer] = useState(false);
     const [openedApp, setOpenedApp] = useState(null);
     const [appViewPos, setAppViewPos] = useState({ x: 0 });
@@ -34,6 +35,7 @@ const SmartHome = ({ onLock, onPinChange, pin }) => {
         'Photos': () => <Photos />,
         'Home': () => <Home />,
         'Music': () => <Music />,
+        'HelloAcrylic': () => <NativeAppWrapper uiTree={appUITree} />,
     };
 
     const renderApp = (appName) => {

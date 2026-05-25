@@ -9,6 +9,7 @@ function App() {
   const [personality, setPersonality] = useState('desktop');
   const [isLocked, setIsLocked] = useState(true); // Start locked
   const [pin, setPin] = useState(localStorage.getItem('acrylic-os-pin') || '0000');
+  const [appUITree, setAppUITree] = useState(null);
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -21,6 +22,10 @@ function App() {
       }
       if (event.data.lock) {
           setIsLocked(true);
+      }
+      if (event.data.type === 'render-app') {
+          console.log('App.js: Received UI tree from app.');
+          setAppUITree(event.data.ui);
       }
     };
 
@@ -56,11 +61,11 @@ function App() {
   const renderPersonality = () => {
     switch (personality) {
       case 'desktop':
-        return <Desktop onLock={handleLock} onPinChange={handlePinChange} pin={pin} />;
+        return <Desktop onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} />;
       case 'phone':
-        return <Phone onLock={handleLock} onPinChange={handlePinChange} pin={pin} />;
+        return <Phone onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} />;
       case 'smarthome':
-        return <SmartHome onLock={handleLock} onPinChange={handlePinChange} pin={pin} />;
+        return <SmartHome onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} />;
       default:
         return <div>Unknown Personality</div>;
     }

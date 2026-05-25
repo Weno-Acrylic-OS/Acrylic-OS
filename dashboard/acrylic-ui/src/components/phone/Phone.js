@@ -15,9 +15,10 @@ import Settings from '../../apps/Settings';
 import Calculator from '../../apps/Calculator';
 import Messages from '../../apps/Messages';
 import Mail from '../../apps/Mail';
+import NativeAppWrapper from '../NativeAppWrapper';
 import Photos from '../../apps/Photos';
 
-const Phone = ({ onLock, onPinChange, pin }) => {
+const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
     const [activeApp, setActiveApp] = useState(null);
     const [showActivities, setShowActivities] = useState(false);
     const [showAppDrawer, setShowAppDrawer] = useState(false);
@@ -33,6 +34,7 @@ const Phone = ({ onLock, onPinChange, pin }) => {
         'Messages': () => <Messages />,
         'Mail': () => <Mail />, 
         'Photos': () => <Photos />,
+        'HelloAcrylic': () => <NativeAppWrapper uiTree={appUITree} />,
     };
 
     const openApp = (appName) => {

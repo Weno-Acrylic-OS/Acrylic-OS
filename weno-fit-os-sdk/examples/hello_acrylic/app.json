@@ -1,0 +1,10 @@
+{
+  "name": "HelloAcrylic",
+  "version": "1.0.0",
+  "author": "Acrylic OS Developer",
+  "description": "A simple multi-device 'Hello, World!' application for Acrylic OS using the Acrylic SDK.",
+  "permissions": ["UI"],
+  "entry_point": "index.js",
+  "icon": "icon.png",
+  "min_os_version": "0.3.0"
+}

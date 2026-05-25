@@ -12,6 +12,6 @@ This plan outlines the steps to evolve the existing Weno Fit OS into a multi-pur
 
 ## Stage 2: Add new basic fundemental features and services to all new personalities - ✅ Completed
 
-# Stage 3: Expand existing Fit OS SDK to be compatible for Acrylic OS and new interfaces. - ⚒️ In Development
+# Stage 3: Expand existing Fit OS SDK to be compatible for Acrylic OS and new interfaces. -  ✅ Completed
 
 ## Stage 4: Prepare Acrylic OS for Real Hardware development - ⛔️ Untouched and Not completed
