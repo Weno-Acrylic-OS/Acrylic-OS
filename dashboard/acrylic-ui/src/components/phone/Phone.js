@@ -4,6 +4,7 @@ import { useDrag } from '@use-gesture/react';
 import PhoneStatusBar from './PhoneStatusBar';
 import AppGrid from './AppGrid';
 import Dock from './Dock';
+import PhoneQuickSettings from './PhoneQuickSettings';
 import ActivitiesView from '../ActivitiesView';
 
 // App Imports
@@ -16,17 +17,23 @@ import Messages from '../../apps/Messages';
 import Mail from '../../apps/Mail';
 import Photos from '../../apps/Photos';
 
-const appMap = {
-    'Browser': <Browser />, 'Files': <Files />, 'Weno Store': <WenoStore />,
-    'Settings': <Settings />, 'Calculator': <Calculator />, 'Messages': <Messages />,
-    'Mail': <Mail />, 'Photos': <Photos />,
-};
-
-const Phone = () => {
+const Phone = ({ onLock, onPinChange, pin }) => {
     const [activeApp, setActiveApp] = useState(null);
     const [showActivities, setShowActivities] = useState(false);
     const [showAppDrawer, setShowAppDrawer] = useState(false);
+    const [showQuickSettings, setShowQuickSettings] = useState(false);
     const [appViewPos, setAppViewPos] = useState({ y: 0 });
+
+    const appMap = {
+        'Browser': () => <Browser />, 
+        'Files': () => <Files />, 
+        'Weno Store': () => <WenoStore />,
+        'Settings': () => <Settings onPinChange={onPinChange} pin={pin} />, 
+        'Calculator': () => <Calculator />, 
+        'Messages': () => <Messages />,
+        'Mail': () => <Mail />, 
+        'Photos': () => <Photos />,
+    };
 
     const openApp = (appName) => {
         if (appMap[appName]) {
@@ -57,13 +64,22 @@ const Phone = () => {
 
     // Gesture for opening the app drawer from the home screen
     const homeGestureBind = useDrag(({ down, movement: [, my] }) => {
-        if (activeApp) return;
+        if (activeApp || showQuickSettings) return;
         if (down && my < 0) setShowAppDrawer(true);
         if (down && my > 0) setShowAppDrawer(false);
     }, { axis: 'y', filterTaps: true });
 
+    // Gesture for opening the Quick Settings panel
+    const qsGestureBind = useDrag(({ down, movement: [, my] }) => {
+        if (activeApp) return;
+        if (down && my > 50) { // A small downward drag
+            setShowQuickSettings(true);
+        }
+    }, { axis: 'y' });
+
     const renderAppView = () => {
         if (!activeApp) return null;
+        const appRenderer = appMap[activeApp];
         return (
             <div 
                 {...appGestureBind()} 
@@ -73,14 +89,17 @@ const Phone = () => {
                 <div className="gesture-handle-area">
                     <div className="gesture-handle"></div>
                 </div>
-                {appMap[activeApp]}
+                {appRenderer ? appRenderer() : <div>App not found</div>}
             </div>
         );
     };
 
     return (
         <div className="phone-screen" {...homeGestureBind()}>
-            <PhoneStatusBar />
+            <div className="phone-power-button" onClick={onLock}></div>
+            <div {...qsGestureBind()} style={{ zIndex: 51, position: 'relative' }}>
+                <PhoneStatusBar />
+            </div>
 
             {/* App Drawer */}
             <div className={`app-drawer ${showAppDrawer ? 'visible' : ''}`}>
@@ -95,6 +114,9 @@ const Phone = () => {
             
             {/* Dock */}
             {!activeApp && <Dock onAppClick={openApp} />}
+
+            {/* Quick Settings Overlay */}
+            <PhoneQuickSettings isVisible={showQuickSettings} onClose={() => setShowQuickSettings(false)} />
             
             {/* Activities Overlay */}
             {showActivities && 

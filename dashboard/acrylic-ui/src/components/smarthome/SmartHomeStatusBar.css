@@ -23,3 +23,15 @@
     height: 20px;
     width: auto;
 }
+
+.status-bar-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    gap: 15px;
+}

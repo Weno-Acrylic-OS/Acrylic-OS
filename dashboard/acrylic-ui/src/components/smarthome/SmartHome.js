@@ -18,27 +18,28 @@ import Photos from '../../apps/Photos';
 import Home from '../../apps/Home';
 import Music from '../../apps/Music';
 
-const appMap = {
-    'Calculator': <Calculator />,
-    'Browser': <Browser />,
-    'Files': <Files />,
-    'Weno Store': <WenoStore />,
-    'Settings': <Settings />,
-    'Messages': <Messages />,
-    'Mail': <Mail />,
-    'Photos': <Photos />,
-    'Home': <Home />,
-    'Music': <Music />,
-};
-
-const renderApp = (appName) => {
-    return appMap[appName] || <p>{appName} Application not found.</p>;
-}
-
-const SmartHome = () => {
+const SmartHome = ({ onLock, onPinChange, pin }) => {
     const [showAppDrawer, setShowAppDrawer] = useState(false);
     const [openedApp, setOpenedApp] = useState(null);
     const [appViewPos, setAppViewPos] = useState({ x: 0 });
+
+    const appMap = {
+        'Calculator': () => <Calculator />,
+        'Browser': () => <Browser />,
+        'Files': () => <Files />,
+        'Weno Store': () => <WenoStore />,
+        'Settings': () => <Settings onPinChange={onPinChange} pin={pin} />,
+        'Messages': () => <Messages />,
+        'Mail': () => <Mail />,
+        'Photos': () => <Photos />,
+        'Home': () => <Home />,
+        'Music': () => <Music />,
+    };
+
+    const renderApp = (appName) => {
+        const appRenderer = appMap[appName];
+        return appRenderer ? appRenderer() : <p>{appName} Application not found.</p>;
+    }
 
     const homeGestureBind = useDrag(({ down, movement: [, my] }) => {
         if (openedApp) return;
@@ -95,7 +96,7 @@ const SmartHome = () => {
 
     return (
         <div className="smarthome-screen" {...homeGestureBind()}>
-            <SmartHomeStatusBar />
+            <SmartHomeStatusBar onLock={onLock} />
             <div className="smarthome-header">
                 <h1>My Home</h1>
                 <p>Welcome back</p>

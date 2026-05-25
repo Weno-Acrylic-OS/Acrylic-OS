@@ -1,0 +1,38 @@
+.quick-settings-panel {
+    position: absolute;
+    top: 40px; /* Below the TopBar */
+    right: 15px;
+    width: 300px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    padding: 15px;
+    z-index: 999;
+}
+
+.quick-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.qs-tile {
+    height: 80px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.qs-tile.active {
+    background-color: #2196F3;
+    color: white;
+}

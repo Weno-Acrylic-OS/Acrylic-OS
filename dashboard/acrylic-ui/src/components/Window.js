@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Window.css';
 
-const Window = ({ title, children, onClose, initialPosition, initialSize, zIndex, onFocus }) => {
+const Window = ({ title, children, onClose, onMinimize, initialPosition, initialSize, zIndex, onFocus }) => {
     // Window State
     const [position, setPosition] = useState(initialPosition || { x: 100, y: 50 });
     const [size, setSize] = useState(initialSize || { w: 400, h: 300 });
@@ -100,6 +100,10 @@ const Window = ({ title, children, onClose, initialPosition, initialSize, zIndex
             <div className="title-bar" onMouseDown={handleDragMouseDown} onDoubleClick={handleToggleMaximize}>
                 <span className="title">{title}</span>
                 <div className="title-bar-buttons">
+                    <button className="title-bar-button" onClick={onMinimize}>
+                        {/* Minimize Icon */}
+                        <svg width="12" height="12" viewBox="0 0 24 24"><path stroke="black" strokeWidth="3" d="M4,12 L20,12"></path></svg>
+                    </button>
                     <button className="title-bar-button" onClick={handleToggleMaximize}>
                         {/* Maximize Icon */}
                         <svg width="12" height="12" viewBox="0 0 24 24"><path stroke="black" strokeWidth="3" fill="none" d="M2,2 L22,2 L22,22 L2,22 L2,2 Z"></path></svg>

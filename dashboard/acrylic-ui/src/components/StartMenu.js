@@ -1,6 +1,17 @@
 import React from 'react';
 import './StartMenu.css';
 
+const apps = [
+    { name: 'Browser', icon: '/dashbord/Browser.png' },
+    { name: 'Calculator', icon: '/dashboard/Calculator.png' },
+    { name: 'Files', icon: '/dashboard/Files.png' },
+    { name: 'Mail', icon: '/dashboard/Mail.png' },
+    { name: 'Messages', icon: '/dashboard/Messages.png' },
+    { name: 'Photos', icon: '/dashboard/Photos.png' },
+    { name: 'Settings', icon: '/dashboard/Settings.png' },
+    { name: 'Weno Store', icon: '/dashboard/Wenostore.png' },
+];
+
 const StartMenu = ({ onAppClick }) => {
     // A simple guard
     const handleAppClick = (appName) => {
@@ -15,18 +26,18 @@ const StartMenu = ({ onAppClick }) => {
                 {/* User profile or OS logo could go here */}
             </div>
             <div className="start-menu-main">
-                <ul>
-                    <li onClick={() => handleAppClick('Browser')}>Browser</li>
-                    <li onClick={() => handleAppClick('Files')}>Files</li>
-                    <li onClick={() => handleAppClick('Weno Store')}>Weno Store</li>
-                    <li onClick={() => handleAppClick('Settings')}>Settings</li>
-                    <li onClick={() => handleAppClick('Calculator')}>Calculator</li>
-                    <li onClick={() => handleAppClick('Messages')}>Messages</li>
-                    <li onClick={() => handleAppClick('Mail')}>Mail</li>
-                    <li onClick={() => handleAppClick('Photos')}>Photos</li>
-                    <li className="start-menu-divider"></li>
-                    <li>Shut Down...</li>
-                </ul>
+                <div className="start-menu-app-grid">
+                    {apps.map(app => (
+                        <div key={app.name} className="start-menu-app-icon" onClick={() => handleAppClick(app.name)}>
+                            <img src={`/${app.icon}`} alt={app.name} />
+                            <span>{app.name}</span>
+                        </div>
+                    ))}
+                </div>
+                <div className="start-menu-footer">
+                    <div className="start-menu-divider"></div>
+                    <div className="start-menu-footer-item">Shut Down...</div>
+                </div>
             </div>
         </div>
     );

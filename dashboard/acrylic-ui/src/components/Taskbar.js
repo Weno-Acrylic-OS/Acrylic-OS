@@ -20,7 +20,7 @@ const Taskbar = ({ onAppClick, windows, onTaskbarAppClick }) => {
                     {windows.map(win => (
                         <button 
                             key={win.id} 
-                            className="taskbar-app-button"
+                            className={`taskbar-app-button ${win.isMinimized ? 'minimized' : ''}`}
                             onClick={() => onTaskbarAppClick(win.id)}
                         >
                             {win.title.substring(0, 10)}
