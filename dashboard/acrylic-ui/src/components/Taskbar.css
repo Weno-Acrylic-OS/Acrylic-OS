@@ -50,3 +50,8 @@
     background: #204876;
     color: white;
 }
+
+.taskbar-app-button.minimized {
+    background: #a0b0c8;
+    color: #f0f0f0;
+}
