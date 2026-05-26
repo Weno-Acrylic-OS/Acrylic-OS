@@ -4,12 +4,14 @@ import Desktop from './components/Desktop';
 import Phone from './components/phone/Phone';
 import SmartHome from './components/smarthome/SmartHome';
 import LockScreen from './components/lockscreen/LockScreen';
+import OOBE from './components/oobe/OOBE';
 
 function App() {
   const [personality, setPersonality] = useState('desktop');
   const [isLocked, setIsLocked] = useState(true); // Start locked
   const [pin, setPin] = useState(localStorage.getItem('acrylic-os-pin') || '0000');
   const [appUITree, setAppUITree] = useState(null);
+  const [showOOBE, setShowOOBE] = useState(!localStorage.getItem('oobe_completed'));
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -58,6 +60,11 @@ function App() {
       // Maybe show a confirmation message here
   };
 
+  const handleOOBEComplete = () => {
+      localStorage.setItem('oobe_completed', 'true');
+      setShowOOBE(false);
+  };
+
   const renderPersonality = () => {
     switch (personality) {
       case 'desktop':
@@ -73,7 +80,11 @@ function App() {
 
   return (
     <div className="App">
-        {isLocked ? <LockScreen onUnlock={handleUnlock} /> : renderPersonality()}
+        {showOOBE ? (
+            <OOBE onComplete={handleOOBEComplete} onPinChange={handlePinChange} />
+        ) : (
+            isLocked ? <LockScreen onUnlock={handleUnlock} /> : renderPersonality()
+        )}
     </div>
   );
 }
