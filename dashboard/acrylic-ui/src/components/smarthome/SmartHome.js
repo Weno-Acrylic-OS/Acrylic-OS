@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SmartHome.css';
 import { useDrag } from '@use-gesture/react';
 import CarouselWidget from './CarouselWidget';
 import SmartHomeDock from './SmartHomeDock';
 import SmartHomeAppGrid from './SmartHomeAppGrid';
 import SmartHomeStatusBar from './SmartHomeStatusBar';
+import NativeAppWrapper from '../NativeAppWrapper';
 
 // App Components
 import Calculator from '../../apps/Calculator';
@@ -16,13 +17,27 @@ import Messages from '../../apps/Messages';
 import Mail from '../../apps/Mail';
 import Photos from '../../apps/Photos';
 import Home from '../../apps/Home';
-import NativeAppWrapper from '../NativeAppWrapper';
+import { addNotification, getNotifications, subscribe } from '../NotificationManager';
+import Notification from '../Notification';
 import Music from '../../apps/Music';
 
 const SmartHome = ({ onLock, onPinChange, pin, appUITree }) => {
     const [showAppDrawer, setShowAppDrawer] = useState(false);
     const [openedApp, setOpenedApp] = useState(null);
     const [appViewPos, setAppViewPos] = useState({ x: 0 });
+    const [activeToast, setActiveToast] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = subscribe(() => {
+            const newNotifications = getNotifications();
+            if (newNotifications.length > 0) {
+                // For simplicity, just show the latest as a toast
+                setActiveToast(newNotifications[0]);
+            }
+        });
+
+        return unsubscribe;
+    }, []);
 
     const appMap = {
         'Calculator': () => <Calculator />,
@@ -114,6 +129,7 @@ const SmartHome = ({ onLock, onPinChange, pin, appUITree }) => {
             </div>
 
             <SmartHomeDock onAppClick={handleAppLaunch} />
+            {activeToast && <Notification notification={activeToast} onDismiss={() => setActiveToast(null)} />}
         </div>
     );
 };
