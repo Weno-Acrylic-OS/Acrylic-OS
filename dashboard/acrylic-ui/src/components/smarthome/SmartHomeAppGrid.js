@@ -10,6 +10,7 @@ const apps = [
     { name: 'Phone' },
     { name: 'Photos' },
     { name: 'Settings' },
+    { name: 'HelloAcrylic' },
 ];
 
 const SmartHomeAppGrid = ({ onAppClick }) => {

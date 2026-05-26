@@ -2,7 +2,7 @@ import React from 'react';
 import './StartMenu.css';
 
 const apps = [
-    { name: 'Browser', icon: '/dashbord/Browser.png' },
+    { name: 'Browser', icon: '/dashboard/Browser.png' },
     { name: 'Calculator', icon: '/dashboard/Calculator.png' },
     { name: 'Files', icon: '/dashboard/Files.png' },
     { name: 'Mail', icon: '/dashboard/Mail.png' },
@@ -10,6 +10,7 @@ const apps = [
     { name: 'Photos', icon: '/dashboard/Photos.png' },
     { name: 'Settings', icon: '/dashboard/Settings.png' },
     { name: 'Weno Store', icon: '/dashboard/Wenostore.png' },
+    { name: 'HelloAcrylic', icon: '/dashboard/logo192.png' }, // Using a generic icon for now
 ];
 
 const StartMenu = ({ onAppClick }) => {

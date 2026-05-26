@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Desktop.css';
 import Taskbar from './Taskbar';
 import TopBar from './TopBar';
 import Window from './Window';
 import ActivitiesView from './ActivitiesView';
+import { addNotification, getNotifications, subscribe } from './NotificationManager';
+import NotificationPanel from './NotificationPanel';
+import Notification from './Notification';
 // App Components
 import Calculator from '../apps/Calculator';
 import Browser from '../apps/Browser';
@@ -18,7 +21,24 @@ import Photos from '../apps/Photos';
 const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
     const [windows, setWindows] = useState([]);
     const [showActivities, setShowActivities] = useState(false);
-    const [topZIndex, setTopZIndex] = useState(100); // Initial z-index
+    const [topZIndex, setTopZIndex] = useState(100);
+    const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+    const [activeToast, setActiveToast] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = subscribe(() => {
+            const newNotifications = getNotifications();
+            if (newNotifications.length > 0) {
+                // For simplicity, just show the latest as a toast
+                setActiveToast(newNotifications[0]);
+            }
+        });
+
+        // Demo notification
+        setTimeout(() => addNotification('Welcome!', 'This is a test notification.'), 2000);
+
+        return unsubscribe;
+    }, []);
 
     const appMap = {
         'Calculator': () => <Calculator />,
@@ -36,7 +56,7 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
         const appRenderer = appMap[appName];
         return appRenderer ? appRenderer() : <p>{appName} Application not found.</p>;
     }
-// ...
+
     const openWindow = (appName) => {
         const existingWindow = windows.find(w => w.title === appName);
         if (existingWindow) {
@@ -99,6 +119,10 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
         setShowActivities(!showActivities);
     };
 
+    const toggleNotificationPanel = () => {
+        setShowNotificationPanel(!showNotificationPanel);
+    }
+
     const switchWindow = (id) => {
         focusWindow(id);
         setShowActivities(false);
@@ -106,7 +130,7 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
 
     return (
         <div className="desktop">
-            <TopBar onActivitiesClick={toggleActivitiesView} onLock={onLock} />
+            <TopBar onActivitiesClick={toggleActivitiesView} onLock={onLock} onToggleNotifications={toggleNotificationPanel} />
 
             {windows.filter(w => !w.isMinimized).map(win => (
                 <Window 
@@ -129,6 +153,9 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
                     onSwitchWindow={switchWindow}
                 />
             )}
+
+            <NotificationPanel isVisible={showNotificationPanel} onClose={() => setShowNotificationPanel(false)} />
+            {activeToast && <Notification notification={activeToast} onDismiss={() => setActiveToast(null)} />}
 
             <Taskbar onAppClick={openWindow} windows={windows} onTaskbarAppClick={toggleMinimize} />
         </div>

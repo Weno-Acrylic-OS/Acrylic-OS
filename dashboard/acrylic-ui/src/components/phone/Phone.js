@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Phone.css';
 import { useDrag } from '@use-gesture/react';
 import PhoneStatusBar from './PhoneStatusBar';
@@ -16,6 +16,8 @@ import Calculator from '../../apps/Calculator';
 import Messages from '../../apps/Messages';
 import Mail from '../../apps/Mail';
 import NativeAppWrapper from '../NativeAppWrapper';
+import { addNotification, getNotifications, subscribe } from '../NotificationManager';
+import Notification from '../Notification';
 import Photos from '../../apps/Photos';
 
 const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
@@ -24,6 +26,19 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
     const [showAppDrawer, setShowAppDrawer] = useState(false);
     const [showQuickSettings, setShowQuickSettings] = useState(false);
     const [appViewPos, setAppViewPos] = useState({ y: 0 });
+    const [activeToast, setActiveToast] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = subscribe(() => {
+            const newNotifications = getNotifications();
+            if (newNotifications.length > 0) {
+                // For simplicity, just show the latest as a toast
+                setActiveToast(newNotifications[0]);
+            }
+        });
+
+        return unsubscribe;
+    }, []);
 
     const appMap = {
         'Browser': () => <Browser />, 
@@ -120,6 +135,9 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
             {/* Quick Settings Overlay */}
             <PhoneQuickSettings isVisible={showQuickSettings} onClose={() => setShowQuickSettings(false)} />
             
+            {/* Notification Toast */}
+            {activeToast && <Notification notification={activeToast} onDismiss={() => setActiveToast(null)} />}
+
             {/* Activities Overlay */}
             {showActivities && 
                 <ActivitiesView 
