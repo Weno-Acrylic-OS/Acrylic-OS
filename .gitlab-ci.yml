@@ -19,10 +19,12 @@ build_arm_os:
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     - apt-get install -y --no-install-recommends nodejs
   script:
+    - make weno_defconfig
     - make -f Makefile.os
   artifacts:
     paths:
-      - build_arm/acrylic_os.iso
+      - output/images/rootfs.ext4
+      - output/images/Image
     expire_in: 1 week
 
 # --- Build Stage ---
