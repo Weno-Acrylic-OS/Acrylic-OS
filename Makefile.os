@@ -29,21 +29,38 @@ $(FINAL_ISO_PATH): $(ISO_IMAGE)
 	@mkdir -p $(CURDIR)/build_arm
 	@cp $(ISO_IMAGE) $(FINAL_ISO_PATH)
 
-TEMPORARY_PATCH_BIN_DIR := $(CURDIR)/.tmp_patch_bin
+# Check if we are on macOS
+ifeq ($(shell uname), Darwin)
+	IS_MACOS := yes
+else
+	IS_MACOS := no
+endif
+
+# ... (rest of the file until the target)
 
 $(ISO_IMAGE): $(BUILDROOT_DIR)/.config
 	@echo "--- Building Buildroot system (this will take a long time)... ---"
+ifeq ($(IS_MACOS), yes)
+	@echo "--- Applying macOS patch symlink workaround ---"
 	@mkdir -p $(TEMPORARY_PATCH_BIN_DIR)
 	@ln -sf "$$(brew --prefix gpatch)/bin/gpatch" "$(TEMPORARY_PATCH_BIN_DIR)/patch"
 	@PATH="$(TEMPORARY_PATCH_BIN_DIR):$(PATH)" $(MAKE) -C $(BUILDROOT_DIR)
 	@rm -rf $(TEMPORARY_PATCH_BIN_DIR)
+else
+	@$(MAKE) -C $(BUILDROOT_DIR)
+endif
 
 $(BUILDROOT_DIR)/.config: $(BUILDROOT_DIR) x86_os/configs/weno_defconfig $(OVERLAY_UI_DIR)/index.html
 	@echo "--- Configuring Buildroot... ---"
+ifeq ($(IS_MACOS), yes)
+	@echo "--- Applying macOS patch symlink workaround ---"
 	@mkdir -p $(TEMPORARY_PATCH_BIN_DIR)
 	@ln -sf "$$(brew --prefix gpatch)/bin/gpatch" "$(TEMPORARY_PATCH_BIN_DIR)/patch"
 	@PATH="$(TEMPORARY_PATCH_BIN_DIR):$(PATH)" $(MAKE) -C $(BUILDROOT_DIR) BR2_EXTERNAL=$(CURDIR)/x86_os weno_defconfig
 	@rm -rf $(TEMPORARY_PATCH_BIN_DIR)
+else
+	@$(MAKE) -C $(BUILDROOT_DIR) BR2_EXTERNAL=$(CURDIR)/x86_os weno_defconfig
+endif
 
 # --- UI Build
 build-ui: $(OVERLAY_UI_DIR)/index.html
