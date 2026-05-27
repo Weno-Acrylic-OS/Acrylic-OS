@@ -19,7 +19,9 @@ build_arm_os:
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     - apt-get install -y --no-install-recommends nodejs
   script:
-    - make weno_defconfig
+# Use -C to tell make to run inside the Buildroot folder
+    - make -C x86_os/buildroot-2023.11.1 DEFCONFIG=../../x86_os/configs/weno_defconfig defconfig
+    # Now run your custom wrapper Makefile
     - make -f Makefile.os
   artifacts:
     paths:
