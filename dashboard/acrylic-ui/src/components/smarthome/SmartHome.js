@@ -17,7 +17,7 @@ import Messages from '../../apps/Messages';
 import Mail from '../../apps/Mail';
 import Photos from '../../apps/Photos';
 import Home from '../../apps/Home';
-import { addNotification, getNotifications, subscribe } from '../NotificationManager';
+import { getNotifications, subscribe } from '../NotificationManager';
 import Notification from '../Notification';
 import Music from '../../apps/Music';
 
