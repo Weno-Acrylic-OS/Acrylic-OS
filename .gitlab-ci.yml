@@ -11,6 +11,18 @@ stages:
 default:
   image: node:18
 
+build_arm_os:
+  stage: build
+  image: ubuntu:22.04
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends build-essential gcc g++ make git wget tar cpio unzip rsync bc libncurses-dev flex bison python3 npm qemu-system-arm qemu-system-x86
+  script:
+    - make -f Makefile.os
+  artifacts:
+    paths:
+      - build_arm/acrylic_os.iso
+    expire_in: 1 week
+
 # --- Build Stage ---
 build_project:
   stage: build
