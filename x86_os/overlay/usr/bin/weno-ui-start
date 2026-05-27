@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# weno-ui-start - Called by xinit to start the UI session
+
+# Run the window manager in the background.
+# Fluxbox is simple and lightweight.
+/usr/bin/fluxbox &
+
+# Wait a moment for the window manager to start
+sleep 1
+
+# Start the web browser in kiosk mode.
+# We will need to replace this with the actual path to our UI.
+# For now, we point to a placeholder.
+/usr/bin/surf file:///usr/share/weno-ui/index.html
