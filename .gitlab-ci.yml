@@ -15,7 +15,9 @@ build_arm_os:
   stage: build
   image: ubuntu:22.04
   before_script:
-    - apt-get update && apt-get install -y --no-install-recommends build-essential gcc g++ make git wget tar cpio unzip rsync bc libncurses-dev flex bison python3 npm qemu-system-arm qemu-system-x86
+    - apt-get update && apt-get install -y --no-install-recommends curl build-essential gcc g++ make git wget tar cpio unzip rsync bc libncurses-dev flex bison python3 qemu-system-arm qemu-system-x86
+    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    - apt-get install -y --no-install-recommends nodejs
   script:
     - make -f Makefile.os
   artifacts:
