@@ -16,7 +16,7 @@ import Calculator from '../../apps/Calculator';
 import Messages from '../../apps/Messages';
 import Mail from '../../apps/Mail';
 import NativeAppWrapper from '../NativeAppWrapper';
-import { addNotification, getNotifications, subscribe } from '../NotificationManager';
+import { getNotifications, subscribe } from '../NotificationManager';
 import Notification from '../Notification';
 import Photos from '../../apps/Photos';
 
