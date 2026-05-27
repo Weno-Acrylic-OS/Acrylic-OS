@@ -1,7 +1,7 @@
 # Makefile for the Weno Fit OS Kiosk System
 
 # --- Configuration
-BUILDROOT_VERSION := 2023.11.1
+BUILDROOT_VERSION := 2023.02.8
 BUILDROOT_TARBALL := buildroot-$(BUILDROOT_VERSION).tar.gz
 BUILDROOT_URL := https://buildroot.org/downloads/$(BUILDROOT_TARBALL)
 BUILDROOT_DIR := $(CURDIR)/x86_os/buildroot-$(BUILDROOT_VERSION)
