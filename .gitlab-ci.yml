@@ -23,10 +23,10 @@ build_arm_os:
     - make -C x86_os/buildroot-2023.11.1 DEFCONFIG=../../x86_os/configs/weno_defconfig defconfig
     # Now run your custom wrapper Makefile
     - make -f Makefile.os
-  artifacts:
+artifacts:
     paths:
-      - output/images/rootfs.ext4
-      - output/images/Image
+      - x86_os/buildroot-2023.11.1/output/images/Image
+      - x86_os/buildroot-2023.11.1/output/images/rootfs.ext4
     expire_in: 1 week
 
 # --- Build Stage ---
