@@ -15,14 +15,13 @@ build_arm_os:
   stage: build
   image: ubuntu:22.04
   before_script:
-    - apt-get update && apt-get install -y --no-install-recommends file ca-certificates curl pkg-config build-essential gcc g++ make git wget tar cpio unzip rsync bc libncurses-dev flex bison python3 qemu-system-arm qemu-system-x86
+    - apt-get update && apt-get install -y --no-install-recommends file ca-certificates curl pkg-config libssl-dev libelf-dev kmod build-essential gcc g++ make git wget tar cpio unzip rsync bc libncurses-dev flex bison python3 qemu-system-arm qemu-system-x86
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     - apt-get install -y --no-install-recommends nodejs
   script:
-    # 1. Load the config. Point to the Buildroot directory correctly.
-    - make -C x86_os/buildroot-2023.11.1 DEFCONFIG=../../x86_os/configs/weno_defconfig defconfig
-    # 2. Run the build
-    - make -f Makefile.os
+  - rm -rf x86_os/buildroot-2023.11.1/output  # Clear old failed build artifacts
+  - make -C x86_os/buildroot-2023.11.1 DEFCONFIG=../../x86_os/configs/weno_defconfig defconfig
+  - make -f Makefile.os
   artifacts:
     # IMPORTANT: Ensure these paths exist after the build
     paths:
