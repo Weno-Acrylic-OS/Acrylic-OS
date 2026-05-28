@@ -19,11 +19,12 @@ build_arm_os:
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     - apt-get install -y --no-install-recommends nodejs
   script:
-# Use -C to tell make to run inside the Buildroot folder
+    # 1. Load the config. Point to the Buildroot directory correctly.
     - make -C x86_os/buildroot-2023.11.1 DEFCONFIG=../../x86_os/configs/weno_defconfig defconfig
-    # Now run your custom wrapper Makefile
+    # 2. Run the build
     - make -f Makefile.os
-artifacts:
+  artifacts:
+    # IMPORTANT: Ensure these paths exist after the build
     paths:
       - x86_os/buildroot-2023.11.1/output/images/Image
       - x86_os/buildroot-2023.11.1/output/images/rootfs.ext4
