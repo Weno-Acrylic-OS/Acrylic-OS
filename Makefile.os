@@ -1,4 +1,4 @@
-# Makefile for the Weno Fit OS Kiosk System
+# Makefile for the Acrylic OS Kiosk System
 
 # --- Configuration
 BUILDROOT_VERSION := 2023.02.8
@@ -9,25 +9,25 @@ BUILDROOT_DOWNLOAD_DIR := $(CURDIR)/x86_os
 
 REACT_UI_DIR := $(CURDIR)/dashboard/acrylic-ui
 REACT_BUILD_DIR := $(REACT_UI_DIR)/build
-OVERLAY_UI_DIR := $(CURDIR)/x86_os/overlay/usr/share/weno-ui
+OVERLAY_UI_DIR := $(CURDIR)/x86_os/overlay/usr/share/acrylic-ui
 
 # --- Output
 OUTPUT_DIR := $(BUILDROOT_DIR)/output
-ISO_IMAGE := $(OUTPUT_DIR)/images/rootfs.iso9660
-FINAL_ISO_NAME := acrylic_os.iso
-FINAL_ISO_PATH := $(CURDIR)/build_arm/$(FINAL_ISO_NAME)
+IMG_IMAGE := $(OUTPUT_DIR)/images/acrylic_os.img
+FINAL_IMG_NAME := acrylic_os.img
+FINAL_IMG_PATH := $(CURDIR)/build_arm/$(FINAL_IMG_NAME)
 
-.PHONY: all clean iso run-qemu build-ui
+.PHONY: all clean img run-qemu build-ui
 
-all: iso
+all: img
 
 # --- Main build flow
-iso: $(FINAL_ISO_PATH)
+img: $(FINAL_IMG_PATH)
 
-$(FINAL_ISO_PATH): $(ISO_IMAGE)
-	@echo "--- Copying final ISO image to build_arm/ ---"
+$(FINAL_IMG_PATH): $(IMG_IMAGE)
+	@echo "--- Copying final disk image to build_arm/ ---"
 	@mkdir -p $(CURDIR)/build_arm
-	@cp $(ISO_IMAGE) $(FINAL_ISO_PATH)
+	@cp $(IMG_IMAGE) $(FINAL_IMG_PATH)
 
 # Check if we are on macOS
 ifeq ($(shell uname), Darwin)
@@ -38,7 +38,7 @@ endif
 
 # ... (rest of the file until the target)
 
-$(ISO_IMAGE): $(BUILDROOT_DIR)/.config
+$(IMG_IMAGE): $(BUILDROOT_DIR)/.config
 	@echo "--- Building Buildroot system (this will take a long time)... ---"
 ifeq ($(IS_MACOS), yes)
 	@echo "--- Applying macOS patch symlink workaround ---"
@@ -96,17 +96,17 @@ clean:
 	rm -rf $(CURDIR)/build_arm
 	rm -rf $(OVERLAY_UI_DIR)
 
-run-qemu: iso
-	qemu-system-aarch64 -M virt -cpu cortex-a57 -m 1024 
-		-drive file=$(FINAL_ISO_PATH),media=cdrom,if=none,id=cd 
-		-device virtio-scsi-pci -device scsi-cd,drive=cd 
+run-qemu: img
+	qemu-system-aarch64 -M virt -cpu cortex-a57 -m 1024 \
+		-drive file=/opt/homebrew/share/qemu/edk2-aarch64-code.fd,if=pflash,format=raw,readonly=on \
+		-drive file=$(FINAL_IMG_PATH),if=virtio,format=raw \
 		-device virtio-gpu-pci -device qemu-xhci -device usb-kbd -device usb-mouse
 
 help:
-	@echo "Weno Fit OS Build System"
+	@echo "Acrylic OS Build System"
 	@echo "Targets:"
-	@echo "  all/iso    - Build the final bootable ISO image for the target architecture."
-	@echo "  run-qemu   - Build and run the ISO in QEMU."
+	@echo "  all/img    - Build the final bootable disk image for the target architecture."
+	@echo "  run-qemu   - Build and run the image in QEMU."
 	@echo "  build-ui   - Build the React UI and place it in the overlay."
 	@echo "  clean      - Clean all build artifacts."
 	@echo "  help       - Show this help message."
