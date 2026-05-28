@@ -1,20 +1,20 @@
 #!/bin/sh
 
-# S99weno_ui - Startup script for the Weno Kiosk UI
+# S99acrylic_ui - Startup script for the Acrylic OS Kiosk UI
 
 case "$1" in
     start)
-        echo "Starting Weno UI Kiosk..."
+        echo "Starting Acrylic OS Kiosk..."
         # Start the X server on display :0, in the background
-        /usr/bin/xinit /usr/bin/weno-ui-start -- :0 &
+        /usr/bin/xinit /usr/bin/acrylic-ui-start -- :0 &
         ;;
     stop)
         # We don't really have a stop mechanism for this simple kiosk
-        echo "Stopping Weno UI Kiosk is not supported."
+        echo "Stopping Acrylic OS Kiosk is not supported."
         ;;
     restart|reload)
         # Restarting would just be a reboot in this environment
-        echo "Restarting Weno UI Kiosk is not supported."
+        echo "Restarting Acrylic OS Kiosk is not supported."
         ;;
     *)
         echo "Usage: $0 {start|stop|restart}"
