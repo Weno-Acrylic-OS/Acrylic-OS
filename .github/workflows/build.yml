@@ -1,0 +1,41 @@
+name: Build Acrylic OS
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # IMPORTANT: GitHub runners only have ~14GB free. 
+      # This step frees up ~20GB by removing Android/Dotnet/Haskell.
+      - name: Maximize Build Space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 2048
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential wget cpio unzip rsync bc libncurses-dev flex bison libssl-dev python3 nodejs npm
+
+      - name: Build OS
+        run: |
+          # 1. Prepare UI
+          make -f Makefile.os build-ui
+          # 2. Configure Buildroot
+          # Note: Ensure BR2_ROOTFS_OVERLAY is set to "../../x86_os/overlay" in weno_defconfig
+          make -C x86_os/buildroot-2023.02.8 BR2_EXTERNAL=$(pwd)/x86_os DEFCONFIG=../../x86_os/configs/weno_defconfig defconfig
+          # 3. Compile
+          make -f Makefile.os
+
+      - name: Upload Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: Acrylic-OS-ARM64
+          path: build_arm/*.img  # Upload the .img, NOT the .iso
