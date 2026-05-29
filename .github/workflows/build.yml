@@ -5,11 +5,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      # 1. This MUST be the first step. It wipes pre-installed bloatware.
       - name: Maximize Build Space
-        uses: easimon/maximize-build-space@master
+        uses: easimon/maximize-build-space@v10
         with:
           root-reserve-mb: 2048
           swap-size-mb: 1024
@@ -19,6 +17,11 @@ jobs:
           remove-codeql: 'true'
           remove-docker-images: 'true'
 
+      # 2. Checkout your code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 3. Now apt-get will have enough room to download index files
       - name: Install Dependencies
         run: |
           sudo apt-get update
@@ -26,16 +29,13 @@ jobs:
 
       - name: Build OS
         run: |
-          # 1. Prepare UI
-          make -f Makefile.os build-ui
-          # 2. Configure Buildroot
-          # Note: Ensure BR2_ROOTFS_OVERLAY is set to "../../x86_os/overlay" in weno_defconfig
+          # Configure Buildroot
           make -C x86_os/buildroot-2023.02.8 BR2_EXTERNAL=$(pwd)/x86_os DEFCONFIG=../../x86_os/configs/weno_defconfig defconfig
-          # 3. Compile
+          # Compile the image
           make -f Makefile.os
 
       - name: Upload Image
         uses: actions/upload-artifact@v4
         with:
           name: Acrylic-OS-ARM64
-          path: build_arm/*.img  # Upload the .img, NOT the .iso
+          path: x86_os/buildroot-2023.02.8/output/images/*.img
