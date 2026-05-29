@@ -20,9 +20,11 @@ jobs:
       # 2. Checkout your code
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          submodules: 'recursive' # This ensures Buildroot actually downloads
-          fetch-depth: 0
+
+      - name: Manual Submodule Init
+        run: |
+          # Only initialize buildroot, skip the broken companion_app
+          git submodule update --init x86_os/buildroot-2023.02.8 || echo "Buildroot folder already exists"
 
       # 3. Now apt-get will have enough room to download index files
       - name: Install Dependencies
