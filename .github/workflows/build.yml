@@ -20,6 +20,9 @@ jobs:
       # 2. Checkout your code
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive' # This ensures Buildroot actually downloads
+          fetch-depth: 0
 
       # 3. Now apt-get will have enough room to download index files
       - name: Install Dependencies
