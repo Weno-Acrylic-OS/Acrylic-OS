@@ -46,7 +46,7 @@ jobs:
           # Note: We use the discovered $BR_DIR variable here
           make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
-            DEFCONFIG="../../configs/weno_defconfig" \
+            DEFCONFIG="../../../configs/weno_defconfig" \
             defconfig
           
           # 4. Compile the final image
