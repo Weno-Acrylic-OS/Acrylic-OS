@@ -23,8 +23,6 @@ build_arm_os:
   - make -f Makefile.os
   artifacts:
     # IMPORTANT: Ensure these paths exist after the build
-    cache:
-      key: buildroot-cache
     paths:
       - x86_os/buildroot-2023.02.8/dl/
       - x86_os/buildroot-2023.02.8/host/bin/ccache
