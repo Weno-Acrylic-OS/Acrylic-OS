@@ -34,9 +34,23 @@ jobs:
 
       - name: Build OS
         run: |
-          # Configure Buildroot
-          make -C x86_os/buildroot-2023.02.8 BR2_EXTERNAL=$(pwd)/x86_os DEFCONFIG=../../x86_os/configs/weno_defconfig defconfig
-          # Compile the image
+          # 1. Dynamically find the Buildroot directory
+          # This looks for any folder starting with 'buildroot-' inside x86_os
+          BR_DIR=$(ls -d $GITHUB_WORKSPACE/x86_os/buildroot-* | head -n 1)
+          echo "Found Buildroot at: $BR_DIR"
+          
+          # 2. Set absolute path for External Tree
+          EXT_PATH="$GITHUB_WORKSPACE/x86_os"
+          
+          # 3. Configure Buildroot
+          # Note: We use the discovered $BR_DIR variable here
+          make -C "$BR_DIR" \
+            BR2_EXTERNAL="$EXT_PATH" \
+            DEFCONFIG="../../configs/weno_defconfig" \
+            defconfig
+          
+          # 4. Compile the final image
+          # Ensure your Makefile.os also uses the correct path!
           make -f Makefile.os
 
       - name: Upload Image
