@@ -79,9 +79,21 @@ jobs:
           fi
           ls -lh "$BR_DIR/output/images/" || exit 1
 
-          # 7. Final copy
-          make -f Makefile.os
+         # 7. Final copy
+         #  make -f Makefile.os
 
+      - name: Generate Image with Genimage
+        run: |
+          BR_DIR=$(pwd)/x86_os/buildroot-2023.11.1
+          EXT_PATH=$(pwd)/x86_os
+          
+          echo "=== Running genimage to create final disk image ==="
+          make -C "$BR_DIR" \
+            BR2_EXTERNAL="$EXT_PATH" \
+            source
+          
+          echo "Image generation completed"
+          
       - name: Upload Image
         uses: actions/upload-artifact@v4
         with:
