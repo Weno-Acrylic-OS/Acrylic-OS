@@ -53,6 +53,10 @@ jobs:
             BR2_EXTERNAL="$EXT_PATH" \
             defconfig BR2_DEFCONFIG="$CONFIG_FILE"
           
+          # 2. DIAGNOSTIC: List every file in the images folder
+          echo "Checking Buildroot output images:"
+          ls -F "$BR_DIR/output/images/"
+
           # 4. Final Compile
           make -f Makefile.os
 
@@ -60,4 +64,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Acrylic-OS-ARM64
-          path: x86_os/buildroot-2023.02.8/output/images/*.img
+          # Using a wildcard ensures it finds the image regardless of the exact version folder
+          path: x86_os/buildroot-*/output/images/*
