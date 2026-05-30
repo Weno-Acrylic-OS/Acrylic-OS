@@ -5,7 +5,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 1. This MUST be the first step. It wipes pre-installed bloatware.
       - name: Maximize Build Space
         uses: easimon/maximize-build-space@v10
         with:
@@ -17,86 +16,72 @@ jobs:
           remove-codeql: 'true'
           remove-docker-images: 'true'
 
-      # 2. Checkout your code
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Manual Submodule Init
         run: |
-          # Only initialize buildroot, skip the broken companion_app
           git submodule update --init x86_os/buildroot-2023.11.1 || echo "Buildroot folder already exists"
 
-      # 3. Now apt-get will have enough room to download index files
       - name: Install Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential wget cpio unzip rsync bc libncurses-dev flex bison libssl-dev python3 nodejs npm
 
-      - name: Build OS
+      - name: Configure and Build Buildroot
         run: |
-          # 1. Define Absolute Paths
+          set -e
           ROOT_DIR=$(pwd)
           EXT_PATH="$ROOT_DIR/x86_os"
           BR_DIR="$ROOT_DIR/x86_os/buildroot-2023.11.1"
           CONFIG_FILE="$ROOT_DIR/x86_os/configs/weno_defconfig"
 
-          # 2. Sanity Check
           if [ ! -f "$CONFIG_FILE" ]; then
             echo "ERROR: Cannot find config at $CONFIG_FILE"
             ls -R $EXT_PATH/configs
             exit 1
           fi
 
-          # 3. Configure Buildroot
+          echo "=== Configuring Buildroot ==="
           make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             defconfig BR2_DEFCONFIG="$CONFIG_FILE"
           
-          # 4. Build with image generation
-          echo "Starting the full build process... This will take a while."
-          make -C "$BR_DIR" \
+          echo "=== Building Buildroot (this takes a while) ==="
+          timeout 3600 make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             -j2
 
-          # 5. DEBUG: Check what's in the images directory
-          echo "=== DEBUG: Contents of output/images/ ==="
-          ls -lah "$BR_DIR/output/images/" || echo "Directory does not exist"
-          
-          echo "=== DEBUG: Contents of output/build/ ==="
-          ls -lah "$BR_DIR/output/build/" | head -20 || echo "Directory does not exist"
-          
-          echo "=== DEBUG: Checking .config for genimage ==="
-          grep -i genimage "$BR_DIR/.config" || echo "No genimage found in .config"
-          
-          echo "=== DEBUG: Checking .config for rootfs options ==="
-          grep -E "BR2_TARGET_ROOTFS|BR2_TARGET_GENIMAGE" "$BR_DIR/.config" || echo "No rootfs/genimage options found"
-
-          # 6. Verify image was generated
-          echo "Checking Buildroot output images:"
-          if [ ! -d "$BR_DIR/output/images" ]; then
-            echo "ERROR: Images directory not found!"
-            exit 1
-          fi
-          ls -lh "$BR_DIR/output/images/" || exit 1
-
-          # 7. Final copy
-          make -f Makefile.os
-
-      - name: Generate Image with Genimage
+      - name: Check Build Artifacts
+        if: always()
         run: |
           BR_DIR=$(pwd)/x86_os/buildroot-2023.11.1
-          EXT_PATH=$(pwd)/x86_os
           
-          echo "=== Running genimage to create final disk image ==="
-          make -C "$BR_DIR" \
-            BR2_EXTERNAL="$EXT_PATH" \
-            source
+          echo "=== Checking output/images directory ==="
+          if [ -d "$BR_DIR/output/images" ]; then
+            ls -lah "$BR_DIR/output/images/"
+          else
+            echo "ERROR: output/images directory does not exist!"
+          fi
           
-          echo "Image generation completed"
+          echo ""
+          echo "=== Checking for .img files anywhere in output ==="
+          find "$BR_DIR/output" -name "*.img" -type f 2>/dev/null || echo "No .img files found"
+          
+          echo ""
+          echo "=== Checking genimage config ==="
+          grep -i genimage "$BR_DIR/.config" || echo "genimage not found in config"
+          
+          echo ""
+          echo "=== Checking rootfs options ==="
+          grep -E "BR2_TARGET_ROOTFS|BR2_TARGET_GENIMAGE" "$BR_DIR/.config" || echo "No rootfs options found"
+
+      - name: Copy Final Image
+        run: |
+          make -f Makefile.os
 
       - name: Upload Image
         uses: actions/upload-artifact@v4
         with:
           name: Acrylic-OS-ARM64
-          # Using a wildcard ensures it finds the image regardless of the exact version folder
           path: x86_os/buildroot-*/output/images/*
