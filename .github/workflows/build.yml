@@ -79,8 +79,8 @@ jobs:
           fi
           ls -lh "$BR_DIR/output/images/" || exit 1
 
-         # 7. Final copy
-         make -f Makefile.os
+          # 7. Final copy
+          make -f Makefile.os
 
       - name: Generate Image with Genimage
         run: |
