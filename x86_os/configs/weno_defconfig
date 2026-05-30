@@ -50,4 +50,4 @@ BR2_PACKAGE_LIBERATION=y
 # --- Custom Overlay
 BR2_EXTERNAL_WENO_PATH="$(BR2_EXTERNAL_PATH)"
 BR2_ROOTFS_OVERLAY="../../x86_os/overlay"
-BR2_POST_BUILD_SCRIPT="board/weno-arm64/post-build.sh"
+BR2_POST_BUILD_SCRIPT="../../board/weno-arm64/post-build.sh"
