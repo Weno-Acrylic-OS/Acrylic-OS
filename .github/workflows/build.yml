@@ -40,29 +40,33 @@ jobs:
           BR_DIR="$ROOT_DIR/x86_os/buildroot-2023.11.1"
           CONFIG_FILE="$ROOT_DIR/x86_os/configs/weno_defconfig"
 
-          # 2. Sanity Check (This will show in your logs if it fails)
+          # 2. Sanity Check
           if [ ! -f "$CONFIG_FILE" ]; then
             echo "ERROR: Cannot find config at $CONFIG_FILE"
             ls -R $EXT_PATH/configs
             exit 1
           fi
 
-          # 3. Configure Buildroot using the ABSOLUTE path to the config
-          # By using a leading '/', we bypass the ../../ confusion
+          # 3. Configure Buildroot
           make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             defconfig BR2_DEFCONFIG="$CONFIG_FILE"
           
-          # 4. THE ACTUAL BUILD (Slow - this is the 55+ minute compile)
-          # This command actually generates the files in output/images/
+          # 4. Build with image generation
           echo "Starting the full build process... This will take a while."
-          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH"
+          make -C "$BR_DIR" \
+            BR2_EXTERNAL="$EXT_PATH" \
+            -j$(nproc)
 
-          # 2. DIAGNOSTIC: List every file in the images folder
+          # 5. Verify image was generated
           echo "Checking Buildroot output images:"
-          ls -F "$BR_DIR/output/images/"
+          if [ ! -d "$BR_DIR/output/images" ]; then
+            echo "ERROR: Images directory not found!"
+            exit 1
+          fi
+          ls -lh "$BR_DIR/output/images/" || exit 1
 
-          # 4. Final Compile
+          # 6. Final copy
           make -f Makefile.os
 
       - name: Upload Image
