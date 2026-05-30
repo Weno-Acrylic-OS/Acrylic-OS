@@ -24,7 +24,7 @@ jobs:
       - name: Manual Submodule Init
         run: |
           # Only initialize buildroot, skip the broken companion_app
-          git submodule update --init x86_os/buildroot-2023.02.8 || echo "Buildroot folder already exists"
+          git submodule update --init x86_os/buildroot-2023.11.1 || echo "Buildroot folder already exists"
 
       # 3. Now apt-get will have enough room to download index files
       - name: Install Dependencies

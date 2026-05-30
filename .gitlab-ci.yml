@@ -24,9 +24,9 @@ build_arm_os:
   artifacts:
     # IMPORTANT: Ensure these paths exist after the build
     paths:
-      - x86_os/buildroot-2023.02.8/dl/
-      - x86_os/buildroot-2023.02.8/host/bin/ccache
-      - x86_os/buildroot-2023.02.8/output/host/usr/share/ccache
+      - x86_os/buildroot-2023.11.1/dl/
+      - x86_os/buildroot-2023.11.1/host/bin/ccache
+      - x86_os/buildroot-2023.11.1/output/host/usr/share/ccache
       - x86_os/buildroot-2023.11.1/output/images/Image
       - x86_os/buildroot-2023.11.1/output/images/rootfs.ext4
     expire_in: 1 week
