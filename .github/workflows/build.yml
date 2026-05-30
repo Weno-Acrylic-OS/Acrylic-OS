@@ -56,7 +56,7 @@ jobs:
           echo "Starting the full build process... This will take a while."
           make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
-            -j$(nproc)
+            -j2
 
           # 5. DEBUG: Check what's in the images directory
           echo "=== DEBUG: Contents of output/images/ ==="
