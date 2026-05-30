@@ -58,7 +58,20 @@ jobs:
             BR2_EXTERNAL="$EXT_PATH" \
             -j$(nproc)
 
-          # 5. Verify image was generated
+          # 5. DEBUG: Check what's in the images directory
+          echo "=== DEBUG: Contents of output/images/ ==="
+          ls -lah "$BR_DIR/output/images/" || echo "Directory does not exist"
+          
+          echo "=== DEBUG: Contents of output/build/ ==="
+          ls -lah "$BR_DIR/output/build/" | head -20 || echo "Directory does not exist"
+          
+          echo "=== DEBUG: Checking .config for genimage ==="
+          grep -i genimage "$BR_DIR/.config" || echo "No genimage found in .config"
+          
+          echo "=== DEBUG: Checking .config for rootfs options ==="
+          grep -E "BR2_TARGET_ROOTFS|BR2_TARGET_GENIMAGE" "$BR_DIR/.config" || echo "No rootfs/genimage options found"
+
+          # 6. Verify image was generated
           echo "Checking Buildroot output images:"
           if [ ! -d "$BR_DIR/output/images" ]; then
             echo "ERROR: Images directory not found!"
@@ -66,7 +79,7 @@ jobs:
           fi
           ls -lh "$BR_DIR/output/images/" || exit 1
 
-          # 6. Final copy
+          # 7. Final copy
           make -f Makefile.os
 
       - name: Upload Image
