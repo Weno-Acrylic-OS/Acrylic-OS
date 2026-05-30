@@ -53,6 +53,11 @@ jobs:
             BR2_EXTERNAL="$EXT_PATH" \
             defconfig BR2_DEFCONFIG="$CONFIG_FILE"
           
+          # 4. THE ACTUAL BUILD (Slow - this is the 55+ minute compile)
+          # This command actually generates the files in output/images/
+          echo "Starting the full build process... This will take a while."
+          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH"
+
           # 2. DIAGNOSTIC: List every file in the images folder
           echo "Checking Buildroot output images:"
           ls -F "$BR_DIR/output/images/"
