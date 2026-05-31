@@ -40,7 +40,6 @@ jobs:
 
           if [ ! -f "$CONFIG_FILE" ]; then
             echo "ERROR: Cannot find config at $CONFIG_FILE"
-            ls -R $EXT_PATH/configs
             exit 1
           fi
 
@@ -49,33 +48,12 @@ jobs:
             BR2_EXTERNAL="$EXT_PATH" \
             defconfig BR2_DEFCONFIG="$CONFIG_FILE"
           
-          echo "=== Building Buildroot (this takes a while) ==="
+          echo "=== Building Buildroot ==="
           timeout 3600 make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             -j2
-
-      - name: Generate Final Image with Genimage
-        run: |
-          BR_DIR=$(pwd)/x86_os/buildroot-2023.11.1
-          EXT_PATH=$(pwd)/x86_os
           
-          echo "=== Running genimage manually ==="
-          cd "$BR_DIR/output/build"
-          
-          if [ ! -f "genimage-weno" ]; then
-            echo "ERROR: genimage config directory not found!"
-            ls -la "$BR_DIR/output/build/" | grep -i genimage
-            exit 1
-          fi
-          
-          /usr/bin/genimage --rootpath "$BR_DIR/output/target" \
-            --tmppath "$BR_DIR/output/build/genimage-weno-tmp" \
-            --inputpath "$BR_DIR/output/binaries" \
-            --outputpath "$BR_DIR/output/images" \
-            --config "$BR_DIR/board/weno-arm64/genimage.cfg" || {
-            echo "genimage failed!"
-            exit 1
-          }
+          echo "=== Build completed ==="
 
       - name: Check Build Artifacts
         if: always()
