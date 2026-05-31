@@ -32,17 +32,34 @@ jobs:
 
       - name: Configure and Build Buildroot
         run: |
-          set -e
+          set -euo pipefail
           ROOT_DIR=$(pwd)
           # Use the absolute path to your metadata/board files
           EXT_PATH="$ROOT_DIR/x86_os" 
           BR_DIR="$ROOT_DIR/x86_os/buildroot-2023.11.1"
+
+          echo "=== Resource snapshot (before build) ==="
+          df -h
+          echo ""
+          df -i
+          echo ""
+          free -h
           
           make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             weno_defconfig
 
-          timeout 18000 make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" -j2
+          timeout 18000 make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" -j1 2>&1 | tee "$ROOT_DIR/buildroot.log"
+
+      - name: Resource Snapshot After Build
+        if: always()
+        run: |
+          echo "=== Resource snapshot (after build) ==="
+          df -h
+          echo ""
+          df -i
+          echo ""
+          free -h
 
       - name: Check Build Artifacts
         if: always()
@@ -89,3 +106,10 @@ jobs:
         with:
           name: Acrylic-OS-ARM64
           path: x86_os/buildroot-*/output/images/*
+
+      - name: Upload Buildroot Log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buildroot-log
+          path: buildroot.log
