@@ -29,11 +29,9 @@ BR2_TARGET_ROOTFS_EXT2=y
 BR2_TARGET_ROOTFS_EXT2_4=y
 BR2_TARGET_ROOTFS_EXT2_SIZE="512M"
 
-# This is the "Master Switch" to run genimage
+# Disk image assembly via genimage (post-image hook)
 BR2_PACKAGE_HOST_GENIMAGE=y
-BR2_TARGET_ROOTFS_GENIMAGE=y
-BR2_TARGET_ROOTFS_GENIMAGE_CFG="$(BR2_EXTERNAL_WENO_X86_PATH)/board/weno-arm64/genimage.cfg"
-BR2_TARGET_ROOTFS_GENIMAGE_TMP_DIR="/tmp/genimage-weno"
+BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_WENO_X86_PATH)/board/weno-arm64/post-image.sh"
 
 # Bootloader setup
 BR2_TARGET_GRUB2=y
@@ -56,4 +54,3 @@ BR2_PACKAGE_LIBERATION=y
 
 # --- Custom Overlay
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_WENO_X86_PATH)/overlay"
-BR2_POST_BUILD_SCRIPT="$(BR2_EXTERNAL_WENO_X86_PATH)/board/weno-arm64/post-build.sh"
