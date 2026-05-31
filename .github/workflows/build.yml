@@ -42,6 +42,8 @@ jobs:
             BR2_EXTERNAL="$EXT_PATH" \
             weno_defconfig
 
+          timeout 18000 make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" -j2
+
       - name: Check Build Artifacts
         if: always()
         run: |
