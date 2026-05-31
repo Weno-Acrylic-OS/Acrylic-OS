@@ -29,6 +29,8 @@ $(FINAL_IMG_PATH): $(IMG_IMAGE)
 	@mkdir -p $(CURDIR)/build_arm
 	@cp $(IMG_IMAGE) $(FINAL_IMG_PATH)
 
+	ls -la x86_os/buildroot-2023.11.1/output/images/
+
 # Check if we are on macOS
 ifeq ($(shell uname), Darwin)
 	IS_MACOS := yes
