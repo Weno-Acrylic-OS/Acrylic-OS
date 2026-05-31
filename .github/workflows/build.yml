@@ -61,6 +61,18 @@ jobs:
           find "$BR_DIR/output" -name "*.img" -type f 2>/dev/null || echo "No .img files found"
           
           echo ""
+          echo "=== efi-part ==="
+          find x86_os/buildroot-2023.11.1/output/images/efi-part -type f | sort
+
+          echo ""
+          echo "=== Looking for bootaa64.efi ==="
+          find x86_os/buildroot-2023.11.1/output -name "bootaa64.efi"
+
+          echo ""
+          echo "=== Looking for grub.cfg ==="
+          find x86_os/buildroot-2023.11.1/output -name "grub.cfg"
+          
+          echo ""
           echo "=== Checking genimage config ==="
           grep -i genimage "$BR_DIR/.config" || echo "genimage not found in config"
           
