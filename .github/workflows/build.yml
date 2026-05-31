@@ -26,7 +26,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential wget cpio unzip rsync bc libncurses-dev flex bison libssl-dev python3 nodejs npm
+          sudo apt-get install -y build-essential wget cpio unzip rsync genimage bc libncurses-dev flex bison libssl-dev python3 nodejs npm
 
       - name: Configure and Build Buildroot
         run: |
@@ -51,6 +51,29 @@ jobs:
           timeout 3600 make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             -j2
+
+      - name: Generate Final Image with Genimage
+        run: |
+          BR_DIR=$(pwd)/x86_os/buildroot-2023.11.1
+          EXT_PATH=$(pwd)/x86_os
+          
+          echo "=== Running genimage manually ==="
+          cd "$BR_DIR/output/build"
+          
+          if [ ! -f "genimage-weno" ]; then
+            echo "ERROR: genimage config directory not found!"
+            ls -la "$BR_DIR/output/build/" | grep -i genimage
+            exit 1
+          fi
+          
+          /usr/bin/genimage --rootpath "$BR_DIR/output/target" \
+            --tmppath "$BR_DIR/output/build/genimage-weno-tmp" \
+            --inputpath "$BR_DIR/output/binaries" \
+            --outputpath "$BR_DIR/output/images" \
+            --config "$BR_DIR/board/weno-arm64/genimage.cfg" || {
+            echo "genimage failed!"
+            exit 1
+          }
 
       - name: Check Build Artifacts
         if: always()
