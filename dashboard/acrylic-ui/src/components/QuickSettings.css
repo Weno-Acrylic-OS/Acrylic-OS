@@ -3,11 +3,9 @@
     top: 40px; /* Below the TopBar */
     right: 15px;
     width: 300px;
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background-color: #D8E3F8;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+   /* box-shadow: 0 4px 20px rgba(0,0,0,0.1); */
     padding: 15px;
     z-index: 999;
 }
@@ -20,20 +18,20 @@
 
 .qs-tile {
     height: 80px;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #3B608F;
     border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     font-size: 14px;
-    color: #333;
+    color: #FFFFFF;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .qs-tile.active {
-    background-color: #2196F3;
+    background-color: #204876;
     color: white;
 }
 
@@ -53,19 +51,19 @@
 .qs-notification-header h3 {
     margin: 0;
     font-size: 16px;
-    color: #333;
+    color: #204876;
 }
 
 .qs-notification-header button {
     background: none;
     border: none;
-    color: #2196F3;
+    color: #204876;
     cursor: pointer;
     font-size: 14px;
 }
 
 .qs-notification-item {
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: #D8E3F8;
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 10px;
@@ -74,11 +72,11 @@
 .qs-notification-item h4 {
     margin: 0 0 5px 0;
     font-size: 14px;
-    color: #333;
+    color: #545F71;
 }
 
 .qs-notification-item p {
     margin: 0;
     font-size: 12px;
-    color: #555;
+    color: #3C4758;
 }

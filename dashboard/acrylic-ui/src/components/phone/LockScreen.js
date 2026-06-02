@@ -35,7 +35,7 @@ const LockScreen = ({ onUnlockRequest }) => {
             <div className="lock-screen-unlock-prompt">
                 <p>Tap to unlock</p>
                 <div className="unlock-icon-container" onClick={onUnlockRequest}>
-                    <Lock size={24} color="white" />
+                    <Lock size={24} color="#204876" />
                 </div>
             </div>
         </div>
