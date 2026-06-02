@@ -6,6 +6,7 @@ import AppGrid from './AppGrid';
 import Dock from './Dock';
 import PhoneQuickSettings from './PhoneQuickSettings';
 import ActivitiesView from '../ActivitiesView';
+import LockScreen from './LockScreen'; // This line was missing!
 
 // App Imports
 import Browser from '../../apps/Browser';
@@ -20,7 +21,7 @@ import { getNotifications, subscribe } from '../NotificationManager';
 import Notification from '../Notification';
 import Photos from '../../apps/Photos';
 
-const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
+const Phone = ({ isLocked, onLock, requestPinScreen, onPinChange, pin, appUITree }) => {
     const [activeApp, setActiveApp] = useState(null);
     const [showActivities, setShowActivities] = useState(false);
     const [showAppDrawer, setShowAppDrawer] = useState(false);
@@ -29,10 +30,16 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
     const [activeToast, setActiveToast] = useState(null);
 
     useEffect(() => {
+        // When the phone is locked, close any active app.
+        if (isLocked) {
+            setActiveApp(null);
+        }
+    }, [isLocked]);
+
+    useEffect(() => {
         const unsubscribe = subscribe(() => {
             const newNotifications = getNotifications();
             if (newNotifications.length > 0) {
-                // For simplicity, just show the latest as a toast
                 setActiveToast(newNotifications[0]);
             }
         });
@@ -53,10 +60,11 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
     };
 
     const openApp = (appName) => {
+        if (isLocked) return;
         if (appMap[appName]) {
             setActiveApp(appName);
             setAppViewPos({ y: 0 });
-            setShowAppDrawer(false); // Close drawer when app opens
+            setShowAppDrawer(false);
         } else {
             console.warn(`App "${appName}" not found.`);
         }
@@ -64,7 +72,6 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
 
     const closeApp = () => setActiveApp(null);
 
-    // Gesture for swiping up an open app
     const appGestureBind = useDrag(({ down, movement: [, my], velocity: [, vy], direction: [, dy] }) => {
         if (!activeApp) return;
         const y = down ? Math.min(my, 0) : 0;
@@ -79,17 +86,15 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
         }
     }, { axis: 'y', filterTaps: true, preventDefault: true });
 
-    // Gesture for opening the app drawer from the home screen
     const homeGestureBind = useDrag(({ down, movement: [, my] }) => {
         if (activeApp || showQuickSettings) return;
         if (down && my < 0) setShowAppDrawer(true);
         if (down && my > 0) setShowAppDrawer(false);
     }, { axis: 'y', filterTaps: true });
 
-    // Gesture for opening the Quick Settings panel
     const qsGestureBind = useDrag(({ down, movement: [, my] }) => {
         if (activeApp) return;
-        if (down && my > 50) { // A small downward drag
+        if (down && my > 50) {
             setShowQuickSettings(true);
         }
     }, { axis: 'y' });
@@ -111,6 +116,15 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
         );
     };
 
+    const handleUnlockRequest = () => {
+        console.log("Phone.js: Unlock requested. Calling parent to show PIN screen.");
+        requestPinScreen();
+    };
+
+    if (isLocked) {
+        return <LockScreen onUnlockRequest={handleUnlockRequest} />;
+    }
+
     return (
         <div className="phone-screen" {...homeGestureBind()}>
             <div className="phone-power-button" onClick={onLock}></div>
@@ -118,7 +132,6 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
                 <PhoneStatusBar />
             </div>
 
-            {/* App Drawer */}
             <div className={`app-drawer ${showAppDrawer ? 'visible' : ''}`}>
                 <div className="drawer-handle-area" onClick={() => setShowAppDrawer(false)}>
                     <div className="drawer-handle"></div>
@@ -126,19 +139,14 @@ const Phone = ({ onLock, onPinChange, pin, appUITree }) => {
                 <AppGrid onAppClick={openApp} />
             </div>
 
-            {/* Active App View */}
             {renderAppView()}
             
-            {/* Dock */}
             {!activeApp && <Dock onAppClick={openApp} />}
 
-            {/* Quick Settings Overlay */}
             <PhoneQuickSettings isVisible={showQuickSettings} onClose={() => setShowQuickSettings(false)} />
             
-            {/* Notification Toast */}
             {activeToast && <Notification notification={activeToast} onDismiss={() => setActiveToast(null)} />}
 
-            {/* Activities Overlay */}
             {showActivities && 
                 <ActivitiesView 
                     windows={activeApp ? [{id: 1, title: activeApp}] : []} 

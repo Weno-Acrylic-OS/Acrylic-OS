@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Browser.css';
+import TextInput from '../components/common/TextInput';
 
 const Browser = () => {
     const [url, setUrl] = useState('https://www.google.com/webhp?igu=1'); // igu=1 is a trick to allow embedding Google
@@ -22,11 +23,12 @@ const Browser = () => {
     return (
         <div className="browser">
             <div className="browser-toolbar">
-                <input 
+                <TextInput 
                     type="text" 
                     value={inputValue} 
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
+                    placeholder="Enter address..."
                 />
                 <button onClick={handleGo}>Go</button>
             </div>
