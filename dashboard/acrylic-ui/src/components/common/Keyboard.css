@@ -1,0 +1,57 @@
+.keyboard-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    padding: 10px;
+    box-sizing: border-box;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    touch-action: none; /* Prevents scrolling while using keyboard */
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.keyboard-key {
+    height: 45px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #555;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.1s;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.keyboard-key:active {
+    background-color: #777;
+}
+
+.keyboard-key.special {
+    flex-grow: 1.5;
+    background-color: #444;
+}
+
+.keyboard-key.space {
+    flex-grow: 8;
+}
+
+.keyboard-row.numeric {
+    width: 250px;
+    margin: 0 auto;
+}
+
+.keyboard-key.placeholder {
+    background-color: transparent;
+    pointer-events: none;
+}

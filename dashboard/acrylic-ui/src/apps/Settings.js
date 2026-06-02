@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Settings.css';
+import TextInput from '../components/common/TextInput';
 
 const Settings = ({ onPinChange, pin: currentPin }) => {
     const [isDndActive, setIsDndActive] = useState(false);
@@ -73,9 +74,9 @@ const Settings = ({ onPinChange, pin: currentPin }) => {
                 <div className="settings-item-column">
                     <span>Change PIN</span>
                     <div className="pin-change-form">
-                        <input type="password" placeholder="Old PIN" value={oldPin} onChange={e => setOldPin(e.target.value)} maxLength="4" />
-                        <input type="password" placeholder="New PIN" value={newPin} onChange={e => setNewPin(e.target.value)} maxLength="4" />
-                        <input type="password" placeholder="Confirm New PIN" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} maxLength="4" />
+                        <TextInput type="password" placeholder="Old PIN" value={oldPin} onChange={e => setOldPin(e.target.value)} maxLength="4" keyboardLayout="numeric" />
+                        <TextInput type="password" placeholder="New PIN" value={newPin} onChange={e => setNewPin(e.target.value)} maxLength="4" keyboardLayout="numeric" />
+                        <TextInput type="password" placeholder="Confirm New PIN" value={confirmPin} onChange={e => setConfirmPin(e.target.value)} maxLength="4" keyboardLayout="numeric" />
                         <button onClick={handlePinSave}>Save PIN</button>
                         {pinMessage.text && <p className={`pin-message ${pinMessage.type}`}>{pinMessage.text}</p>}
                     </div>

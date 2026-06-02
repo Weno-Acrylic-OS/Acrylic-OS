@@ -1,0 +1,55 @@
+.phone-lock-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../../../public/wallpaper.png");
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 80px 20px 40px 20px;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+.lock-screen-time-date {
+    text-align: center;
+}
+
+.lock-screen-time {
+    font-size: 64px;
+    font-weight: 200;
+}
+
+.lock-screen-date {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.lock-screen-unlock-prompt {
+    text-align: center;
+}
+
+.lock-screen-unlock-prompt p {
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.unlock-icon-container {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.unlock-icon-container:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
