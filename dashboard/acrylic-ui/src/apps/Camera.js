@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './Camera.css';
-import { Camera as CameraIcon, RefreshCw, Aperture } from 'react-feather';
+import { RefreshCw, Aperture } from 'react-feather';
 
 const CameraApp = () => {
     const videoRef = useRef(null);
@@ -32,7 +32,7 @@ const CameraApp = () => {
                 stream.getTracks().forEach(track => track.stop());
             }
         };
-    }, [startCamera]);
+    }, [startCamera, stream]);
 
     const handleTakePhoto = () => {
         if (!videoRef.current) return;

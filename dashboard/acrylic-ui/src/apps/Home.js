@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Home.css';
-import { Power, Thermometer, Zap, Sun } from 'react-feather';
+import { Thermometer, Zap, Sun } from 'react-feather';
 
 const initialDevices = {
     '1': { id: '1', name: 'Living Room Light', type: 'light', state: { isOn: false } },

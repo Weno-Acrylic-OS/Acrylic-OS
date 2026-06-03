@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import Desktop from './components/Desktop';
 import Phone from './components/phone/Phone';
@@ -27,7 +27,7 @@ function App() {
     window.addEventListener('message', handleMessage);
     window.parent.postMessage({ status: 'ready' }, '*');
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [handleLock]);
 
   const handleUnlock = (enteredPin) => {
       if (enteredPin === pin) {
@@ -38,12 +38,12 @@ function App() {
       }
   };
 
-  const handleLock = () => {
+  const handleLock = useCallback(() => {
       setIsLocked(true);
       if (personality !== 'phone') {
         setShowPinScreen(true);
       }
-  };
+  }, [personality]);
   
   const handlePinScreenRequest = () => {
       console.log("App.js: Received request to show PIN screen. Setting state.");
