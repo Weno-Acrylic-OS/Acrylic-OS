@@ -17,54 +17,54 @@ const mockLibrary = [
     },
     {
         album: 'Ocean Breath',
-        artist: 'Mariana',
-        art: 'https://images.unsplash.com/photo-1507525428034-b723a9ce6890?w=500',
-        tracks: ['Tidal Pull', 'Deep Blue', 'Surface Glimmer'],
-    },
-];
+        import React, { useState, useEffect, useCallback } from 'react';
+        import './Music.css';
+        import { Play, Pause, SkipBack, SkipForward } from 'react-feather';
 
-const Music = () => {
-    const [library] = useState(mockLibrary);
-    const [currentTrack, setCurrentTrack] = useState({ albumIndex: 0, trackIndex: 0 });
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
+        // ... (mockLibrary const is unchanged) ...
 
-    const activeAlbum = library[currentTrack.albumIndex];
-    const activeTrackName = activeAlbum.tracks[currentTrack.trackIndex];
+        const Music = () => {
+            const [library] = useState(mockLibrary);
+            const [currentTrack, setCurrentTrack] = useState({ albumIndex: 0, trackIndex: 0 });
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [progress, setProgress] = useState(0);
 
-    useEffect(() => {
-        let interval;
-        if (isPlaying) {
-            interval = setInterval(() => {
-                setProgress(p => {
-                    if (p >= 100) {
-                        handleNext();
-                        return 0;
-                    }
-                    return p + 1; // Simulate 100-second songs
-                });
-            }, 1000);
-        }
-        return () => clearInterval(interval);
-    }, [isPlaying, currentTrack]);
+            const activeAlbum = library[currentTrack.albumIndex];
+            const activeTrackName = activeAlbum.tracks[currentTrack.trackIndex];
 
-    const handlePlayPause = () => {
-        setIsPlaying(!isPlaying);
-    };
+            const handleNext = useCallback(() => {
+                let { albumIndex, trackIndex } = currentTrack;
+                if (trackIndex < library[albumIndex].tracks.length - 1) {
+                    trackIndex++;
+                } else {
+                    albumIndex = (albumIndex + 1) % library.length;
+                    trackIndex = 0;
+                }
+                setCurrentTrack({ albumIndex, trackIndex });
+                setProgress(0);
+            }, [currentTrack, library]);
 
-    const handleNext = () => {
-        let { albumIndex, trackIndex } = currentTrack;
-        if (trackIndex < library[albumIndex].tracks.length - 1) {
-            trackIndex++;
-        } else {
-            albumIndex = (albumIndex + 1) % library.length;
-            trackIndex = 0;
-        }
-        setCurrentTrack({ albumIndex, trackIndex });
-        setProgress(0);
-    };
+            useEffect(() => {
+                let interval;
+                if (isPlaying) {
+                    interval = setInterval(() => {
+                        setProgress(p => {
+                            if (p >= 100) {
+                                handleNext();
+                                return 0;
+                            }
+                            return p + 1; // Simulate 100-second songs
+                        });
+                    }, 1000);
+                }
+                return () => clearInterval(interval);
+            }, [isPlaying, currentTrack, handleNext]);
 
-    const handlePrev = () => {
+            const handlePlayPause = () => {
+                setIsPlaying(!isPlaying);
+            };
+
+            const handlePrev = () => {
         let { albumIndex, trackIndex } = currentTrack;
         if (progress > 3 || trackIndex === 0) {
             // Go to beginning of track or previous track

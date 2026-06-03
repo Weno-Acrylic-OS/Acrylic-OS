@@ -3,7 +3,7 @@ import './PhoneApp.css';
 import Keypad from './PhoneApp/Keypad';
 import Recents from './PhoneApp/Recents';
 import Contacts from './PhoneApp/Contacts';
-import { Clock, User, Phone } from 'react-feather';
+import { Clock, User } from 'react-feather';
 
 const PhoneApp = () => {
     const [activeTab, setActiveTab] = useState('keypad');
