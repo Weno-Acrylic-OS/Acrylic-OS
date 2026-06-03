@@ -1,5 +1,71 @@
 .home-app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #191919;
+    color: #fff;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.home-header {
+    margin-bottom: 24px;
+}
+
+.home-header h1 {
+    margin: 0 0 4px 0;
+    font-size: 28px;
+}
+
+.home-header p {
+    margin: 0;
+    font-size: 16px;
+    color: #a0a0a0;
+}
+
+.device-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.device-card {
+    background: #2a2a2a;
+    border-radius: 16px;
     padding: 20px;
-    text-align: center;
-    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    aspect-ratio: 1 / 1;
+}
+
+.device-card:hover {
+    transform: translateY(-4px);
+}
+
+.device-card.on {
+    background-color: #404040;
+}
+
+.device-icon {
+    margin-bottom: 20px;
+}
+
+.device-info .device-name {
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+.device-info .device-state {
+    font-size: 14px;
+    color: #a0a0a0;
+    margin: 0;
+}
+
+.device-card.on .device-info .device-state {
+    color: #fff;
 }

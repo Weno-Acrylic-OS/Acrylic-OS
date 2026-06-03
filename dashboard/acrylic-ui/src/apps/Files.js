@@ -1,67 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Files.css';
 
-// Mock file system data
-const fileSystem = {
-    'Home': [
-        { name: 'Documents', type: 'folder' },
-        { name: 'Downloads', type: 'folder' },
-        { name: 'Pictures', type: 'folder' },
-        { name: 'report.pdf', type: 'file' },
-    ],
-    'Documents': [
-        { name: 'work', type: 'folder' },
-        { name: 'project-notes.txt', type: 'file' },
-    ],
-    'Downloads': [
-        { name: 'weno-fit-os-sdk.zip', type: 'file' },
-    ],
-    'Pictures': [
-        { name: 'vacation.jpg', type: 'file' },
-    ],
-    'work': [
-        { name: 'quarterly-review.docx', type: 'file' },
-    ]
-};
-
 const Files = () => {
-    const [currentPath, setCurrentPath] = useState('Home');
-    const [history, setHistory] = useState(['Home']);
+    const [path, setPath] = useState('/');
+    const [items, setItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const openItem = (item) => {
-        if (item.type === 'folder') {
-            const newPath = item.name;
-            // A real implementation would handle nested paths properly
-            // For this mock, we just use the name as the key.
-            if (fileSystem[newPath]) {
-                setHistory([...history, newPath]);
-                setCurrentPath(newPath);
+    useEffect(() => {
+        const fetchFiles = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                // The server runs on the same device, so we can use localhost
+                const response = await fetch(`http://localhost:5001/api/fs?path=${encodeURIComponent(path)}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+                }
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                // Sort with directories first
+                const sortedItems = data.items.sort((a, b) => {
+                    if (a.type === b.type) return a.name.localeCompare(b.name);
+                    return a.type === 'directory' ? -1 : 1;
+                });
+                setItems(sortedItems);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
             }
-        }
-        // else: open file logic would go here
-    };
+        };
 
-    const goBack = () => {
-        if (history.length > 1) {
-            const newHistory = [...history];
-            newHistory.pop();
-            setHistory(newHistory);
-            setCurrentPath(newHistory[newHistory.length - 1]);
-        }
-    };
+        fetchFiles();
+    }, [path]);
 
-    const currentFiles = fileSystem[currentPath] || [];
+    const handleItemClick = (item) => {
+        if (item.type === 'directory') {
+            // A simple way to join paths
+            const newPath = path === '/' ? `/${item.name}` : `${path}/${item.name}`;
+            setPath(newPath);
+        }
+        // In a real app, clicking a file would open it
+    };
+    
+    const goUp = () => {
+        if (path === '/') return;
+        const parentPath = path.substring(0, path.lastIndexOf('/')) || '/';
+        setPath(parentPath);
+    };
 
     return (
         <div className="files-app">
             <div className="files-toolbar">
-                <button onClick={goBack} disabled={history.length <= 1}>↑ Up</button>
-                <div className="path-display">/{currentPath}</div>
+                <button onClick={goUp} disabled={path === '/'}>↑ Up</button>
+                <div className="path-display">{path}</div>
             </div>
             <div className="files-list">
-                {currentFiles.map((item, index) => (
-                    <div key={index} className="file-item" onDoubleClick={() => openItem(item)}>
-                        <span className="file-icon">{item.type === 'folder' ? '📁' : '📄'}</span>
+                {isLoading && <div className="loading-indicator">Loading...</div>}
+                {error && <div className="error-indicator">Error: {error}</div>}
+                {!isLoading && !error && items.map((item, index) => (
+                    <div key={index} className="file-item" onDoubleClick={() => handleItemClick(item)}>
+                        <span className="file-icon">{item.type === 'directory' ? '📁' : '📄'}</span>
                         <span className="file-name">{item.name}</span>
                     </div>
                 ))}
@@ -71,3 +73,4 @@ const Files = () => {
 };
 
 export default Files;
+

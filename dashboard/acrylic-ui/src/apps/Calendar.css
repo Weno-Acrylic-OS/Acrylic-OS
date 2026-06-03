@@ -1,0 +1,125 @@
+.calendar-app {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    background: #f8f9fa;
+    color: #212529;
+}
+
+.calendar-main {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.calendar-header h2 {
+    margin: 0;
+}
+.calendar-nav button {
+    background: none;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.calendar-grid .day-names {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.calendar-grid .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day-cell {
+    height: 80px;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s;
+}
+.day-cell:not(.padding):hover {
+    background: #e9ecef;
+}
+.day-cell.padding {
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+.day-cell.today {
+    background: #e7f5ff;
+    font-weight: bold;
+    color: #007bff;
+}
+.day-cell.selected {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+}
+.event-dot {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: #fd7e14;
+    border-radius: 50%;
+}
+.day-cell.selected .event-dot {
+    background-color: white;
+}
+
+/* Event Panel */
+.event-panel {
+    width: 300px;
+    flex-shrink: 0;
+    border-left: 1px solid #dee2e6;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+.event-panel-header {
+    padding: 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+.event-panel-header h3 {
+    margin: 0;
+}
+.event-list {
+    padding: 20px;
+    overflow-y: auto;
+}
+.event-item {
+    margin-bottom: 15px;
+    padding-left: 15px;
+    border-left: 3px solid #007bff;
+}
+.event-time {
+    font-size: 14px;
+    color: #6c757d;
+}
+.event-title {
+    font-weight: 500;
+}
+.no-events {
+    color: #6c757d;
+}

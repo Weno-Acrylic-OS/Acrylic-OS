@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# S99files_api - Startup script for the Files API server
+
+case "$1" in
+    start)
+        echo "Starting Files API server..."
+        /usr/bin/files_api.py &
+        ;;
+    stop)
+        # Find the process and kill it
+        kill $(pidof python3)
+        ;;
+    restart|reload)
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit 0

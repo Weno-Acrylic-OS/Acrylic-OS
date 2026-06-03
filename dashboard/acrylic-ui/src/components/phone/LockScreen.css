@@ -31,6 +31,8 @@
 
 .lock-screen-unlock-prompt {
     text-align: center;
+    position: relative;
+    z-index: 1;
 }
 
 .lock-screen-unlock-prompt p {

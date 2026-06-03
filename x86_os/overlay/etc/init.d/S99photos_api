@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# S99photos_api - Startup script for the Photos API server
+
+case "$1" in
+    start)
+        echo "Starting Photos API server..."
+        /usr/bin/photos_api.py &
+        ;;
+    stop)
+        # Find and kill the photos api process
+        kill $(ps | grep photos_api.py | grep -v grep | awk '{print $1}')
+        ;;
+    restart|reload)
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit 0
