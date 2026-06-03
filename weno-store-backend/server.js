@@ -62,6 +62,30 @@ app.get('/api/apps', (req, res) => {
     res.json(apps);
 });
 
+app.post('/api/apps/:id/install', (req, res) => {
+    const appId = parseInt(req.params.id, 10);
+    const app = apps.find(a => a.id === appId);
+    if (!app) {
+        return res.status(404).send('App not found.');
+    }
+    app.installed = true;
+    saveDatabase();
+    console.log(`App installed: ${app.name}`);
+    res.json(app);
+});
+
+app.post('/api/apps/:id/uninstall', (req, res) => {
+    const appId = parseInt(req.params.id, 10);
+    const app = apps.find(a => a.id === appId);
+    if (!app) {
+        return res.status(404).send('App not found.');
+    }
+    app.installed = false;
+    saveDatabase();
+    console.log(`App uninstalled: ${app.name}`);
+    res.json(app);
+});
+
 app.post('/api/apps', upload.single('appPackage'), (req, res) => {
     const { name, version, description } = req.body;
     const { file } = req;
@@ -75,7 +99,8 @@ app.post('/api/apps', upload.single('appPackage'), (req, res) => {
         name,
         version,
         description,
-        packageUrl: `/uploads/${file.filename}`
+        packageUrl: `/uploads/${file.filename}`,
+        installed: false // Apps are not installed by default
     };
 
     apps.push(newApp);

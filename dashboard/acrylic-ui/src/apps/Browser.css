@@ -7,20 +7,38 @@
 
 .browser-toolbar {
     display: flex;
-    padding: 5px;
+    padding: 8px;
     border-bottom: 1px solid #ccc;
+    gap: 8px;
+    align-items: center;
 }
 
-.browser-toolbar input {
+.browser-toolbar .text-input-container, /* Assuming TextInput might be wrapped */
+.browser-toolbar input,
+.browser-toolbar .TextInput { /* Direct targeting if class is passed */
     flex-grow: 1;
-    margin-right: 5px;
-    padding: 5px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 14px;
 }
 
 .browser-toolbar button {
-    padding: 5px 10px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.browser-toolbar button:hover {
+    background-color: #e0e0e0;
+}
+
+.browser-toolbar button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .browser iframe {

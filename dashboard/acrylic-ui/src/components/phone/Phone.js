@@ -20,6 +20,9 @@ import NativeAppWrapper from '../NativeAppWrapper';
 import { getNotifications, subscribe } from '../NotificationManager';
 import Notification from '../Notification';
 import Photos from '../../apps/Photos';
+import PhoneApp from '../../apps/PhoneApp'; // Add PhoneApp import here
+import CameraApp from '../../apps/Camera';
+import CalendarApp from '../../apps/Calendar';
 
 const Phone = ({ isLocked, onLock, requestPinScreen, onPinChange, pin, appUITree }) => {
     const [activeApp, setActiveApp] = useState(null);
@@ -56,6 +59,9 @@ const Phone = ({ isLocked, onLock, requestPinScreen, onPinChange, pin, appUITree
         'Messages': () => <Messages />,
         'Mail': () => <Mail />, 
         'Photos': () => <Photos />,
+        'Phone': () => <PhoneApp />, // Add PhoneApp to appMap
+        'Camera': () => <CameraApp />,
+        'Calendar': () => <CalendarApp />,
         'HelloAcrylic': () => <NativeAppWrapper uiTree={appUITree} />,
     };
 

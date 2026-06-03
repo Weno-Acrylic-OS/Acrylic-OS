@@ -1,3 +1,158 @@
 .messages-app {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    background: #fff;
+    color: #000;
+}
+
+.conversation-list {
+    width: 300px;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+}
+
+.list-header {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.list-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.conversation-item:hover {
+    background-color: #e9e9e9;
+}
+
+.conversation-item.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.convo-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.conversation-item.active .convo-avatar {
+    background-color: #fff;
+    color: #007bff;
+}
+
+.convo-details {
+    overflow: hidden;
+}
+
+.convo-name {
+    font-weight: bold;
+}
+
+.convo-preview {
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-item.active .convo-preview {
+    color: #f0f0f0;
+}
+
+
+.message-view {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-header {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f8f8f8;
+}
+
+.message-header h3 {
+    margin: 0;
+}
+
+.message-list {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message-bubble {
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 70%;
+    line-height: 1.4;
+}
+
+.message-bubble.received {
+    background-color: #e9e9eb;
+    align-self: flex-start;
+}
+
+.message-bubble.sent {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+}
+
+.message-input-form {
+    display: flex;
     padding: 10px;
+    border-top: 1px solid #ddd;
+    background: #f8f8f8;
+}
+
+.message-input-form input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    margin-right: 10px;
+}
+
+.message-input-form button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.no-conversation-selected {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #888;
 }

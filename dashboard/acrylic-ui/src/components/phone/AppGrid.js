@@ -10,7 +10,10 @@ const apps = [
     { name: 'Weno Store' },
     { name: 'Settings' },
     { name: 'Calculator' },
-    { name: 'HelloAcrylic' },
+    { name: 'Phone' },
+    { name: 'Camera' },
+    { name: 'Calendar' },
+    { name: 'HelloAcrylic' }
 ];
 
 const AppGrid = ({ onAppClick }) => {

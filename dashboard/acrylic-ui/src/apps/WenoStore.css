@@ -81,3 +81,21 @@
     color: #d93025;
     text-align: center;
 }
+
+.install-btn {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.uninstall-btn {
+    background-color: #f5f5f5;
+    color: #007aff;
+    border: 1px solid #007aff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+}
