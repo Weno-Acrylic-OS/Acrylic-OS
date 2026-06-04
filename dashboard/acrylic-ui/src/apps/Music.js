@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Music.css';
 import { Play, Pause, SkipBack, SkipForward } from 'react-feather';
 
@@ -17,57 +17,58 @@ const mockLibrary = [
     },
     {
         album: 'Ocean Breath',
-        import React, { useState, useEffect, useCallback } from 'react';
-        import './Music.css';
-        import { Play, Pause, SkipBack, SkipForward } from 'react-feather';
+        artist: 'Mariana',
+        art: 'https://images.unsplash.com/photo-1507525428034-b723a9ce6890?w=500',
+        tracks: ['Tidal Pull', 'Deep Blue', 'Surface Glimmer'],
+    },
+];
 
-        // ... (mockLibrary const is unchanged) ...
+const Music = () => {
+    const [library] = useState(mockLibrary);
+    const [currentTrack, setCurrentTrack] = useState({ albumIndex: 0, trackIndex: 0 });
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [progress, setProgress] = useState(0);
 
-        const Music = () => {
-            const [library] = useState(mockLibrary);
-            const [currentTrack, setCurrentTrack] = useState({ albumIndex: 0, trackIndex: 0 });
-            const [isPlaying, setIsPlaying] = useState(false);
-            const [progress, setProgress] = useState(0);
+    const activeAlbum = library[currentTrack.albumIndex];
+    const activeTrackName = activeAlbum.tracks[currentTrack.trackIndex];
 
-            const activeAlbum = library[currentTrack.albumIndex];
-            const activeTrackName = activeAlbum.tracks[currentTrack.trackIndex];
+    const handleNext = useCallback(() => {
+        let { albumIndex, trackIndex } = currentTrack;
+        if (trackIndex < library[albumIndex].tracks.length - 1) {
+            trackIndex++;
+        } else {
+            albumIndex = (albumIndex + 1) % library.length;
+            trackIndex = 0;
+        }
+        setCurrentTrack({ albumIndex, trackIndex });
+        setProgress(0);
+    }, [currentTrack, library]);
 
-            const handleNext = useCallback(() => {
-                let { albumIndex, trackIndex } = currentTrack;
-                if (trackIndex < library[albumIndex].tracks.length - 1) {
-                    trackIndex++;
-                } else {
-                    albumIndex = (albumIndex + 1) % library.length;
-                    trackIndex = 0;
-                }
-                setCurrentTrack({ albumIndex, trackIndex });
-                setProgress(0);
-            }, [currentTrack, library]);
+    useEffect(() => {
+        let interval;
+        if (isPlaying) {
+            interval = setInterval(() => {
+                setProgress(p => {
+                    if (p >= 100) {
+                        handleNext();
+                        return 0;
+                    }
+                    return p + 1; // Simulate 100-second songs
+                });
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [isPlaying, currentTrack, handleNext]);
 
-            useEffect(() => {
-                let interval;
-                if (isPlaying) {
-                    interval = setInterval(() => {
-                        setProgress(p => {
-                            if (p >= 100) {
-                                handleNext();
-                                return 0;
-                            }
-                            return p + 1; // Simulate 100-second songs
-                        });
-                    }, 1000);
-                }
-                return () => clearInterval(interval);
-            }, [isPlaying, currentTrack, handleNext]);
+    const handlePlayPause = () => {
+        setIsPlaying(!isPlaying);
+    };
 
-            const handlePlayPause = () => {
-                setIsPlaying(!isPlaying);
-            };
-
-            const handlePrev = () => {
+    const handlePrev = () => {
         let { albumIndex, trackIndex } = currentTrack;
         if (progress > 3 || trackIndex === 0) {
-            // Go to beginning of track or previous track
+            // Go to beginning of track
+            setProgress(0);
         } else {
             trackIndex--;
         }
@@ -128,4 +129,3 @@ const mockLibrary = [
 };
 
 export default Music;
-
