@@ -17,6 +17,13 @@ function App() {
   const [appUITree, setAppUITree] = useState(null);
   const [showOOBE, setShowOOBE] = useState(!localStorage.getItem('oobe_completed'));
 
+  const handleLock = useCallback(() => {
+      setIsLocked(true);
+      if (personality !== 'phone') {
+        setShowPinScreen(true);
+      }
+  }, [personality]);
+
   useEffect(() => {
     const handleMessage = (event) => {
       if (!event.data) return;
@@ -37,13 +44,6 @@ function App() {
           console.error('Incorrect PIN');
       }
   };
-
-  const handleLock = useCallback(() => {
-      setIsLocked(true);
-      if (personality !== 'phone') {
-        setShowPinScreen(true);
-      }
-  }, [personality]);
   
   const handlePinScreenRequest = () => {
       console.log("App.js: Received request to show PIN screen. Setting state.");
