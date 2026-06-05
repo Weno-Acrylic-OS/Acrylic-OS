@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# S41-detect-personality - Runs early to detect the hardware personality.
+
+# Default personality
+PERSONALITY="phone"
+
+# Find the personality from the kernel command line
+for arg in $(cat /proc/cmdline); do
+    case $arg in
+        acrylic.personality=*)
+            PERSONALITY="${arg#*=}"
+            ;;
+    esac
+done
+
+echo "Detected personality: ${PERSONALITY}"
+echo "${PERSONALITY}" > /tmp/acrylic-personality
+
+exit 0

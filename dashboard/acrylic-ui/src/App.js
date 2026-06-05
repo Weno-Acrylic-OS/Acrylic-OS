@@ -25,8 +25,16 @@ function App() {
   }, [personality]);
 
   useEffect(() => {
+    // Check for personality from URL parameter on initial load
+    const urlParams = new URLSearchParams(window.location.search);
+    const personalityFromUrl = urlParams.get('personality');
+    if (personalityFromUrl) {
+        setPersonality(personalityFromUrl);
+    }
+
     const handleMessage = (event) => {
       if (!event.data) return;
+      // Allow personality to be changed dynamically later if needed
       if (event.data.personality) { setPersonality(event.data.personality); }
       if (event.data.lock) { handleLock(); }
       if (event.data.type === 'render-app') { setAppUITree(event.data.ui); }
