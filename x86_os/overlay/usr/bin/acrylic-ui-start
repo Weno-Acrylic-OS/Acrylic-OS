@@ -2,12 +2,19 @@
 
 # acrylic-ui-start - Called by xinit to start the UI session
 
+# Read the personality detected at boot
+if [ -f /tmp/acrylic-personality ]; then
+    PERSONALITY=$(cat /tmp/acrylic-personality)
+else
+    PERSONALITY="desktop" # Fallback
+fi
+
 # Run the window manager in the background.
-# Fluxbox is simple and lightweight.
 /usr/bin/fluxbox &
 
 # Wait a moment for the window manager to start
 sleep 1
 
-# Start the web browser in kiosk mode.
-/usr/bin/surf file:///usr/share/acrylic-ui/index.html
+# Launch the browser, passing the personality as a URL parameter
+/usr/bin/surf "file:///usr/share/acrylic-ui/index.html?personality=${PERSONALITY}"
+
