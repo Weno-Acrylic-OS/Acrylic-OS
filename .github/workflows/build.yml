@@ -50,11 +50,11 @@ jobs:
             BR2_EXTERNAL="$EXT_PATH" \
             weno_defconfig
 
-          # 2. FORCE Buildroot to compile the missing packages (FIXED TARGET NAME)
-          echo "=== Forcing explicit compilation of new runtime components ==="
-          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" xapp_xinit python_dbus dbus -j2
+          # 2. Tell Buildroot to automatically process and sync package changes
+          echo "=== Synchronizing new configuration settings ==="
+          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" oldconfig
 
-          # 3. Wipe out old staging remnants and finalize the newly matched file layout
+          # 3. Force Buildroot to clear out old staging structures and parse the new packages
           echo "=== Re-assembling rootfs structure ==="
           make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" target-finalize
 
