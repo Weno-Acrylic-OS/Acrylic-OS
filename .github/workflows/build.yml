@@ -49,6 +49,12 @@ jobs:
             BR2_EXTERNAL="$EXT_PATH" \
             weno_defconfig
 
+          echo "=== Forcing explicit compilation of new runtime components ==="
+          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" xapp_xinit python-dbus dbus -j2
+
+          echo "=== Re-assembling rootfs structure ==="
+          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" target-finalize
+
           timeout 18000 make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" -j1 2>&1 | tee "$ROOT_DIR/buildroot.log"
 
       - name: Resource Snapshot After Build
