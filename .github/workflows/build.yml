@@ -44,25 +44,28 @@ jobs:
           echo ""
           free -h
           
-          # 1. Load your updated config templates fresh
+          # 1. Load your updated configuration templates fresh
           make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             weno_defconfig
 
+          # 2. Tell Buildroot to automatically process and sync package changes
           make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" olddefconfig
 
-          # 2. FORCE Buildroot to push the compiled binaries directly into the target folder
-          echo "=== Deploying packages forcefully to target rootfs ==="
-          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" xapp_xinit-rebuild python_dbus-rebuild dbus-rebuild
+          # 3. Wipe out the old target filesystem directory completely.
+          # This forces Buildroot to re-populate /usr/bin/ with everything 
+          # in your config (including xinit and python-dbus) on the next step.
+          echo "=== Clearing old target rootfs staging to force re-deployment ==="
+          rm -rf "$BR_DIR/output/target"
 
-          # 3. Completely delete old image layers so genimage cannot reuse old cached pieces
-          echo "=== Wiping old image cache to guarantee fresh generation ==="
+          # 4. Completely delete old image layers so genimage cannot reuse old cached pieces
+          echo "=== Wiping old image cache ==="
           rm -f "$BR_DIR/output/images/rootfs.ext2"
           rm -f "$BR_DIR/output/images/rootfs.ext4"
           rm -f "$BR_DIR/output/images/boot.vfat"
           rm -f "$BR_DIR/output/images/acrylic_os.img"
 
-          # 4. Run the final image compilation loop, logging everything
+          # 5. Run the final image compilation loop, logging everything
           echo "=== Baking final bootable image ==="
           timeout 18000 make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" -j1 2>&1 | tee "$ROOT_DIR/buildroot.log"
 
