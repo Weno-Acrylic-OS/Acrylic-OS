@@ -34,7 +34,6 @@ jobs:
         run: |
           set -euo pipefail
           ROOT_DIR=$(pwd)
-          # Use the absolute path to your metadata/board files
           EXT_PATH="$ROOT_DIR/x86_os" 
           BR_DIR="$ROOT_DIR/x86_os/buildroot-2023.11.1"
 
@@ -45,20 +44,25 @@ jobs:
           echo ""
           free -h
           
-          # 1. Load your updated configuration fresh
+          # 1. Load your updated config templates fresh
           make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             weno_defconfig
 
-          # 2. Tell Buildroot to automatically process and sync package changes
-          echo "=== Synchronizing new configuration settings ==="
-          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" oldconfig
+          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" olddefconfig
 
-          # 3. Force Buildroot to clear out old staging structures and parse the new packages
-          echo "=== Re-assembling rootfs structure ==="
-          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" target-finalize
+          # 2. FORCE Buildroot to push the compiled binaries directly into the target folder
+          echo "=== Deploying packages forcefully to target rootfs ==="
+          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" xapp_xinit-rebuild python_dbus-rebuild dbus-rebuild
 
-          # 4. Run the final image compilation loop, logging everything as usual
+          # 3. Completely delete old image layers so genimage cannot reuse old cached pieces
+          echo "=== Wiping old image cache to guarantee fresh generation ==="
+          rm -f "$BR_DIR/output/images/rootfs.ext2"
+          rm -f "$BR_DIR/output/images/rootfs.ext4"
+          rm -f "$BR_DIR/output/images/boot.vfat"
+          rm -f "$BR_DIR/output/images/acrylic_os.img"
+
+          # 4. Run the final image compilation loop, logging everything
           echo "=== Baking final bootable image ==="
           timeout 18000 make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" -j1 2>&1 | tee "$ROOT_DIR/buildroot.log"
 
