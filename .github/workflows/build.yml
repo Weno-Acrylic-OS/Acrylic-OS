@@ -45,16 +45,21 @@ jobs:
           echo ""
           free -h
           
+          # 1. Load your updated configuration fresh
           make -C "$BR_DIR" \
             BR2_EXTERNAL="$EXT_PATH" \
             weno_defconfig
 
+          # 2. FORCE Buildroot to compile the missing packages (FIXED TARGET NAME)
           echo "=== Forcing explicit compilation of new runtime components ==="
-          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" xapp_xinit python-dbus dbus -j2
+          make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" xapp_xinit python_dbus dbus -j2
 
+          # 3. Wipe out old staging remnants and finalize the newly matched file layout
           echo "=== Re-assembling rootfs structure ==="
           make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" target-finalize
 
+          # 4. Run the final image compilation loop, logging everything as usual
+          echo "=== Baking final bootable image ==="
           timeout 18000 make -C "$BR_DIR" BR2_EXTERNAL="$EXT_PATH" -j1 2>&1 | tee "$ROOT_DIR/buildroot.log"
 
       - name: Resource Snapshot After Build
