@@ -1,2 +1,6 @@
 # macOS specfic Finder memory files
 .DS_Store
+
+# Build Artifacts from QEMU tests.
+build_arm/*.img
+x86_os/final/*
