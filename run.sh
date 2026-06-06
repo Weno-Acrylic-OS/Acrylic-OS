@@ -4,7 +4,7 @@
 PERSONALITY=${1:-phone}
 
 # Paths to build artifacts
-KERNEL_PATH="x86_os/buildroot-2023.11.1/output/images/Image"
+KERNEL_PATH="x86_os/final/output/images/Image"
 IMG_PATH="build_arm/acrylic_os.img"
 EFI_FW_PATH="/opt/homebrew/share/qemu/edk2-aarch64-code.fd"
 
