@@ -2,11 +2,43 @@
 
 # S99acrylic_ui - Startup script for the Acrylic OS Kiosk UI
 
+XORG_BIN=/usr/bin/Xorg
+XSOCKET=/tmp/.X11-unix/X0
+
+start_xorg_if_needed() {
+    if [ -S "$XSOCKET" ]; then
+        return 0
+    fi
+
+    if [ ! -x "$XORG_BIN" ]; then
+        echo "Error: Xorg is not installed, and xinit is unavailable."
+        return 1
+    fi
+
+    echo "Starting Xorg..."
+    start-stop-daemon -S -q -b -m -p /var/run/xorg.pid --exec "$XORG_BIN" -- :0.0 vt01 -s 0 -noreset -allowMouseOpenFail
+
+    i=0
+    while [ ! -S "$XSOCKET" ] && [ "$i" -lt 20 ]; do
+        sleep 1
+        i=$((i + 1))
+    done
+
+    if [ ! -S "$XSOCKET" ]; then
+        echo "Error: Xorg did not start."
+        return 1
+    fi
+
+    return 0
+}
+
 case "$1" in
     start)
         echo "Starting Acrylic OS Kiosk..."
-        # Start the X server on display :0, in the background
-        /usr/bin/xinit /usr/bin/acrylic-ui-start -- :0 &
+        if start_xorg_if_needed; then
+            export DISPLAY=:0.0
+            /usr/bin/acrylic-ui-start &
+        fi
         ;;
     stop)
         # We don't really have a stop mechanism for this simple kiosk
