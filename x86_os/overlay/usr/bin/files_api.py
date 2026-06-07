@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
 import os
-import dbus
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+
+try:
+    import dbus
+except ModuleNotFoundError:
+    dbus = None
 
 app = Flask(__name__)
 CORS(app)
@@ -45,6 +49,12 @@ def ota_install():
     data = request.get_json()
     if not data or 'url' not in data:
         return jsonify({"error": "Missing 'url' in request body"}), 400
+
+    if dbus is None:
+        return jsonify({
+            "error": "Update service is unavailable on this build.",
+            "details": "The Python 'dbus' module is not installed in the Acrylic OS image."
+        }), 501
     
     bundle_url = data['url']
     
