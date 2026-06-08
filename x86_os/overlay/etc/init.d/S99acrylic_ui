@@ -6,26 +6,19 @@ XORG_BIN=/usr/bin/Xorg
 XSOCKET=/tmp/.X11-unix/X0
 
 start_xorg_if_needed() {
-    if [ -S "$XSOCKET" ]; then
-        return 0
-    fi
-
-    if [ -x "$XORG_BIN" ]; then
-        echo "Starting Xorg..."
-        start-stop-daemon -S -q -b -m -p /var/run/xorg.pid --exec "$XORG_BIN" -- :0.0 vt01 -s 0 -noreset -allowMouseOpenFail
-    else
+    if [ ! -x "$XORG_BIN" ]; then
         echo "Error: Xorg is not installed."
         return 1
     fi
 
     i=0
-    while [ ! -S "$XSOCKET" ] && [ "$i" -lt 20 ]; do
+    while [ ! -S "$XSOCKET" ] && [ "$i" -lt 60 ]; do
         sleep 1
         i=$((i + 1))
     done
 
     if [ ! -S "$XSOCKET" ]; then
-        echo "Error: Xorg did not start."
+        echo "Error: Xorg display socket did not appear."
         return 1
     fi
 
