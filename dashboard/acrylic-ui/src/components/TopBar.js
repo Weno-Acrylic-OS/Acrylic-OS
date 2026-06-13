@@ -39,11 +39,11 @@ const TopBar = ({ onActivitiesClick, onLock, onToggleNotifications, onAlyssaClic
                 </div>
                 <div className="top-bar-right">
                     <button className="status-button" onClick={onAlyssaClick}>
-                        <Command size={16} />
+                        <img src="/dashboard/Alyssad.svg" alt="Alyssa" />
                     </button>
                     <button className="status-button" onClick={toggleQuickSettings}>
-                        <img src="/dashboard/Wifi.svg" alt="Wi-Fi" />
-                        <img src="/dashboard/Battery.svg" alt="Battery" />
+                        <img src="/dashboard/Wifid.svg" alt="Wi-Fi" />
+                        <img src="/dashboard/Batteryd.svg" alt="Battery" />
                     </button>
                     <span className="time" onClick={onToggleNotifications}>{formatTime(currentTime)}</span>
                     <button className="activities-button" onClick={onLock}>Lock</button>

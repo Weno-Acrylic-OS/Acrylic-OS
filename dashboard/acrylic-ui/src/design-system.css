@@ -54,3 +54,10 @@
   --border-color: #3a3a3c;
   --divider-color: #3a3a3c;
 }
+
+  /* =================================
+     UI Component Dimensions
+     ================================= */
+  --top-bar-height: 40px;
+  --taskbar-height: 56px; /* Approximate height including padding */
+  --taskbar-margin: var(--spacing-md);

@@ -39,18 +39,9 @@ const Window = ({ title, children, onClose, onMinimize, initialPosition, initial
 
     // --- Maximize Handler ---
     const handleToggleMaximize = () => {
-        if (isMaximized) {
-            // Restore
-            setPosition(prevPosition);
-            setSize(prevSize);
-        } else {
-            // Maximize
-            onFocus(); // Bring window to front
-            setPrevPosition(position);
-            setPrevSize(size);
-            setPosition({ x: 0, y: 30 }); // Position below top bar
-            setSize({ w: window.innerWidth, h: window.innerHeight - 70 }); // Fill space between top and bottom bar
-        }
+        // The CSS .maximized class now handles all sizing and positioning.
+        // We just need to toggle the state.
+        onFocus();
         setIsMaximized(!isMaximized);
     };
 
@@ -87,7 +78,7 @@ const Window = ({ title, children, onClose, onMinimize, initialPosition, initial
     return (
         <div 
             className={`window ${isMaximized ? 'maximized' : ''}`}
-            style={{ 
+            style={isMaximized ? { zIndex } : { 
                 top: `${position.y}px`, 
                 left: `${position.x}px`,
                 width: `${size.w}px`,
