@@ -8,13 +8,32 @@
       body { font-family: sans-serif; margin: 0; padding: 0; background-color: #333; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
       .canvas-container { border: 2px solid white; padding: 10px; border-radius: 20px; background-color: #111; }
       canvas { border: 1px solid #555; }
+
+      #view-wrapper {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: flex-start;
+      }
+
+      /* When dual view is active, show the car container */
+      .dual-view-active #car-container {
+        display: block;
+      }
     </style>
   </head>
   <body>
     <h1>Acrylic OS Simulator</h1>
-    <div class="canvas-container">
-      <canvas id="canvas" width="240" height="320"></canvas>
-      <iframe id="react-app" style="display: none; width: 100%; height: 100%;"></iframe>
+    <div id="view-wrapper">
+        <div class="canvas-container">
+          <canvas id="canvas" width="240" height="320"></canvas>
+          <iframe id="react-app" style="display: none; width: 100%; height: 100%;"></iframe>
+        </div>
+
+        <!-- New container for the Car+ view -->
+        <div id="car-container" class="canvas-container" style="display: none;">
+            <iframe id="car-iframe" style="width: 100%; height: 100%;"></iframe>
+        </div>
     </div>
 
     <div class="controls">
@@ -23,6 +42,8 @@
       <button onclick="setPersonality('desktop')">Desktop</button>
       <button onclick="setPersonality('phone')">Phone</button>
       <button onclick="setPersonality('smarthome')">Smart Home</button>
+      <br/><br/>
+      <button id="toggle-car-view" style="display: none;">Toggle Car View</button>
       <br/><br/>
       <button id="btn_toggle_qs">Toggle Quick Settings</button>
       <button id="btn_toggle_notifications">Toggle Notifications</button>
@@ -34,16 +55,31 @@
       let reactAppReady = false;
       let pendingPersonality = null;
 
+      const carIframe = document.getElementById('car-iframe');
+      const carContainer = document.getElementById('car-container');
+      const toggleButton = document.getElementById('toggle-car-view');
+      const viewWrapper = document.getElementById('view-wrapper');
+      let carAppReady = false;
+
       function setPersonality(personality) {
         console.log(`Shell: Setting personality to: ${personality}`);
         const canvas = document.getElementById('canvas');
-        const canvasContainer = document.querySelector('.canvas-container');
+        const phoneContainer = document.querySelector('#view-wrapper > .canvas-container:first-child');
+
+        // Always reset the dual-view state when changing personality
+        toggleButton.style.display = 'none';
+        viewWrapper.classList.remove('dual-view-active');
+        carContainer.style.display = 'none';
+        
+        if (personality === 'phone') {
+            toggleButton.style.display = 'inline-block'; // Show toggle button for phone
+        }
 
         if (personality === 'wearable') {
-            canvas.style.display = 'block';
             iframe.style.display = 'none';
-            canvasContainer.style.width = '240px';
-            canvasContainer.style.height = '320px';
+            canvas.style.display = 'block';
+            phoneContainer.style.width = '240px';
+            phoneContainer.style.height = '320px';
         } else {
             canvas.style.display = 'none';
             iframe.style.display = 'block';
@@ -60,9 +96,9 @@
                 pendingPersonality = null;
             }
             
-            if (personality === 'desktop') canvasContainer.style.width = '1024px', canvasContainer.style.height = '768px';
-            else if (personality === 'phone') canvasContainer.style.width = '375px', canvasContainer.style.height = '667px';
-            else if (personality === 'smarthome') canvasContainer.style.width = '800px', canvasContainer.style.height = '600px';
+            if (personality === 'desktop') phoneContainer.style.width = '1024px', phoneContainer.style.height = '768px';
+            else if (personality === 'phone') phoneContainer.style.width = '375px', phoneContainer.style.height = '667px';
+            else if (personality === 'smarthome') phoneContainer.style.width = '800px', phoneContainer.style.height = '600px';
         }
       }
     </script>
@@ -80,20 +116,40 @@
         console.log("Shell: Emscripten runtime initialized.");
       };
 
+      toggleButton.addEventListener('click', () => {
+        const isDualActive = viewWrapper.classList.toggle('dual-view-active');
+        // If the car view is now active and hasn't been loaded yet
+        if (isDualActive && carIframe.src === '') {
+            carIframe.src = 'dashboard/index.html';
+        }
+      });
+
       window.addEventListener('message', (event) => {
         if (event.origin !== window.origin || !event.data) return;
         const data = event.data;
 
+        // Logic for standard React app ready signal
         if (data.status === 'ready') {
-            console.log("Shell: Received 'ready' signal from React app.");
-            reactAppReady = true;
-            if (pendingPersonality) {
-                console.log(`Shell: Sending pending personality: ${pendingPersonality}`);
-                iframe.contentWindow.postMessage({ personality: pendingPersonality }, window.origin);
-                pendingPersonality = null;
+            if (event.source === iframe.contentWindow) {
+                reactAppReady = true;
+                if (pendingPersonality) {
+                    iframe.contentWindow.postMessage({ personality: pendingPersonality }, window.origin);
+                    pendingPersonality = null;
+                }
+            } else if (event.source === carIframe.contentWindow) {
+                carAppReady = true;
+                carIframe.contentWindow.postMessage({ personality: 'car' }, window.origin);
             }
         }
 
+        // Logic for Weno Car+ message forwarding
+        if (data.type === 'weno-car-send') {
+            if (carIframe && carIframe.contentWindow) {
+                carIframe.contentWindow.postMessage({ type: 'weno-car-receive', message: data.message }, window.origin);
+            }
+        }
+
+        // Logic for C++/WASM bridge
         if (data.command && Module.ccall) {
             console.log(`Shell: Received command: ${data.command}`);
             switch (data.command) {

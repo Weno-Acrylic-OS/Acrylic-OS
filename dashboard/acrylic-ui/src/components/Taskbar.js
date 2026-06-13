@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Taskbar.css';
 import StartMenu from './StartMenu';
-const Taskbar = ({ onAppClick, windows, onTaskbarAppClick }) => {
+const Taskbar = ({ onAppClick, windows, onTaskbarAppClick, appList }) => {
     const [showStartMenu, setShowStartMenu] = useState(false);
 
     const toggleStartMenu = () => {
@@ -10,7 +10,7 @@ const Taskbar = ({ onAppClick, windows, onTaskbarAppClick }) => {
 
     return (
         <>
-            {showStartMenu && <StartMenu onAppClick={onAppClick} />}
+            {showStartMenu && <StartMenu onAppClick={onAppClick} appList={appList} />}
             <div className="taskbar">
                 <button className="start-button" onClick={toggleStartMenu}>
                     <img src="all_apps.svg" alt="All Apps" style={{ width: '20px', height: '20px' }} />

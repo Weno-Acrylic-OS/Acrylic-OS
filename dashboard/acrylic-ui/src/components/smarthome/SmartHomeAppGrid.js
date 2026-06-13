@@ -1,25 +1,13 @@
 import React from 'react';
 import './SmartHomeAppGrid.css';
 
-const apps = [
-    { name: 'Browser' },
-    { name: 'Calculator' },
-    { name: 'Files' },
-    { name: 'Mail' },
-    { name: 'Messages' },
-    { name: 'Phone' },
-    { name: 'Photos' },
-    { name: 'Settings' },
-    { name: 'HelloAcrylic' },
-];
-
-const SmartHomeAppGrid = ({ onAppClick }) => {
+const SmartHomeAppGrid = ({ onAppClick, appList = [] }) => {
     return (
         <div className="smarthome-app-grid">
-            {apps.map(app => (
-                <div key={app.name} className="smarthome-app-icon" onClick={() => onAppClick(app.name)}>
-                    <img src={`/dashboard/${app.name.toLowerCase().replace(/ /g, '')}sm.png`} alt={app.name} />
-                    <span>{app.name}</span>
+            {appList.map(appName => (
+                <div key={appName} className="smarthome-app-icon" onClick={() => onAppClick(appName)}>
+                    <img src={`/dashboard/${appName.toLowerCase().replace(/ /g, '')}sm.png`} alt={appName} />
+                    <span>{appName}</span>
                 </div>
             ))}
         </div>

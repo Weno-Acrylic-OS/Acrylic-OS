@@ -17,6 +17,8 @@ import Messages from '../apps/Messages';
 import Mail from '../apps/Mail';
 import NativeAppWrapper from './NativeAppWrapper';
 import Photos from '../apps/Photos';
+import { useInstalledApps } from '../hooks/useInstalledApps';
+import Alyssa from './common/Alyssa';
 
 const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
     const [windows, setWindows] = useState([]);
@@ -24,33 +26,60 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
     const [topZIndex, setTopZIndex] = useState(100);
     const [showNotificationPanel, setShowNotificationPanel] = useState(false);
     const [activeToast, setActiveToast] = useState(null);
+    const [showAlyssa, setShowAlyssa] = useState(false);
+
+    // Create a registry of all possible app components
+    const ALL_APPS_REGISTRY = {
+        'Calculator': Calculator,
+        'Browser': Browser,
+        'Files': Files,
+        'Weno Store': WenoStore,
+        'Settings': Settings,
+        'Messages': Messages,
+        'Mail': Mail,
+        'Photos': Photos,
+        'HelloAcrylic': NativeAppWrapper,
+    };
+
+    // Fetch the list of installed apps
+    const { apps: installedApps } = useInstalledApps();
 
     useEffect(() => {
         const unsubscribe = subscribe(() => {
             const newNotifications = getNotifications();
             if (newNotifications.length > 0) {
-                // For simplicity, just show the latest as a toast
                 setActiveToast(newNotifications[0]);
             }
         });
-
-        // Demo notification
         setTimeout(() => addNotification('Welcome!', 'This is a test notification.'), 2000);
-
         return unsubscribe;
     }, []);
 
-    const appMap = {
-        'Calculator': () => <Calculator />,
-        'Browser': () => <Browser />,
-        'Files': () => <Files />,
-        'Weno Store': () => <WenoStore />,
-        'Settings': () => <Settings onPinChange={onPinChange} pin={pin} />,
-        'Messages': () => <Messages />,
-        'Mail': () => <Mail />,
-        'Photos': () => <Photos />,
-        'HelloAcrylic': () => <NativeAppWrapper uiTree={appUITree} />,
-    };
+    // Define core apps that should always be present
+    const coreApps = [
+        'Settings', 'Browser', 'Files', 'Weno Store',
+        'Photos', 'Messages', 'Mail', 'Calculator',
+    ];
+
+    // Combine core apps with installed apps, removing duplicates
+    const allAppNames = [...new Set([...coreApps, ...installedApps.map(app => app.name)])];
+
+    // Dynamically generate the map of apps that can be rendered
+    const appMap = allAppNames.reduce((acc, appName) => {
+        const AppComponent = ALL_APPS_REGISTRY[appName];
+        if (AppComponent) {
+            if (appName === 'Settings') {
+                acc[appName] = () => <AppComponent onPinChange={onPinChange} pin={pin} />;
+            } else if (appName === 'HelloAcrylic') {
+                acc[appName] = () => <AppComponent uiTree={appUITree} />;
+            } else {
+                acc[appName] = () => <AppComponent />;
+            }
+        }
+        return acc;
+    }, {});
+
+    const appListForStartMenu = allAppNames;
 
     const renderApp = (appName) => {
         const appRenderer = appMap[appName];
@@ -123,6 +152,10 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
         setShowNotificationPanel(!showNotificationPanel);
     }
 
+    const toggleAlyssa = () => {
+        setShowAlyssa(!showAlyssa);
+    }
+
     const switchWindow = (id) => {
         focusWindow(id);
         setShowActivities(false);
@@ -130,7 +163,8 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
 
     return (
         <div className="desktop">
-            <TopBar onActivitiesClick={toggleActivitiesView} onLock={onLock} onToggleNotifications={toggleNotificationPanel} />
+            <Alyssa isVisible={showAlyssa} onClose={toggleAlyssa} />
+            <TopBar onActivitiesClick={toggleActivitiesView} onLock={onLock} onToggleNotifications={toggleNotificationPanel} onAlyssaClick={toggleAlyssa} />
 
             {windows.filter(w => !w.isMinimized).map(win => (
                 <Window 
@@ -157,7 +191,7 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
             <NotificationPanel isVisible={showNotificationPanel} onClose={() => setShowNotificationPanel(false)} />
             {activeToast && <Notification notification={activeToast} onDismiss={() => setActiveToast(null)} />}
 
-            <Taskbar onAppClick={openWindow} windows={windows} onTaskbarAppClick={toggleMinimize} />
+            <Taskbar onAppClick={openWindow} windows={windows} onTaskbarAppClick={toggleMinimize} appList={appListForStartMenu} />
         </div>
     );
 };

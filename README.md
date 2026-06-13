@@ -37,3 +37,13 @@ You can run different interfaces also known as personalities with [run.sh](http:
 - `./run.sh desktop` To emulate the desktop personality.
 - `./run.sh smarthome` To emulate the Smart Home personality (Smart Home Displays and TV Sticks).
 
+
+
+## Running the Weno Store
+
+To run the Weno Store server to install apps run this command: 
+
+```sh
+cd weno-store-backend && npm run start
+```
+

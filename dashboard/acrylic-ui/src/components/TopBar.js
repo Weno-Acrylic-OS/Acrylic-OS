@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './TopBar.css';
 import QuickSettings from './QuickSettings';
 import AppMenu from './AppMenu';
+import { Command } from 'react-feather'; // Import the icon
 
-const TopBar = ({ onActivitiesClick, onLock, onToggleNotifications }) => {
+const TopBar = ({ onActivitiesClick, onLock, onToggleNotifications, onAlyssaClick }) => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [showAppMenu, setShowAppMenu] = useState(false);
     const [showQuickSettings, setShowQuickSettings] = useState(false);
@@ -37,11 +38,14 @@ const TopBar = ({ onActivitiesClick, onLock, onToggleNotifications }) => {
                     <button className="activities-button" onClick={onActivitiesClick}>Activities</button>
                 </div>
                 <div className="top-bar-right">
+                    <button className="status-button" onClick={onAlyssaClick}>
+                        <Command size={16} />
+                    </button>
                     <button className="status-button" onClick={toggleQuickSettings}>
                         <img src="/dashboard/Wifi.svg" alt="Wi-Fi" />
                         <img src="/dashboard/Battery.svg" alt="Battery" />
                     </button>
-                    <span className="time">{formatTime(currentTime)}</span>
+                    <span className="time" onClick={onToggleNotifications}>{formatTime(currentTime)}</span>
                     <button className="activities-button" onClick={onLock}>Lock</button>
                 </div>
             </div>

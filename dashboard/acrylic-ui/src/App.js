@@ -3,6 +3,7 @@ import './App.css';
 import Desktop from './components/Desktop';
 import Phone from './components/phone/Phone';
 import SmartHome from './components/smarthome/SmartHome';
+import Car from './components/Car';
 import LockScreen from './components/lockscreen/LockScreen';
 import OOBE from './components/oobe/OOBE';
 
@@ -76,6 +77,8 @@ function App() {
         return <Phone isLocked={isLocked} onLock={handleLock} requestPinScreen={handlePinScreenRequest} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} />;
       case 'smarthome':
         return <SmartHome onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} />;
+      case 'car':
+        return <Car />;
       default:
         return <div>Unknown Personality</div>;
     }

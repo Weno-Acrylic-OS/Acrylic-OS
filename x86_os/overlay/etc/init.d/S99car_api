@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# S99car_api - Startup script for the Weno Car+ API server
+
+case "$1" in
+    start)
+        echo "Starting Car+ API server..."
+        /usr/bin/car_api.py &
+        ;;
+    stop)
+        # Find and kill the car api process
+        kill $(ps | grep car_api.py | grep -v grep | awk '{print $1}')
+        ;;
+    restart|reload)
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit 0

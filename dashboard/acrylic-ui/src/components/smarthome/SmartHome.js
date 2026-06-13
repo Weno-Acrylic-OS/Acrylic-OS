@@ -20,6 +20,7 @@ import Home from '../../apps/Home';
 import { getNotifications, subscribe } from '../NotificationManager';
 import Notification from '../Notification';
 import Music from '../../apps/Music';
+import { useInstalledApps } from '../../hooks/useInstalledApps';
 
 const SmartHome = ({ onLock, onPinChange, pin, appUITree }) => {
     const [showAppDrawer, setShowAppDrawer] = useState(false);
@@ -27,31 +28,59 @@ const SmartHome = ({ onLock, onPinChange, pin, appUITree }) => {
     const [appViewPos, setAppViewPos] = useState({ x: 0 });
     const [activeToast, setActiveToast] = useState(null);
 
+    // Create a registry of all possible app components
+    const ALL_APPS_REGISTRY = {
+        'Calculator': Calculator,
+        'Browser': Browser,
+        'Files': Files,
+        'Weno Store': WenoStore,
+        'Settings': Settings,
+        'Messages': Messages,
+        'Mail': Mail,
+        'Photos': Photos,
+        'Home': Home,
+        'Music': Music,
+        'HelloAcrylic': NativeAppWrapper,
+    };
+
+    // Fetch the list of installed apps
+    const { apps: installedApps } = useInstalledApps();
+
     useEffect(() => {
         const unsubscribe = subscribe(() => {
             const newNotifications = getNotifications();
             if (newNotifications.length > 0) {
-                // For simplicity, just show the latest as a toast
                 setActiveToast(newNotifications[0]);
             }
         });
-
         return unsubscribe;
     }, []);
 
-    const appMap = {
-        'Calculator': () => <Calculator />,
-        'Browser': () => <Browser />,
-        'Files': () => <Files />,
-        'Weno Store': () => <WenoStore />,
-        'Settings': () => <Settings onPinChange={onPinChange} pin={pin} />,
-        'Messages': () => <Messages />,
-        'Mail': () => <Mail />,
-        'Photos': () => <Photos />,
-        'Home': () => <Home />,
-        'Music': () => <Music />,
-        'HelloAcrylic': () => <NativeAppWrapper uiTree={appUITree} />,
-    };
+    // Define core apps that should always be present for the Smart Home
+    const coreApps = [
+        'Home', 'Music', 'Settings', 'Weno Store',
+        'Browser', 'Calculator', 'Files', 'Mail', 'Messages', 'Phone', 'Photos',
+    ];
+
+    // Combine core apps with installed apps, removing duplicates
+    const allAppNames = [...new Set([...coreApps, ...installedApps.map(app => app.name)])];
+
+    // Dynamically generate the map of apps that can be rendered
+    const appMap = allAppNames.reduce((acc, appName) => {
+        const AppComponent = ALL_APPS_REGISTRY[appName];
+        if (AppComponent) {
+            if (appName === 'Settings') {
+                acc[appName] = () => <AppComponent onPinChange={onPinChange} pin={pin} />;
+            } else if (appName === 'HelloAcrylic') {
+                acc[appName] = () => <AppComponent uiTree={appUITree} />;
+            } else {
+                acc[appName] = () => <AppComponent />;
+            }
+        }
+        return acc;
+    }, {});
+    
+    const appList = allAppNames;
 
     const renderApp = (appName) => {
         const appRenderer = appMap[appName];
@@ -125,10 +154,10 @@ const SmartHome = ({ onLock, onPinChange, pin, appUITree }) => {
                  <div className="drawer-handle-area" onClick={() => setShowAppDrawer(false)}>
                     <div className="drawer-handle"></div>
                 </div>
-                <SmartHomeAppGrid onAppClick={handleAppLaunch} />
+                <SmartHomeAppGrid onAppClick={handleAppLaunch} appList={appList} />
             </div>
 
-            <SmartHomeDock onAppClick={handleAppLaunch} />
+            <SmartHomeDock onAppClick={handleAppLaunch} appList={appList} />
             {activeToast && <Notification notification={activeToast} onDismiss={() => setActiveToast(null)} />}
         </div>
     );

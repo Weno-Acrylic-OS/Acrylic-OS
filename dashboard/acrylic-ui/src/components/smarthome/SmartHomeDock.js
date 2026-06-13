@@ -7,13 +7,17 @@ const AppIcon = ({ name, icon, onClick }) => (
     </div>
 );
 
-const SmartHomeDock = ({ onAppClick }) => {
-    // The user requested Home, Music, and Weno Store
-    const dockApps = [
-        { name: 'Home', icon: 'home' },
-        { name: 'Music', icon: 'music' },
-        { name: 'Weno Store', icon: 'wenostore' },
-    ];
+const iconMap = {
+    'Home': 'home',
+    'Music': 'music',
+    'Weno Store': 'wenostore',
+};
+
+const SmartHomeDock = ({ onAppClick, appList = [] }) => {
+    // Filter the incoming appList to only show the specific apps intended for the dock
+    const dockApps = appList
+        .filter(appName => ['Home', 'Music', 'Weno Store'].includes(appName))
+        .map(appName => ({ name: appName, icon: iconMap[appName] }));
 
     return (
         <div className="smarthome-dock">

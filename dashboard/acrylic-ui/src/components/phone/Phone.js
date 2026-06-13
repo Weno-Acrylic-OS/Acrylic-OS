@@ -23,6 +23,7 @@ import Photos from '../../apps/Photos';
 import PhoneApp from '../../apps/PhoneApp'; // Add PhoneApp import here
 import CameraApp from '../../apps/Camera';
 import CalendarApp from '../../apps/Calendar';
+import WenoCar from '../../apps/WenoCar';
 
 const Phone = ({ isLocked, onLock, requestPinScreen, onPinChange, pin, appUITree }) => {
     const [activeApp, setActiveApp] = useState(null);
@@ -62,6 +63,7 @@ const Phone = ({ isLocked, onLock, requestPinScreen, onPinChange, pin, appUITree
         'Phone': () => <PhoneApp />, // Add PhoneApp to appMap
         'Camera': () => <CameraApp />,
         'Calendar': () => <CalendarApp />,
+        'Weno Car+': () => <WenoCar />,
         'HelloAcrylic': () => <NativeAppWrapper uiTree={appUITree} />,
     };
 

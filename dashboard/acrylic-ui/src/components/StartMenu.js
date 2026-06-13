@@ -1,20 +1,25 @@
 import React from 'react';
 import './StartMenu.css';
 
-const apps = [
-    { name: 'Browser', icon: '/dashboard/Browser.png' },
-    { name: 'Calculator', icon: '/dashboard/Calculator.png' },
-    { name: 'Files', icon: '/dashboard/Files.png' },
-    { name: 'Mail', icon: '/dashboard/Mail.png' },
-    { name: 'Messages', icon: '/dashboard/Messages.png' },
-    { name: 'Photos', icon: '/dashboard/Photos.png' },
-    { name: 'Settings', icon: '/dashboard/Settings.png' },
-    { name: 'Weno Store', icon: '/dashboard/Wenostore.png' },
-    { name: 'HelloAcrylic', icon: '/dashboard/logo192.png' }, // Using a generic icon for now
-];
+// A local map to find icons for the dynamic apps
+const iconMap = {
+    'Browser': '/dashboard/Browser.png',
+    'Calculator': '/dashboard/Calculator.png',
+    'Files': '/dashboard/Files.png',
+    'Mail': '/dashboard/Mail.png',
+    'Messages': '/dashboard/Messages.png',
+    'Photos': '/dashboard/Photos.png',
+    'Settings': '/dashboard/Settings.png',
+    'Weno Store': '/dashboard/Wenostore.png',
+    'HelloAcrylic': '/dashboard/logo192.png',
+    'Phone': '/dashboard/Phone.png', // Assuming an icon exists
+    'Camera': '/dashboard/Camera.png', // Assuming an icon exists
+    'Calendar': '/dashboard/Calendar.png', // Assuming an icon exists
+    'Weno Car+': '/dashboard/Car.png', // Assuming an icon exists
+};
+const defaultIcon = '/dashboard/logo192.png';
 
-const StartMenu = ({ onAppClick }) => {
-    // A simple guard
+const StartMenu = ({ onAppClick, appList = [] }) => {
     const handleAppClick = (appName) => {
         if (onAppClick) {
             onAppClick(appName);
@@ -28,10 +33,10 @@ const StartMenu = ({ onAppClick }) => {
             </div>
             <div className="start-menu-main">
                 <div className="start-menu-app-grid">
-                    {apps.map(app => (
-                        <div key={app.name} className="start-menu-app-icon" onClick={() => handleAppClick(app.name)}>
-                            <img src={`/${app.icon}`} alt={app.name} />
-                            <span>{app.name}</span>
+                    {appList.map(appName => (
+                        <div key={appName} className="start-menu-app-icon" onClick={() => handleAppClick(appName)}>
+                            <img src={iconMap[appName] || defaultIcon} alt={appName} />
+                            <span>{appName}</span>
                         </div>
                     ))}
                 </div>
