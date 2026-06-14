@@ -12,7 +12,7 @@ const Settings = ({ onPinChange, pin: currentPin }) => {
     // State for OTA Update feature
     const [updateCheckStatus, setUpdateCheckStatus] = useState(''); // e.g., 'checking', 'error', 'updated', 'available'
     const [latestVersionInfo, setLatestVersionInfo] = useState(null);
-    const currentOSVersion = '1.0.0-release'; // This would ideally come from the OS
+    const currentOSVersion = '21.7.0'; // This would ideally come from the OS
 
     const handleCheckForUpdate = async () => {
         setUpdateCheckStatus('checking');

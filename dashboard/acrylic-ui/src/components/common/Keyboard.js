@@ -31,7 +31,7 @@ const Keyboard = () => {
         return rows.map((row, rowIndex) => (
             <div key={rowIndex} className="keyboard-row">
                 {row.map((key) => {
-                    const keyClass = `keyboard-key ${key.length > 1 ? 'special' : ''} ${key === 'Space' ? 'space' : ''}`;
+                    const keyClass = `keyboard-key ${key.length > 1 ? 'keyboard-key' : ''} ${key === 'Space' ? 'space' : ''}`;
                     return (
                         <button key={key} className={keyClass} onClick={() => handleKeyPress(key)}>
                             {isShifted ? key.toUpperCase() : key}

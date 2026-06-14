@@ -46,7 +46,7 @@
 }
 
 .pin-dot.filled {
-    background-color: #D8E3F8;
+    background-color: white;
 }
 
 .numpad {
@@ -65,8 +65,8 @@
     height: 75px;
     border-radius: 50%;
     border: none;
-    background-color: #D8E3F8;
-    color: #204876;
+    background-color: #FFF;
+    color: #777;
     font-size: 32px;
     font-weight: 400;
     cursor: pointer;
@@ -76,9 +76,11 @@
 }
 
 .numpad button:hover {
-    background-color: #3B608F;
+    background-color: #666;
+    color: white;
 }
 
 .numpad button:active {
-    background-color: #3B608F;
+    background-color: #666;
+    color: white;
 }

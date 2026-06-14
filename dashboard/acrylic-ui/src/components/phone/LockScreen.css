@@ -42,7 +42,7 @@
 
 .unlock-icon-container {
     cursor: pointer;
-    background-color: #D8E3F8;
+    background-color: #FFF;
     border-radius: 50%;
     width: 60px;
     height: 60px;
@@ -53,5 +53,5 @@
 }
 
 .unlock-icon-container:hover {
-    background-color: #DFE2EB;
+    background-color: #FFF;
 }

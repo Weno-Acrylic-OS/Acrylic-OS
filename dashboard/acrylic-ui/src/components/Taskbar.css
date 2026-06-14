@@ -39,7 +39,7 @@
 }
 
 .taskbar-app-button {
-    background: #D8E3F8;
+    background: #EEE;
     color: #333;
     padding: 5px;
     font-family: 'RobotoVariable', sans-serif;
@@ -51,11 +51,11 @@
 }
 
 .taskbar-app-button:hover {
-    background: #204876;
-    color: white;
+    background: #CCC;
+    color: black;
 }
 
 .taskbar-app-button.minimized {
-    background: #a0b0c8;
+    background: #999;
     color: #f0f0f0;
 }

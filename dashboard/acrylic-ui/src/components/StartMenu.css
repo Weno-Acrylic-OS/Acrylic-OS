@@ -69,7 +69,6 @@
 }
 
 .start-menu-footer-item:hover {
-    background: #204876;
-    color: white;
+    background: rgba(0, 0, 0, 0.1);
 }
 

@@ -150,9 +150,9 @@ app.get('/api/apps/source/:appName', (req, res) => {
 app.get('/api/os/latest', (req, res) => {
     // In a real system, this would come from a database or a manifest file.
     res.json({
-        version: '1.1.0-alpha',
+        version: '21.8.0',
         notes: '- Improved keyboard performance\n- Added support for new app features\n- Bug fixes and stability improvements',
-        release_date: '2026-07-20'
+        release_date: '2026-06-09'
     });
 });
 

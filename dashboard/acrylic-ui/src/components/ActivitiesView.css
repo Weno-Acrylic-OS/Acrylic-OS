@@ -32,7 +32,7 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    border-radius: 26px;
+    border-radius: 16px;
 }
 
 .window-preview:hover {
@@ -41,23 +41,23 @@
 
 .preview-title-bar {
     height: 25px;
-    background: #D4E3FF;
+    background: transparent;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 5px;
     font-size: 12px;
     color: black;
-    border-radius: 26px 26px 0px 0px;
+    border-radius: 16px 16px 0px 0px;
 }
 
 .preview-close-button {
-    background: #ff5f57;
+    background: transparent;
     border: none;
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    color: #9d0000;
+    color: #000;
     cursor: pointer;
     line-height: 12px;
     align-items: center;

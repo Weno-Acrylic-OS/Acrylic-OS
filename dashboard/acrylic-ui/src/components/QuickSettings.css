@@ -3,7 +3,7 @@
     top: 40px; /* Below the TopBar */
     right: 15px;
     width: 300px;
-    background-color: #D8E3F8;
+    background-color: #FFF;
     border-radius: 12px;
    /* box-shadow: 0 4px 20px rgba(0,0,0,0.1); */
     padding: 15px;
@@ -18,7 +18,7 @@
 
 .qs-tile {
     height: 80px;
-    background-color: #3B608F;
+    background: #999;
     border-radius: 8px;
     display: flex;
     justify-content: center;
@@ -31,7 +31,7 @@
 }
 
 .qs-tile.active {
-    background-color: #204876;
+    background: linear-gradient(180deg, #000000 0%, #424242 100%);
     color: white;
 }
 
@@ -51,19 +51,19 @@
 .qs-notification-header h3 {
     margin: 0;
     font-size: 16px;
-    color: #204876;
+    color: #000;
 }
 
 .qs-notification-header button {
     background: none;
     border: none;
-    color: #204876;
+    color: #CCC;
     cursor: pointer;
     font-size: 14px;
 }
 
 .qs-notification-item {
-    background-color: #D8E3F8;
+    background-color: #CCC;
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 10px;
@@ -72,11 +72,11 @@
 .qs-notification-item h4 {
     margin: 0 0 5px 0;
     font-size: 14px;
-    color: #545F71;
+    color: #FFF;
 }
 
 .qs-notification-item p {
     margin: 0;
     font-size: 12px;
-    color: #3C4758;
+    color: #FFF;
 }
