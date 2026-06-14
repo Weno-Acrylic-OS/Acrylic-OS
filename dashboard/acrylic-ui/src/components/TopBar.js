@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './TopBar.css';
 import QuickSettings from './QuickSettings';
 import AppMenu from './AppMenu';
-import { Command } from 'react-feather'; // Import the icon
 
 const TopBar = ({ onActivitiesClick, onLock, onToggleNotifications, onAlyssaClick }) => {
     const [currentTime, setCurrentTime] = useState(new Date());

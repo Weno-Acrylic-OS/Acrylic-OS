@@ -7,10 +7,6 @@ const Window = ({ title, children, onClose, onMinimize, initialPosition, initial
     const [size, setSize] = useState(initialSize || { w: 400, h: 300 });
     const [isMaximized, setIsMaximized] = useState(false);
     
-    // Previous state before maximizing
-    const [prevPosition, setPrevPosition] = useState(position);
-    const [prevSize, setPrevSize] = useState(size);
-
     // Dragging State
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
