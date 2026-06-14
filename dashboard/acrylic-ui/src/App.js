@@ -9,6 +9,7 @@ import OOBE from './components/oobe/OOBE';
 
 import { KeyboardProvider } from './components/common/KeyboardContext';
 import Keyboard from './components/common/Keyboard';
+import { WidgetLayoutProvider } from './hooks/WidgetLayoutContext';
 
 function App() {
   const [personality, setPersonality] = useState('desktop');
@@ -17,6 +18,23 @@ function App() {
   const [pin, setPin] = useState(localStorage.getItem('acrylic-os-pin') || '0000');
   const [appUITree, setAppUITree] = useState(null);
   const [showOOBE, setShowOOBE] = useState(!localStorage.getItem('oobe_completed'));
+
+  const [selectedWallpaper, setSelectedWallpaper] = useState('url("/dashboard/wallpaper.png")'); // Default wallpaper
+  const [selectedAccentColor, setSelectedAccentColor] = useState('#007aff'); // Default primary accent color
+
+  const handleWallpaperChange = (newWallpaper) => {
+      setSelectedWallpaper(newWallpaper);
+  };
+
+  const handleAccentColorChange = (newColor) => {
+      setSelectedAccentColor(newColor);
+  };
+
+  useEffect(() => {
+    // Apply wallpaper and accent color to the root of the document
+    document.documentElement.style.setProperty('--background-primary', selectedWallpaper);
+    document.documentElement.style.setProperty('--primary-accent', selectedAccentColor);
+  }, [selectedWallpaper, selectedAccentColor]);
 
   const handleLock = useCallback(() => {
       setIsLocked(true);
@@ -72,11 +90,11 @@ function App() {
   const renderPersonality = () => {
     switch (personality) {
       case 'desktop':
-        return <Desktop onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} />;
+        return <Desktop onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} onWallpaperChange={handleWallpaperChange} onAccentColorChange={handleAccentColorChange} />;
       case 'phone':
-        return <Phone isLocked={isLocked} onLock={handleLock} requestPinScreen={handlePinScreenRequest} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} />;
+        return <Phone isLocked={isLocked} onLock={handleLock} requestPinScreen={handlePinScreenRequest} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} onWallpaperChange={handleWallpaperChange} onAccentColorChange={handleAccentColorChange} />;
       case 'smarthome':
-        return <SmartHome onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} />;
+        return <SmartHome onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} onWallpaperChange={handleWallpaperChange} onAccentColorChange={handleAccentColorChange} />;
       case 'car':
         return <Car />;
       default:
@@ -105,12 +123,14 @@ function App() {
   };
 
   return (
-    <KeyboardProvider>
-      <div className="App">
-        {renderContent()}
-        {personality !== 'desktop' && <Keyboard />}
-      </div>
-    </KeyboardProvider>
+    <WidgetLayoutProvider>
+      <KeyboardProvider>
+        <div className="App">
+          {renderContent()}
+          {personality !== 'desktop' && <Keyboard />}
+        </div>
+      </KeyboardProvider>
+    </WidgetLayoutProvider>
   );
 }
 

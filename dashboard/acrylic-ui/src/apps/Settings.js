@@ -2,7 +2,20 @@ import React, { useState, useEffect } from 'react';
 import './Settings.css';
 import TextInput from '../components/common/TextInput';
 
-const Settings = ({ onPinChange, pin: currentPin }) => {
+const wallpapers = [
+    { name: 'Default', css: 'url("/dashboard/wallpaper.png")' },
+    { name: 'Mountain', css: 'url("https://images.unsplash.com/photo-1549880338-65ddcdfd017b?w=800")' },
+    { name: 'Abstract', css: 'url("https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800")' },
+];
+
+const accentColors = [
+    { name: 'Blue', color: '#007aff' },
+    { name: 'Orange', color: '#ff9500' },
+    { name: 'Teal', color: '#5ac8fa' },
+    { name: 'Green', color: '#34c759' },
+];
+
+const Settings = ({ onPinChange, pin: currentPin, onWallpaperChange, onAccentColorChange }) => {
     const [isDndActive, setIsDndActive] = useState(false);
     const [oldPin, setOldPin] = useState('');
     const [newPin, setNewPin] = useState('');
@@ -162,6 +175,24 @@ const Settings = ({ onPinChange, pin: currentPin }) => {
             <UpdateModal />
             <h1>Settings</h1>
             <div className="settings-list">
+                <div className="settings-item-column">
+                    <span>Appearance</span>
+                    <p className="setting-description">Change the wallpaper and accent color.</p>
+                    <div className="appearance-options">
+                        <div className="wallpaper-options">
+                            {wallpapers.map(wp => (
+                                <div key={wp.name} className="wallpaper-swatch" onClick={() => onWallpaperChange(wp.css)}>
+                                    <img src={wp.css.replace('url("', '').replace('")', '')} alt={wp.name} />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="color-options">
+                            {accentColors.map(ac => (
+                                <div key={ac.name} className="color-swatch" style={{ backgroundColor: ac.color }} onClick={() => onAccentColorChange(ac.color)}></div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
                 <div className="settings-item">
                     <span>Do Not Disturb</span>
                     <label className="switch">

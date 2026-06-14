@@ -17,16 +17,19 @@ import Messages from '../apps/Messages';
 import Mail from '../apps/Mail';
 import NativeAppWrapper from './NativeAppWrapper';
 import Photos from '../apps/Photos';
+import AlyssaApps from '../apps/AlyssaApps';
 import { useInstalledApps } from '../hooks/useInstalledApps';
 import Alyssa from './common/Alyssa';
+import DashboardView from './desktop/DashboardView';
 
-const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
+const Desktop = ({ onLock, onPinChange, pin, appUITree, onWallpaperChange, onAccentColorChange }) => {
     const [windows, setWindows] = useState([]);
     const [showActivities, setShowActivities] = useState(false);
     const [topZIndex, setTopZIndex] = useState(100);
     const [showNotificationPanel, setShowNotificationPanel] = useState(false);
     const [activeToast, setActiveToast] = useState(null);
     const [showAlyssa, setShowAlyssa] = useState(false);
+    const [showDashboard, setShowDashboard] = useState(false);
 
     // Create a registry of all possible app components
     const ALL_APPS_REGISTRY = {
@@ -38,6 +41,7 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
         'Messages': Messages,
         'Mail': Mail,
         'Photos': Photos,
+        'Alyssa Apps': AlyssaApps,
         'HelloAcrylic': NativeAppWrapper,
     };
 
@@ -58,7 +62,7 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
     // Define core apps that should always be present
     const coreApps = [
         'Settings', 'Browser', 'Files', 'Weno Store',
-        'Photos', 'Messages', 'Mail', 'Calculator',
+        'Photos', 'Messages', 'Mail', 'Calculator', 'Alyssa Apps',
     ];
 
     // Combine core apps with installed apps, removing duplicates
@@ -69,7 +73,7 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
         const AppComponent = ALL_APPS_REGISTRY[appName];
         if (AppComponent) {
             if (appName === 'Settings') {
-                acc[appName] = () => <AppComponent onPinChange={onPinChange} pin={pin} />;
+                acc[appName] = () => <AppComponent onPinChange={onPinChange} pin={pin} onWallpaperChange={onWallpaperChange} onAccentColorChange={onAccentColorChange} />;
             } else if (appName === 'HelloAcrylic') {
                 acc[appName] = () => <AppComponent uiTree={appUITree} />;
             } else {
@@ -156,6 +160,10 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
         setShowAlyssa(!showAlyssa);
     }
 
+    const toggleDashboard = () => {
+        setShowDashboard(!showDashboard);
+    }
+
     const switchWindow = (id) => {
         focusWindow(id);
         setShowActivities(false);
@@ -164,7 +172,8 @@ const Desktop = ({ onLock, onPinChange, pin, appUITree }) => {
     return (
         <div className="desktop">
             <Alyssa isVisible={showAlyssa} onClose={toggleAlyssa} />
-            <TopBar onActivitiesClick={toggleActivitiesView} onLock={onLock} onToggleNotifications={toggleNotificationPanel} onAlyssaClick={toggleAlyssa} />
+            <DashboardView isVisible={showDashboard} onClose={toggleDashboard} />
+            <TopBar onActivitiesClick={toggleActivitiesView} onLock={onLock} onToggleNotifications={toggleNotificationPanel} onAlyssaClick={toggleAlyssa} onDashboardClick={toggleDashboard} />
 
             {windows.filter(w => !w.isMinimized).map(win => (
                 <Window 

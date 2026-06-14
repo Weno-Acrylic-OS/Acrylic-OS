@@ -22,7 +22,7 @@ import Notification from '../Notification';
 import Music from '../../apps/Music';
 import { useInstalledApps } from '../../hooks/useInstalledApps';
 
-const SmartHome = ({ onLock, onPinChange, pin, appUITree }) => {
+const SmartHome = ({ onLock, onPinChange, pin, appUITree, onWallpaperChange, onAccentColorChange }) => {
     const [showAppDrawer, setShowAppDrawer] = useState(false);
     const [openedApp, setOpenedApp] = useState(null);
     const [appViewPos, setAppViewPos] = useState({ x: 0 });
@@ -70,7 +70,7 @@ const SmartHome = ({ onLock, onPinChange, pin, appUITree }) => {
         const AppComponent = ALL_APPS_REGISTRY[appName];
         if (AppComponent) {
             if (appName === 'Settings') {
-                acc[appName] = () => <AppComponent onPinChange={onPinChange} pin={pin} />;
+                acc[appName] = () => <AppComponent onPinChange={onPinChange} pin={pin} onWallpaperChange={onWallpaperChange} onAccentColorChange={onAccentColorChange} />;
             } else if (appName === 'HelloAcrylic') {
                 acc[appName] = () => <AppComponent uiTree={appUITree} />;
             } else {

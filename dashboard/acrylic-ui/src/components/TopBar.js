@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './TopBar.css';
 import QuickSettings from './QuickSettings';
 import AppMenu from './AppMenu';
+import { Grid } from 'react-feather';
 
-const TopBar = ({ onActivitiesClick, onLock, onToggleNotifications, onAlyssaClick }) => {
+const TopBar = ({ onActivitiesClick, onLock, onToggleNotifications, onAlyssaClick, onDashboardClick }) => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [showAppMenu, setShowAppMenu] = useState(false);
     const [showQuickSettings, setShowQuickSettings] = useState(false);
@@ -39,6 +40,9 @@ const TopBar = ({ onActivitiesClick, onLock, onToggleNotifications, onAlyssaClic
                 <div className="top-bar-right">
                     <button className="status-button" onClick={onAlyssaClick}>
                         <img src="/dashboard/Alyssad.svg" alt="Alyssa" />
+                    </button>
+                    <button className="status-button" onClick={onDashboardClick}>
+                        <Grid size={16} />
                     </button>
                     <button className="status-button" onClick={toggleQuickSettings}>
                         <img src="/dashboard/Wifid.svg" alt="Wi-Fi" />

@@ -1,0 +1,32 @@
+.weather-widget {
+    background: linear-gradient(135deg, #5D9CEC, #2A79C9);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.weather-info {
+    text-align: right;
+}
+
+.weather-info .temperature {
+    font-size: 42px;
+    font-weight: var(--font-weight-bold);
+    margin: 0;
+}
+
+.weather-info .condition {
+    font-size: 18px;
+    margin: -5px 0 0 0;
+}
+
+.weather-info .city {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 5px 0 0 0;
+}

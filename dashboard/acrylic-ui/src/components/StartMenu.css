@@ -4,7 +4,7 @@
     left: 50%; /* Center horizontally */
     transform: translateX(-50%); /* Adjust for its own width */
     width: auto;
-    height: 300px;
+    height: auto;
     background: #FFF;
     color: #000;
     display: flex;

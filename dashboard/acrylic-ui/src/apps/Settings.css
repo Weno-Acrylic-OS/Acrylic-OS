@@ -167,3 +167,37 @@ input:checked + .slider:before {
     justify-content: flex-end;
     gap: 10px;
 }
+
+.setting-description {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.appearance-options {
+    margin-top: 15px;
+}
+
+.wallpaper-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.wallpaper-swatch {
+    width: 80px;
+    height: 50px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.wallpaper-swatch:hover {
+    border-color: var(--primary-accent);
+}
+
+.wallpaper-swatch img {
+    width: 100;
+}
