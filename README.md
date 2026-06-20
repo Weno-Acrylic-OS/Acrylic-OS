@@ -47,3 +47,29 @@ To run the Weno Store server to install apps run this command:
 cd weno-store-backend && npm run start
 ```
 
+## Running the Alyssa AI Backend
+
+To run the Alyssa AI backend server (required for the Alyssa assistant feature):
+
+1.  Navigate to the backend directory:
+    ```bash
+    cd alyssa-ai-backend
+    ```
+2.  Set up a Python virtual environment and activate it (first time setup):
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+3.  Install the required Python packages (first time setup, downloads AI model):
+    ```bash
+    pip install -r requirements.txt
+    ```
+4.  Run the AI server:
+    ```bash
+    python3 server.py
+    ```
+
+*Note: The AI model download (`pip install`) can take some time and consume a significant amount of data and disk space.*
+
+
+

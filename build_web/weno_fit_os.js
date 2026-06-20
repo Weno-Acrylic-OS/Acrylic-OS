@@ -71,7 +71,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp9xdha2j4.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp87sxr4zv.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -206,21 +206,21 @@ Module['FS_createPath']("/assets", "icons", true, true);
 
   })();
 
-// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp9xdha2j4.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp8m8fd3ps.js
+// end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp87sxr4zv.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpeyxf2im2.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmp8m8fd3ps.js
-// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpoh5my_qe.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpeyxf2im2.js
+// include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmphzwve3b4.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmpoh5my_qe.js
+  // end include: /var/folders/hm/d0k5jgzj3tl8vcjlt82s54p80000gn/T/tmphzwve3b4.js
 
 
 var arguments_ = [];

@@ -4,3 +4,4 @@
 # Build Artifacts from QEMU tests.
 build_arm/*.img
 x86_os/final/*
+.aider*

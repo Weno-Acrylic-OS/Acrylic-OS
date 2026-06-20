@@ -4,6 +4,9 @@ import Desktop from './components/Desktop';
 import Phone from './components/phone/Phone';
 import SmartHome from './components/smarthome/SmartHome';
 import Car from './components/Car';
+import IQ_WindshieldStrip from './components/iq/IQ_WindshieldStrip';
+import IQ_AR_Overlay from './components/iq/IQ_AR_Overlay';
+import IQ_ConsoleTablet from './components/iq/IQ_ConsoleTablet';
 import LockScreen from './components/lockscreen/LockScreen';
 import OOBE from './components/oobe/OOBE';
 
@@ -13,47 +16,44 @@ import { WidgetLayoutProvider } from './hooks/WidgetLayoutContext';
 
 function App() {
   const [personality, setPersonality] = useState('desktop');
+  const [display, setDisplay] = useState(null); // For IQ multi-display
   const [isLocked, setIsLocked] = useState(true);
-  const [showPinScreen, setShowPinScreen] = useState(false); // Control the PIN overlay
+  const [showPinScreen, setShowPinScreen] = useState(false);
   const [pin, setPin] = useState(localStorage.getItem('acrylic-os-pin') || '0000');
   const [appUITree, setAppUITree] = useState(null);
   const [showOOBE, setShowOOBE] = useState(!localStorage.getItem('oobe_completed'));
+  const [selectedWallpaper, setSelectedWallpaper] = useState('url("/dashboard/wallpaper.png")');
+  const [selectedAccentColor, setSelectedAccentColor] = useState('#007aff');
 
-  const [selectedWallpaper, setSelectedWallpaper] = useState('url("/dashboard/wallpaper.png")'); // Default wallpaper
-  const [selectedAccentColor, setSelectedAccentColor] = useState('#007aff'); // Default primary accent color
-
-  const handleWallpaperChange = (newWallpaper) => {
-      setSelectedWallpaper(newWallpaper);
-  };
-
-  const handleAccentColorChange = (newColor) => {
-      setSelectedAccentColor(newColor);
-  };
+  const handleWallpaperChange = (newWallpaper) => { setSelectedWallpaper(newWallpaper); };
+  const handleAccentColorChange = (newColor) => { setSelectedAccentColor(newColor); };
 
   useEffect(() => {
-    // Apply wallpaper and accent color to the root of the document
     document.documentElement.style.setProperty('--background-primary', selectedWallpaper);
     document.documentElement.style.setProperty('--primary-accent', selectedAccentColor);
   }, [selectedWallpaper, selectedAccentColor]);
 
   const handleLock = useCallback(() => {
       setIsLocked(true);
-      if (personality !== 'phone') {
-        setShowPinScreen(true);
-      }
+      if (personality !== 'phone') { setShowPinScreen(true); }
   }, [personality]);
 
   useEffect(() => {
-    // Check for personality from URL parameter on initial load
     const urlParams = new URLSearchParams(window.location.search);
     const personalityFromUrl = urlParams.get('personality');
     if (personalityFromUrl) {
         setPersonality(personalityFromUrl);
+        // If the personality is 'iq', also determine which display it is
+        if (personalityFromUrl === 'iq') {
+            const displayFromUrl = urlParams.get('display');
+            if (displayFromUrl) {
+                setDisplay(displayFromUrl);
+            }
+        }
     }
 
     const handleMessage = (event) => {
       if (!event.data) return;
-      // Allow personality to be changed dynamically later if needed
       if (event.data.personality) { setPersonality(event.data.personality); }
       if (event.data.lock) { handleLock(); }
       if (event.data.type === 'render-app') { setAppUITree(event.data.ui); }
@@ -73,7 +73,6 @@ function App() {
   };
   
   const handlePinScreenRequest = () => {
-      console.log("App.js: Received request to show PIN screen. Setting state.");
       setShowPinScreen(true);
   };
 
@@ -97,6 +96,13 @@ function App() {
         return <SmartHome onLock={handleLock} onPinChange={handlePinChange} pin={pin} appUITree={appUITree} onWallpaperChange={handleWallpaperChange} onAccentColorChange={handleAccentColorChange} />;
       case 'car':
         return <Car />;
+      case 'iq':
+        switch(display) {
+            case 'strip': return <IQ_WindshieldStrip />;
+            case 'ar': return <IQ_AR_Overlay />;
+            case 'console': return <IQ_ConsoleTablet />;
+            default: return <div>IQ Display not specified</div>;
+        }
       default:
         return <div>Unknown Personality</div>;
     }
@@ -107,8 +113,8 @@ function App() {
       return <OOBE onComplete={handleOOBEComplete} onPinChange={handlePinChange} />;
     }
     
-    // For non-phone personalities, if locked, show the PIN screen and nothing else.
-    if (personality !== 'phone' && isLocked) {
+    // For desktop/smarthome, if locked, show the PIN screen and nothing else.
+    if ((personality === 'desktop' || personality === 'smarthome') && isLocked) {
       return <LockScreen onUnlock={handleUnlock} />;
     }
 

@@ -1,0 +1,6 @@
+flask
+sentence-transformers
+torch
+torchvision
+torchaudio
+flask-cors

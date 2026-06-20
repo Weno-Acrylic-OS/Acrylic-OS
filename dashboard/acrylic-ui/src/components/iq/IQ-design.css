@@ -1,0 +1,21 @@
+/* /src/components/iq/IQ-design.css */
+/* Design Tokens specific to the IQ Infotainment System */
+
+:root {
+  /* IQ Palette */
+  --iq-primary-accent: #E60023; /* A vibrant, automotive red */
+  --iq-background: #101010;
+  --iq-surface-1: #181818;
+  --iq-surface-2: #222222;
+  --iq-text-primary: #FFFFFF;
+  --iq-text-secondary: #A0A0A0;
+
+  /* IQ Typography */
+  --iq-font-family: 'Roboto', -apple-system, sans-serif;
+  --iq-font-size-lg: 24px;
+  --iq-font-size-md: 16px;
+  --iq-font-size-sm: 14px;
+  
+  /* IQ Sizing */
+  --iq-border-radius: 12px;
+}
